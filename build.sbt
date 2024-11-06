@@ -31,10 +31,9 @@ lazy val microservice = (project in file("."))
       "controllers.routes._",
       "viewmodels.govuk.all._"
     ),
-    PlayKeys.playDefaultPort := 9000,
-    ScoverageKeys.coverageExcludedFiles := "<empty>;Reverse.*;.*handlers.*;.*components.*;" +
-      ".*Routes.*;.*viewmodels.govuk.*;",
-    ScoverageKeys.coverageMinimumStmtTotal := 78,
+    PlayKeys.playDefaultPort := 16005,
+    ScoverageKeys.coverageExcludedFiles := scoverageExcludedList.mkString(";"),
+    ScoverageKeys.coverageMinimumStmtTotal := 80,
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true,
     scalacOptions ++= Seq(
@@ -58,3 +57,22 @@ lazy val it =
   (project in file("it"))
     .enablePlugins(PlayScala)
     .dependsOn(microservice % "test->test")
+
+lazy val scoverageExcludedList:Seq[String] = Seq(
+  "<empty>",
+  "Reverse.*",
+  ".*handlers.*",
+  ".*components.*",
+  ".*pages.*",
+  ".*Routes.*",
+  ".*viewmodels.govuk.*",
+  ".*views.*",
+  "testOnly.*",
+  ".*testOnly.*",
+  ".*TestOnlyCacheConnector.*",
+  ".*TestOnlyController.*",
+  "testOnlyDoNotUseInAppConf.*"
+
+)
+
+addCommandAlias("runAllChecks", ";clean;compile;scalafmtAll;coverage;test;it/test;scalastyle;coverageReport")
