@@ -45,7 +45,8 @@ lazy val microservice = (project in file("."))
     retrieveManaged := true,
     resolvers ++= Seq(Resolver.jcenterRepo),
     pipelineStages := Seq(digest),
-    Assets / pipelineStages := Seq(concat)
+    Assets / pipelineStages := Seq(concat),
+    scalafmtOnCompile := true
   )
 
 lazy val testSettings: Seq[Def.Setting[_]] = Seq(
