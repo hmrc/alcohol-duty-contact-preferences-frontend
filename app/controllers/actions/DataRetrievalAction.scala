@@ -29,8 +29,9 @@ class DataRetrievalActionImpl @Inject() (
     extends DataRetrievalAction {
 
   override protected def transform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] =
+    // TODO - need to create an appropriate cache key
     sessionRepository.get(request.userId).map {
-      OptionalDataRequest(request.request, request.userId, _)
+      OptionalDataRequest(request.request, request.appaId, request.groupId, request.userId, _)
     }
 }
 
