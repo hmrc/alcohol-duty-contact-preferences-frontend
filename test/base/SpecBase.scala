@@ -41,7 +41,8 @@ trait SpecBase
   val groupId: String       = "groupid"
   val internalId: String    = "id"
 
-  def emptyUserAnswers: UserAnswers = UserAnswers(userAnswersId)
+  def emptyUserAnswers: UserAnswers                        = UserAnswers(userAnswersId)
+  val fakeIdentifierUserDetails: FakeIdentifierUserDetails = FakeIdentifierUserDetails(appaId, groupId, internalId)
 
   def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
@@ -50,6 +51,7 @@ trait SpecBase
       .overrides(
         bind[DataRequiredAction].to[DataRequiredActionImpl],
         bind[IdentifierAction].to[FakeIdentifierAction],
+        bind[FakeIdentifierUserDetails].toInstance(fakeIdentifierUserDetails),
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers))
       )
 }

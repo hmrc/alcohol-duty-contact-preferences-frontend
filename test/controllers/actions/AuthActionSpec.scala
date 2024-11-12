@@ -25,7 +25,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
-import uk.gov.hmrc.auth.core.retrieve.Retrieval
+import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -206,7 +206,46 @@ class AuthActionSpec extends SpecBase {
         }
       }
     }
+
+    "the user does not have an APPAID" - {
+
+      "must redirect the user to the unauthorised page" in {
+
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+
+          val authAction = new AuthenticatedIdentifierAction(
+            new FakeAuthConnector(),
+            appConfig,
+            bodyParsers
+          )
+          val controller = new Harness(authAction)
+          val result     = controller.onPageLoad()(FakeRequest())
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad().url)
+        }
+      }
+    }
   }
+}
+
+class FakeAuthConnector @Inject() extends AuthConnector {
+  val groupId: String        = "groupid"
+  val internalId: String     = "id"
+  val appaId: String         = "SOMEAPPAID"
+  val appaIdKey: String      = "APPAID"
+  val state: String          = "Activated"
+  val enrolment: String      = "HMRC-AD-ORG"
+  val enrolments: Enrolments = Enrolments(Set(Enrolment(enrolment, Seq.empty, state)))
+  override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[A]               =
+    Future.successful(new ~(new ~(Some(internalId), Some(groupId)), enrolments)).asInstanceOf[Future[A]]
 }
 
 class FakeFailingAuthConnector @Inject() (exceptionToReturn: Throwable) extends AuthConnector {

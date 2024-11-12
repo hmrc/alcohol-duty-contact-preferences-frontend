@@ -61,8 +61,8 @@ class AuthenticatedIdentifierAction @Inject() (
 
     authorised(predicate).retrieve(internalId and groupIdentifier and allEnrolments) {
       case optInternalId ~ optGroupId ~ enrolments =>
-        val internalId: String = getOrElseFailWithUnauthorised(optInternalId, "Unable to retrieve internalId")
-        val groupId: String    = getOrElseFailWithUnauthorised(optGroupId, "Unable to retrieve groupIdentifier")
+        val internalId: String = getOrElseFailIllegalState(optInternalId, "Unable to retrieve internalId")
+        val groupId: String    = getOrElseFailIllegalState(optGroupId, "Unable to retrieve groupIdentifier")
         val appaId             = getAppaId(enrolments)
         block(IdentifierRequest(request, appaId, groupId, internalId))
     } recover {
@@ -86,18 +86,25 @@ class AuthenticatedIdentifierAction @Inject() (
   }
 
   private def getAppaId(enrolments: Enrolments): String = {
-    val adrEnrolments: Enrolment  = getOrElseFailWithUnauthorised(
+    val adrEnrolments: Enrolment  = getOrElseFailIllegalState(
       enrolments.enrolments.find(_.key == config.enrolmentServiceName),
       s"Unable to retrieve enrolment: ${config.enrolmentServiceName}"
     )
     val appaIdOpt: Option[String] =
       adrEnrolments.getIdentifier(config.enrolmentIdentifierKey).map(_.value)
-    getOrElseFailWithUnauthorised(appaIdOpt, "Unable to retrieve APPAID from enrolments")
+    getOrElseFailUnauthorized(appaIdOpt, "Unable to retrieve APPAID from enrolments")
   }
 
-  def getOrElseFailWithUnauthorised[T](o: Option[T], failureMessage: String): T =
+  def getOrElseFailIllegalState[T](o: Option[T], failureMessage: String): T =
     o.getOrElse {
       logger.warn(s"Identifier Action failed with error: $failureMessage")
       throw new IllegalStateException(failureMessage)
+    }
+
+  // TODO - APPAID missing is illegal state or unauthorised? Gut feel is that this should be unauthorised in preferences
+  def getOrElseFailUnauthorized[T](o: Option[T], failureMessage: String): T =
+    o.getOrElse {
+      logger.warn(s"Identifier Action failed with error: $failureMessage")
+      throw new UnauthorizedException(failureMessage)
     }
 }
