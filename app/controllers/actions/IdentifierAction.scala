@@ -92,19 +92,30 @@ class AuthenticatedIdentifierAction @Inject() (
     )
     val appaIdOpt: Option[String] =
       adrEnrolments.getIdentifier(config.enrolmentIdentifierKey).map(_.value)
-    getOrElseFailUnauthorized(appaIdOpt, "Unable to retrieve APPAID from enrolments")
+    getOrElseFailUnauthorized(appaIdOpt)
   }
 
-  def getOrElseFailIllegalState[T](o: Option[T], failureMessage: String): T =
+  private def getOrElseFailIllegalState[T](o: Option[T], failureMessage: String): T =
     o.getOrElse {
       logger.warn(s"Identifier Action failed with error: $failureMessage")
       throw new IllegalStateException(failureMessage)
     }
 
   // TODO - APPAID missing is illegal state or unauthorised? Gut feel is that this should be unauthorised in preferences
-  def getOrElseFailUnauthorized[T](o: Option[T], failureMessage: String): T =
-    o.getOrElse {
-      logger.warn(s"Identifier Action failed with error: $failureMessage")
-      throw new UnauthorizedException(failureMessage)
+  private def getOrElseFailUnauthorized[T](maybeAppId: Option[T]): T = {
+    val msg: String = s"Unable to retrieve enrolment: ${config.enrolmentServiceName}"
+
+    maybeAppId match {
+      case Some(appaId) =>
+        if (appaId.toString.isBlank) {
+          logger.warn(s"Identifier Action failed with error: $msg")
+          throw new UnauthorizedException(msg)
+        } else {
+          appaId
+        }
+      case None         =>
+        logger.warn(s"Identifier Action failed with error: $msg")
+        throw new UnauthorizedException(msg)
     }
+  }
 }

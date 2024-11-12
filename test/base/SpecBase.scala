@@ -37,6 +37,9 @@ trait SpecBase
     with IntegrationPatience {
 
   val userAnswersId: String = "id"
+  val appaIdKey: String     = "APPAID"
+  val state: String         = "Activated"
+  val enrolment: String     = "HMRC-AD-ORG"
   val appaId: String        = "appaid" // TODO appaIdGen.sample.get
   val groupId: String       = "groupid"
   val internalId: String    = "id"

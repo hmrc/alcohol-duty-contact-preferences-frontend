@@ -31,7 +31,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthActionSpec extends SpecBase {
+class IdentifierActionSpec extends SpecBase {
 
   class Harness(authAction: IdentifierAction) {
     def onPageLoad(): Action[AnyContent] = authAction(_ => Results.Ok)
@@ -218,7 +218,31 @@ class AuthActionSpec extends SpecBase {
           val appConfig   = application.injector.instanceOf[FrontendAppConfig]
 
           val authAction = new AuthenticatedIdentifierAction(
-            new FakeAuthConnector(),
+            new FakeAuthConnector(Seq.empty),
+            appConfig,
+            bodyParsers
+          )
+          val controller = new Harness(authAction)
+          val result     = controller.onPageLoad()(FakeRequest())
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad().url)
+        }
+      }
+    }
+
+    "the users APPAID is blank" - {
+
+      "must redirect the user to the unauthorised page" in {
+
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+
+          val authAction = new AuthenticatedIdentifierAction(
+            new FakeAuthConnector(Seq(EnrolmentIdentifier(appaIdKey, ""))),
             appConfig,
             bodyParsers
           )
@@ -233,18 +257,18 @@ class AuthActionSpec extends SpecBase {
   }
 }
 
-class FakeAuthConnector @Inject() extends AuthConnector {
+class FakeAuthConnector @Inject() (identifiers: Seq[EnrolmentIdentifier]) extends AuthConnector {
   val groupId: String        = "groupid"
   val internalId: String     = "id"
   val appaId: String         = "SOMEAPPAID"
-  val appaIdKey: String      = "APPAID"
   val state: String          = "Activated"
   val enrolment: String      = "HMRC-AD-ORG"
-  val enrolments: Enrolments = Enrolments(Set(Enrolment(enrolment, Seq.empty, state)))
+  val enrolments: Enrolments = Enrolments(Set(Enrolment(enrolment, identifiers, state)))
+
   override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(implicit
     hc: HeaderCarrier,
     ec: ExecutionContext
-  ): Future[A]               =
+  ): Future[A] =
     Future.successful(new ~(new ~(Some(internalId), Some(groupId)), enrolments)).asInstanceOf[Future[A]]
 }
 
