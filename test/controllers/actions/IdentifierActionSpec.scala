@@ -218,7 +218,7 @@ class IdentifierActionSpec extends SpecBase {
           val appConfig   = application.injector.instanceOf[FrontendAppConfig]
 
           val authAction = new AuthenticatedIdentifierAction(
-            new FakeAuthConnector(Seq.empty),
+            new FakeAuthConnector(Seq.empty, Some(internalId), Some(groupId)),
             appConfig,
             bodyParsers
           )
@@ -242,7 +242,7 @@ class IdentifierActionSpec extends SpecBase {
           val appConfig   = application.injector.instanceOf[FrontendAppConfig]
 
           val authAction = new AuthenticatedIdentifierAction(
-            new FakeAuthConnector(Seq(EnrolmentIdentifier(appaIdKey, ""))),
+            new FakeAuthConnector(Seq(EnrolmentIdentifier(appaIdKey, "")), Some(internalId), Some(groupId)),
             appConfig,
             bodyParsers
           )
@@ -254,12 +254,64 @@ class IdentifierActionSpec extends SpecBase {
         }
       }
     }
+
+    "the users internal id can't be found" - {
+
+      "must raise" in {
+
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+
+          val authAction = new AuthenticatedIdentifierAction(
+            new FakeAuthConnector(Seq(EnrolmentIdentifier(appaIdKey, appaId)), None, Some(groupId)),
+            appConfig,
+            bodyParsers
+          )
+
+          val controller = new Harness(authAction)
+          intercept[IllegalStateException] {
+            await(controller.onPageLoad()(FakeRequest()))
+          }
+
+        }
+      }
+    }
+
+    "the users group id can't be found" - {
+
+      "must raise" in {
+
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+
+          val authAction = new AuthenticatedIdentifierAction(
+            new FakeAuthConnector(Seq(EnrolmentIdentifier(appaIdKey, appaId)), Some(internalId), None),
+            appConfig,
+            bodyParsers
+          )
+
+          val controller = new Harness(authAction)
+          intercept[IllegalStateException] {
+            await(controller.onPageLoad()(FakeRequest()))
+          }
+
+        }
+      }
+    }
   }
 }
 
-class FakeAuthConnector @Inject() (identifiers: Seq[EnrolmentIdentifier]) extends AuthConnector {
-  val groupId: String        = "groupid"
-  val internalId: String     = "id"
+class FakeAuthConnector @Inject() (
+  identifiers: Seq[EnrolmentIdentifier],
+  internalId: Option[String],
+  groupId: Option[String]
+) extends AuthConnector {
   val appaId: String         = "SOMEAPPAID"
   val state: String          = "Activated"
   val enrolment: String      = "HMRC-AD-ORG"
@@ -269,7 +321,7 @@ class FakeAuthConnector @Inject() (identifiers: Seq[EnrolmentIdentifier]) extend
     hc: HeaderCarrier,
     ec: ExecutionContext
   ): Future[A] =
-    Future.successful(new ~(new ~(Some(internalId), Some(groupId)), enrolments)).asInstanceOf[Future[A]]
+    Future.successful(new ~(new ~(internalId, groupId), enrolments)).asInstanceOf[Future[A]]
 }
 
 class FakeFailingAuthConnector @Inject() (exceptionToReturn: Throwable) extends AuthConnector {

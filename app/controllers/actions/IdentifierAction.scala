@@ -71,17 +71,17 @@ class AuthenticatedIdentifierAction @Inject() (
         handleAuthException(e)
       case e: UnauthorizedException  =>
         logger.debug(s"Got UnauthorizedException:", e)
-        Redirect(routes.UnauthorisedController.onPageLoad)
+        Redirect(routes.UnauthorisedController.onPageLoad())
     }
   }
 
   private def handleAuthException: PartialFunction[Throwable, Result] = {
-    case _: InsufficientEnrolments      => Redirect(routes.UnauthorisedController.onPageLoad)
-    case _: InsufficientConfidenceLevel => Redirect(routes.UnauthorisedController.onPageLoad)
-    case _: UnsupportedAuthProvider     => Redirect(routes.UnauthorisedController.onPageLoad)
-    case _: UnsupportedAffinityGroup    => Redirect(routes.UnauthorisedController.onPageLoad)
-    case _: UnsupportedCredentialRole   => Redirect(routes.UnauthorisedController.onPageLoad)
-    case _: IncorrectCredentialStrength => Redirect(routes.UnauthorisedController.onPageLoad)
+    case _: InsufficientEnrolments      => Redirect(routes.UnauthorisedController.onPageLoad())
+    case _: InsufficientConfidenceLevel => Redirect(routes.UnauthorisedController.onPageLoad())
+    case _: UnsupportedAuthProvider     => Redirect(routes.UnauthorisedController.onPageLoad())
+    case _: UnsupportedAffinityGroup    => Redirect(routes.UnauthorisedController.onPageLoad())
+    case _: UnsupportedCredentialRole   => Redirect(routes.UnauthorisedController.onPageLoad())
+    case _: IncorrectCredentialStrength => Redirect(routes.UnauthorisedController.onPageLoad())
     case _                              => Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl)))
   }
 
@@ -101,7 +101,6 @@ class AuthenticatedIdentifierAction @Inject() (
       throw new IllegalStateException(failureMessage)
     }
 
-  // TODO - APPAID missing is illegal state or unauthorised? Gut feel is that this should be unauthorised in preferences
   private def getOrElseFailUnauthorized[T](maybeAppId: Option[T]): T = {
     val msg: String = s"Unable to retrieve enrolment: ${config.enrolmentServiceName}"
 
