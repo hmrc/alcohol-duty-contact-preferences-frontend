@@ -6,7 +6,7 @@ import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 lazy val appName: String = "alcohol-duty-contact-preferences-frontend"
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "2.13.12"
+ThisBuild / scalaVersion := "2.13.14"
 
 lazy val microservice = (project in file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
@@ -57,6 +57,11 @@ lazy val it =
   (project in file("it"))
     .enablePlugins(PlayScala)
     .dependsOn(microservice % "test->test")
+    .settings(
+      Test / parallelExecution := false,
+      Test / fork := true,
+      Test / scalafmtOnCompile := true
+    )
 
 lazy val scoverageExcludedList:Seq[String] = Seq(
   "<empty>",
@@ -75,4 +80,4 @@ lazy val scoverageExcludedList:Seq[String] = Seq(
 
 )
 
-addCommandAlias("runAllChecks", ";clean;compile;scalafmtAll;coverage;test;it/test;scalastyle;coverageReport")
+addCommandAlias("runAllChecks", ";clean;test:compile;scalafmtAll;coverage;test;it/test;scalastyle;coverageReport")

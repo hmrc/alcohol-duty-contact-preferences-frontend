@@ -20,10 +20,16 @@ import com.google.inject.Inject
 import config.FrontendAppConfig
 import controllers.routes
 import models.requests.IdentifierRequest
+import play.api.Logging
 import play.api.mvc.Results._
 import play.api.mvc._
+import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
+import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
+import uk.gov.hmrc.auth.core.CredentialStrength.strong
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
+import uk.gov.hmrc.auth.core.authorise.Predicate
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.{allEnrolments, groupIdentifier, internalId}
+import uk.gov.hmrc.auth.core.retrieve.~
 import uk.gov.hmrc.http.{HeaderCarrier, UnauthorizedException}
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
@@ -39,39 +45,76 @@ class AuthenticatedIdentifierAction @Inject() (
   val parser: BodyParsers.Default
 )(implicit val executionContext: ExecutionContext)
     extends IdentifierAction
-    with AuthorisedFunctions {
+    with AuthorisedFunctions
+    with Logging {
+
+  private def predicate: Predicate =
+    AuthProviders(GovernmentGateway) and
+      Enrolment(config.enrolmentServiceName) and
+      CredentialStrength(strong) and
+      Organisation and
+      ConfidenceLevel.L50
 
   override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    authorised().retrieve(Retrievals.internalId) {
-      _.map { internalId =>
-        block(IdentifierRequest(request, internalId))
-      }.getOrElse(throw new UnauthorizedException("Unable to retrieve internal Id"))
+    authorised(predicate).retrieve(internalId and groupIdentifier and allEnrolments) {
+      case optInternalId ~ optGroupId ~ enrolments =>
+        val internalId: String = getOrElseFailIllegalState(optInternalId, "Unable to retrieve internalId")
+        val groupId: String    = getOrElseFailIllegalState(optGroupId, "Unable to retrieve groupIdentifier")
+        val appaId             = getAppaId(enrolments)
+        block(IdentifierRequest(request, appaId, groupId, internalId))
     } recover {
-      case _: NoActiveSession        =>
-        Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl)))
-      case _: AuthorisationException =>
+      case e: AuthorisationException =>
+        logger.debug(s"Got AuthorisationException:", e)
+        handleAuthException(e)
+      case e: UnauthorizedException  =>
+        logger.debug(s"Got UnauthorizedException:", e)
         Redirect(routes.UnauthorisedController.onPageLoad())
     }
   }
-}
 
-class SessionIdentifierAction @Inject() (
-  val parser: BodyParsers.Default
-)(implicit val executionContext: ExecutionContext)
-    extends IdentifierAction {
+  private def handleAuthException: PartialFunction[Throwable, Result] = {
+    case _: InsufficientEnrolments      => Redirect(routes.UnauthorisedController.onPageLoad())
+    case _: InsufficientConfidenceLevel => Redirect(routes.UnauthorisedController.onPageLoad())
+    case _: UnsupportedAuthProvider     => Redirect(routes.UnauthorisedController.onPageLoad())
+    case _: UnsupportedAffinityGroup    => Redirect(routes.UnauthorisedController.onPageLoad())
+    case _: UnsupportedCredentialRole   => Redirect(routes.UnauthorisedController.onPageLoad())
+    case _: IncorrectCredentialStrength => Redirect(routes.UnauthorisedController.onPageLoad())
+    case _                              => Redirect(config.loginUrl, Map("continue" -> Seq(config.loginContinueUrl)))
+  }
 
-  override def invokeBlock[A](request: Request[A], block: IdentifierRequest[A] => Future[Result]): Future[Result] = {
+  private def getAppaId(enrolments: Enrolments): String = {
+    val adrEnrolments: Enrolment  = getOrElseFailIllegalState(
+      enrolments.enrolments.find(_.key == config.enrolmentServiceName),
+      s"Unable to retrieve enrolment: ${config.enrolmentServiceName}"
+    )
+    val appaIdOpt: Option[String] =
+      adrEnrolments.getIdentifier(config.enrolmentIdentifierKey).map(_.value)
+    getOrElseFailUnauthorized(appaIdOpt)
+  }
 
-    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+  private def getOrElseFailIllegalState[T](o: Option[T], failureMessage: String): T =
+    o.getOrElse {
+      logger.warn(s"Identifier Action failed with error: $failureMessage")
+      throw new IllegalStateException(failureMessage)
+    }
 
-    hc.sessionId match {
-      case Some(session) =>
-        block(IdentifierRequest(request, session.value))
-      case None          =>
-        Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+  private def getOrElseFailUnauthorized[T](maybeAppId: Option[T]): T = {
+    val msg: String = s"Unable to retrieve enrolment: ${config.enrolmentServiceName}"
+
+    maybeAppId match {
+      case Some(appaId) =>
+        if (appaId.toString.isBlank) {
+          logger.warn(s"Identifier Action failed with error: $msg")
+          throw new UnauthorizedException(msg)
+        } else {
+          appaId
+        }
+      case None         =>
+        logger.warn(s"Identifier Action failed with error: $msg")
+        throw new UnauthorizedException(msg)
     }
   }
 }

@@ -25,13 +25,13 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
-import uk.gov.hmrc.auth.core.retrieve.Retrieval
+import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthActionSpec extends SpecBase {
+class IdentifierActionSpec extends SpecBase {
 
   class Harness(authAction: IdentifierAction) {
     def onPageLoad(): Action[AnyContent] = authAction(_ => Results.Ok)
@@ -206,7 +206,122 @@ class AuthActionSpec extends SpecBase {
         }
       }
     }
+
+    "the user does not have an APPAID" - {
+
+      "must redirect the user to the unauthorised page" in {
+
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+
+          val authAction = new AuthenticatedIdentifierAction(
+            new FakeAuthConnector(Seq.empty, Some(internalId), Some(groupId)),
+            appConfig,
+            bodyParsers
+          )
+          val controller = new Harness(authAction)
+          val result     = controller.onPageLoad()(FakeRequest())
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad().url)
+        }
+      }
+    }
+
+    "the users APPAID is blank" - {
+
+      "must redirect the user to the unauthorised page" in {
+
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+
+          val authAction = new AuthenticatedIdentifierAction(
+            new FakeAuthConnector(Seq(EnrolmentIdentifier(appaIdKey, "")), Some(internalId), Some(groupId)),
+            appConfig,
+            bodyParsers
+          )
+          val controller = new Harness(authAction)
+          val result     = controller.onPageLoad()(FakeRequest())
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad().url)
+        }
+      }
+    }
+
+    "the users internal id can't be found" - {
+
+      "must raise" in {
+
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+
+          val authAction = new AuthenticatedIdentifierAction(
+            new FakeAuthConnector(Seq(EnrolmentIdentifier(appaIdKey, appaId)), None, Some(groupId)),
+            appConfig,
+            bodyParsers
+          )
+
+          val controller = new Harness(authAction)
+          intercept[IllegalStateException] {
+            await(controller.onPageLoad()(FakeRequest()))
+          }
+
+        }
+      }
+    }
+
+    "the users group id can't be found" - {
+
+      "must raise" in {
+
+        val application = applicationBuilder(userAnswers = None).build()
+
+        running(application) {
+          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
+          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
+
+          val authAction = new AuthenticatedIdentifierAction(
+            new FakeAuthConnector(Seq(EnrolmentIdentifier(appaIdKey, appaId)), Some(internalId), None),
+            appConfig,
+            bodyParsers
+          )
+
+          val controller = new Harness(authAction)
+          intercept[IllegalStateException] {
+            await(controller.onPageLoad()(FakeRequest()))
+          }
+
+        }
+      }
+    }
   }
+}
+
+class FakeAuthConnector @Inject() (
+  identifiers: Seq[EnrolmentIdentifier],
+  internalId: Option[String],
+  groupId: Option[String]
+) extends AuthConnector {
+  val appaId: String         = "SOMEAPPAID"
+  val state: String          = "Activated"
+  val enrolment: String      = "HMRC-AD-ORG"
+  val enrolments: Enrolments = Enrolments(Set(Enrolment(enrolment, identifiers, state)))
+
+  override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[A] =
+    Future.successful(new ~(new ~(internalId, groupId), enrolments)).asInstanceOf[Future[A]]
 }
 
 class FakeFailingAuthConnector @Inject() (exceptionToReturn: Throwable) extends AuthConnector {
