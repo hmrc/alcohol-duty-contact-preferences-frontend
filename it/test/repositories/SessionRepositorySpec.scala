@@ -37,7 +37,7 @@ import java.util.concurrent.Executors
 import scala.concurrent.{ExecutionContext, Future}
 
 class SessionRepositorySpec
-  extends AnyFreeSpec
+    extends AnyFreeSpec
     with Matchers
     with DefaultPlayMongoRepositorySupport[UserAnswers]
     with ScalaFutures
@@ -45,7 +45,7 @@ class SessionRepositorySpec
     with OptionValues
     with MockitoSugar {
 
-  private val instant = Instant.now.truncatedTo(ChronoUnit.MILLIS)
+  private val instant          = Instant.now.truncatedTo(ChronoUnit.MILLIS)
   private val stubClock: Clock = Clock.fixed(instant, ZoneId.systemDefault)
 
   private val userAnswers = UserAnswers("id", Json.obj("foo" -> "bar"), Instant.ofEpochSecond(1))
@@ -55,8 +55,8 @@ class SessionRepositorySpec
 
   protected override val repository: SessionRepository = new SessionRepository(
     mongoComponent = mongoComponent,
-    appConfig      = mockAppConfig,
-    clock          = stubClock
+    appConfig = mockAppConfig,
+    clock = stubClock
   )(scala.concurrent.ExecutionContext.Implicits.global)
 
   ".set" - {
@@ -68,6 +68,7 @@ class SessionRepositorySpec
       val setResult     = repository.set(userAnswers).futureValue
       val updatedRecord = find(Filters.equal("_id", userAnswers.id)).futureValue.headOption.value
 
+      setResult mustEqual true
       updatedRecord mustEqual expectedResult
     }
 
@@ -108,6 +109,7 @@ class SessionRepositorySpec
 
       val result = repository.clear(userAnswers.id).futureValue
 
+      result mustEqual true
       repository.get(userAnswers.id).futureValue must not be defined
     }
 
@@ -133,6 +135,8 @@ class SessionRepositorySpec
         val expectedUpdatedAnswers = userAnswers copy (lastUpdated = instant)
 
         val updatedAnswers = find(Filters.equal("_id", userAnswers.id)).futureValue.headOption.value
+
+        result mustEqual true
         updatedAnswers mustEqual expectedUpdatedAnswers
       }
     }
