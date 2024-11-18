@@ -20,15 +20,19 @@ import com.google.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 @Singleton
-class FrontendAppConfig @Inject() (configuration: Configuration) {
+class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig: ServicesConfig) {
 
   val host: String    = configuration.get[String]("host")
   val appName: String = configuration.get[String]("appName")
+  val idType: String  = configuration.get[String]("downstream-apis.idType")
+  val regime: String  = configuration.get[String]("downstream-apis.regime")
 
-  private val contactHost                  = configuration.get[String]("contact-frontend.host")
-  private val contactFormServiceIdentifier = "alcohol-duty-contact-preferences-frontend"
+  private val contactHost                         = configuration.get[String]("contact-frontend.host")
+  private val contactFormServiceIdentifier        = "alcohol-duty-contact-preferences-frontend"
+  private lazy val contactPreferencesHost: String = servicesConfig.baseUrl("alcohol-duty-contact-preferences")
 
   def feedbackUrl(implicit request: RequestHeader): String =
     s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=${host + request.uri}"
@@ -48,11 +52,15 @@ class FrontendAppConfig @Inject() (configuration: Configuration) {
     "cy" -> Lang("cy")
   )
 
-  val timeout: Int   = configuration.get[Int]("timeout-dialog.timeout")
-  val countdown: Int = configuration.get[Int]("timeout-dialog.countdown")
+  val timeout: Int                   = configuration.get[Int]("timeout-dialog.timeout")
+  val countdown: Int                 = configuration.get[Int]("timeout-dialog.countdown")
+  val cacheTtl: Long                 = configuration.get[Int]("mongodb.timeToLiveInSeconds")
+  val enrolmentServiceName: String   = configuration.get[String]("enrolment.serviceName")
+  val enrolmentIdentifierKey: String = configuration.get[String]("enrolment.identifierKey")
 
-  val cacheTtl: Long = configuration.get[Int]("mongodb.timeToLiveInSeconds")
+  def adrGetContactPreferencesUrl(appaId: String): String =
+    s"$contactPreferencesHost/alcohol-duty-contact-preferences/contactPreferences/$idType/$appaId/$regime"
 
-  val enrolmentServiceName   = configuration.get[String]("enrolment.serviceName")
-  val enrolmentIdentifierKey = configuration.get[String]("enrolment.identifierKey")
+  def adrSetContactPreferencesUrl(appaId: String): String =
+    s"$contactPreferencesHost/alcohol-duty-contact-preferences/update/contactPreferences/$idType/$appaId/$regime"
 }
