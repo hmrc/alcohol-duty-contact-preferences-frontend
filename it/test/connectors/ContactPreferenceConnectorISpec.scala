@@ -196,7 +196,7 @@ class ContactPreferenceConnectorISpec extends ISpecBase with WireMockHelper {
 
   class SetUp {
     val connector: ContactPreferencesConnector = app.injector.instanceOf[ContactPreferencesConnector]
-    val getUrl                                 = s"/alcohol-duty-contact-preferences/contactPreference/$appaId"
-    val updateUrl                              = s"/alcohol-duty-contact-preferences/update/contactPreference/$appaId"
+    val getUrl                                 = s"/alcohol-duty-contact-preferences/contact-preference/$appaId"
+    val updateUrl                              = s"/alcohol-duty-contact-preferences/update/contact-preference/$appaId"
   }
 }

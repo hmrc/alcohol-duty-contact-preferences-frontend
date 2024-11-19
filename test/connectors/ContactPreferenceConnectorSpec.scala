@@ -32,7 +32,7 @@ import scala.concurrent.Future
 
 class ContactPreferenceConnectorSpec extends SpecBase with ScalaFutures {
   "getContactPreference" - {
-    val mockUrl = s"http://alcohol-duty-contact-preferences/contactPreference/$appaId"
+    val mockUrl = s"http://alcohol-duty-contact-preferences/contact-preference/$appaId"
 
     "successfully retrieve contact preferences" in new SetUp {
       val jsonResponse: String       = Json.toJson(contactPreferenceResponse).toString()
@@ -122,7 +122,7 @@ class ContactPreferenceConnectorSpec extends SpecBase with ScalaFutures {
   }
 
   "setContactPreference" - {
-    val mockUrl = s"http://alcohol-duty-contact-preferences/update/contactPreference/$appaId"
+    val mockUrl = s"http://alcohol-duty-contact-preferences/update/contact-preference/$appaId"
 
     "successfully submit a return" in new SetUp {
       val jsonResponse: String       = Json.toJson(contactPreferenceResponse).toString()
