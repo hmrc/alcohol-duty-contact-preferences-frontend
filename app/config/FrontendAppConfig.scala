@@ -56,9 +56,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   val enrolmentServiceName: String   = configuration.get[String]("enrolment.serviceName")
   val enrolmentIdentifierKey: String = configuration.get[String]("enrolment.identifierKey")
 
-  def adrGetContactPreferencesUrl(appaId: String): String =
-    s"$contactPreferencesHost/alcohol-duty-contact-preferences/contactPreferences/$appaId"
+  def getContactPreferenceUrl(appaId: String): String =
+    s"$contactPreferencesHost/alcohol-duty-contact-preferences/contactPreference/$appaId"
 
-  def adrSetContactPreferencesUrl(appaId: String): String =
-    s"$contactPreferencesHost/alcohol-duty-contact-preferences/update/contactPreferences/$appaId"
+  def setContactPreferenceUrl(appaId: String): String =
+    s"$contactPreferencesHost/alcohol-duty-contact-preferences/update/contactPreference/$appaId"
 }

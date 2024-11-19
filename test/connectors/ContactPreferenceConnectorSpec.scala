@@ -30,23 +30,23 @@ import uk.gov.hmrc.http.{HttpResponse, StringContextOps, UpstreamErrorResponse}
 
 import scala.concurrent.Future
 
-class ContactPreferencesConnectorSpec extends SpecBase with ScalaFutures {
-  "getContactPreferences" - {
-    val mockUrl = s"http://alcohol-duty-contact-preferences/contactPreferences/$appaId"
+class ContactPreferenceConnectorSpec extends SpecBase with ScalaFutures {
+  "getContactPreference" - {
+    val mockUrl = s"http://alcohol-duty-contact-preferences/contactPreference/$appaId"
 
     "successfully retrieve contact preferences" in new SetUp {
-      val jsonResponse: String = Json.toJson(contactPreferencesResponse).toString()
+      val jsonResponse: String       = Json.toJson(contactPreferenceResponse).toString()
       val httpResponse: HttpResponse = HttpResponse(OK, jsonResponse)
 
-      when(mockConfig.adrGetContactPreferencesUrl(eqTo(appaId))).thenReturn(mockUrl)
+      when(mockConfig.getContactPreferenceUrl(eqTo(appaId))).thenReturn(mockUrl)
 
       when(requestBuilder.execute[Either[UpstreamErrorResponse, HttpResponse]](any(), any()))
         .thenReturn(Future.successful(Right(httpResponse)))
 
       when(connector.httpClient.get(any())(any())).thenReturn(requestBuilder)
 
-      whenReady(connector.getContactPreferences(appaId)) { result =>
-        result mustBe contactPreferencesResponse
+      whenReady(connector.getContactPreference(appaId)) { result =>
+        result mustBe contactPreferenceResponse
         verify(connector.httpClient, times(1))
           .get(eqTo(url"$mockUrl"))(any())
 
@@ -58,14 +58,14 @@ class ContactPreferencesConnectorSpec extends SpecBase with ScalaFutures {
     "fail when invalid JSON is returned" in new SetUp {
       val invalidJsonResponse: HttpResponse = HttpResponse(OK, """{ "invalid": "json" }""")
 
-      when(mockConfig.adrGetContactPreferencesUrl(eqTo(appaId))).thenReturn(mockUrl)
+      when(mockConfig.getContactPreferenceUrl(eqTo(appaId))).thenReturn(mockUrl)
 
       when(requestBuilder.execute[Either[UpstreamErrorResponse, HttpResponse]](any(), any()))
         .thenReturn(Future.successful(Right(invalidJsonResponse)))
 
       when(connector.httpClient.get(any())(any())).thenReturn(requestBuilder)
 
-      whenReady(connector.getContactPreferences(appaId).failed) { e =>
+      whenReady(connector.getContactPreference(appaId).failed) { e =>
         e.getMessage must include("Invalid JSON format")
 
         verify(connector.httpClient, times(1))
@@ -81,14 +81,14 @@ class ContactPreferencesConnectorSpec extends SpecBase with ScalaFutures {
         Left[UpstreamErrorResponse, HttpResponse](UpstreamErrorResponse("", BAD_GATEWAY, BAD_GATEWAY, Map.empty))
       )
 
-      when(mockConfig.adrGetContactPreferencesUrl(eqTo(appaId))).thenReturn(mockUrl)
+      when(mockConfig.getContactPreferenceUrl(eqTo(appaId))).thenReturn(mockUrl)
 
       when(requestBuilder.execute[Either[UpstreamErrorResponse, HttpResponse]](any(), any()))
         .thenReturn(upstreamErrorResponse)
 
       when(connector.httpClient.get(any())(any())).thenReturn(requestBuilder)
 
-      whenReady(connector.getContactPreferences(appaId).failed) { e =>
+      whenReady(connector.getContactPreference(appaId).failed) { e =>
         e.getMessage must include("Unexpected response")
 
         verify(connector.httpClient, times(1))
@@ -102,14 +102,14 @@ class ContactPreferencesConnectorSpec extends SpecBase with ScalaFutures {
     "fail when unexpected status code returned" in new SetUp {
       val invalidStatusCodeResponse: HttpResponse = HttpResponse(CREATED, "")
 
-      when(mockConfig.adrGetContactPreferencesUrl(eqTo(appaId))).thenReturn(mockUrl)
+      when(mockConfig.getContactPreferenceUrl(eqTo(appaId))).thenReturn(mockUrl)
 
       when(requestBuilder.execute[Either[UpstreamErrorResponse, HttpResponse]](any(), any()))
         .thenReturn(Future.successful(Right(invalidStatusCodeResponse)))
 
       when(connector.httpClient.get(any())(any())).thenReturn(requestBuilder)
 
-      whenReady(connector.getContactPreferences(appaId).failed) { e =>
+      whenReady(connector.getContactPreference(appaId).failed) { e =>
         e.getMessage mustBe "Unexpected status code: 201"
 
         verify(connector.httpClient, times(1))
@@ -121,29 +121,29 @@ class ContactPreferencesConnectorSpec extends SpecBase with ScalaFutures {
     }
   }
 
-  "submitReturn" - {
-    val mockUrl = s"http://alcohol-duty-contact-preferences/update/contactPreferences/$appaId"
+  "setContactPreference" - {
+    val mockUrl = s"http://alcohol-duty-contact-preferences/update/contactPreference/$appaId"
 
     "successfully submit a return" in new SetUp {
-      val jsonResponse: String = Json.toJson(contactPreferencesResponse).toString()
+      val jsonResponse: String       = Json.toJson(contactPreferenceResponse).toString()
       val httpResponse: HttpResponse = HttpResponse(OK, jsonResponse)
 
-      when(mockConfig.adrSetContactPreferencesUrl(eqTo(appaId))).thenReturn(mockUrl)
+      when(mockConfig.setContactPreferenceUrl(eqTo(appaId))).thenReturn(mockUrl)
 
       when(requestBuilder.execute[Either[UpstreamErrorResponse, HttpResponse]](any(), any()))
         .thenReturn(Future.successful(Right(httpResponse)))
 
       when(
         requestBuilder.withBody(
-          eqTo(Json.toJson(contactPreferencesRequest))
+          eqTo(Json.toJson(contactPreferenceRequest))
         )(any(), any(), any())
       )
         .thenReturn(requestBuilder)
 
       when(connector.httpClient.post(any())(any())).thenReturn(requestBuilder)
 
-      whenReady(connector.setContactPreferences(appaId, contactPreferencesRequest).value) { result =>
-        result mustBe Right(contactPreferencesResponse)
+      whenReady(connector.setContactPreference(appaId, contactPreferenceRequest).value) { result =>
+        result mustBe Right(contactPreferenceResponse)
         verify(connector.httpClient, times(1))
           .post(eqTo(url"$mockUrl"))(any())
       }
@@ -152,21 +152,21 @@ class ContactPreferencesConnectorSpec extends SpecBase with ScalaFutures {
     "fail when invalid JSON is returned" in new SetUp {
       val invalidJsonResponse: HttpResponse = HttpResponse(OK, """{ "invalid": "json" }""")
 
-      when(mockConfig.adrSetContactPreferencesUrl(eqTo(appaId))).thenReturn(mockUrl)
+      when(mockConfig.setContactPreferenceUrl(eqTo(appaId))).thenReturn(mockUrl)
 
       when(requestBuilder.execute[Either[UpstreamErrorResponse, HttpResponse]](any(), any()))
         .thenReturn(Future.successful(Right(invalidJsonResponse)))
 
       when(
         requestBuilder.withBody(
-          eqTo(Json.toJson(contactPreferencesRequest))
+          eqTo(Json.toJson(contactPreferenceRequest))
         )(any(), any(), any())
       )
         .thenReturn(requestBuilder)
 
       when(connector.httpClient.post(any())(any())).thenReturn(requestBuilder)
 
-      whenReady(connector.setContactPreferences(appaId, contactPreferencesRequest).value) { result =>
+      whenReady(connector.setContactPreference(appaId, contactPreferenceRequest).value) { result =>
         result.swap.toOption.get must include("Invalid JSON format")
 
         verify(connector.httpClient, times(1))
@@ -182,21 +182,21 @@ class ContactPreferencesConnectorSpec extends SpecBase with ScalaFutures {
         Left[UpstreamErrorResponse, HttpResponse](UpstreamErrorResponse("", BAD_GATEWAY, BAD_GATEWAY, Map.empty))
       )
 
-      when(mockConfig.adrSetContactPreferencesUrl(eqTo(appaId))).thenReturn(mockUrl)
+      when(mockConfig.setContactPreferenceUrl(eqTo(appaId))).thenReturn(mockUrl)
 
       when(requestBuilder.execute[Either[UpstreamErrorResponse, HttpResponse]](any(), any()))
         .thenReturn(upstreamErrorResponse)
 
       when(
         requestBuilder.withBody(
-          eqTo(Json.toJson(contactPreferencesRequest))
+          eqTo(Json.toJson(contactPreferenceRequest))
         )(any(), any(), any())
       )
         .thenReturn(requestBuilder)
 
       when(connector.httpClient.post(any())(any())).thenReturn(requestBuilder)
 
-      whenReady(connector.setContactPreferences(appaId, contactPreferencesRequest).value) { result =>
+      whenReady(connector.setContactPreference(appaId, contactPreferenceRequest).value) { result =>
         result.swap.toOption.get must include("Unexpected response")
 
         verify(connector.httpClient, times(1))
@@ -210,21 +210,21 @@ class ContactPreferencesConnectorSpec extends SpecBase with ScalaFutures {
     "fail when unexpected status code returned" in new SetUp {
       val invalidStatusCodeResponse: HttpResponse = HttpResponse(UNPROCESSABLE_ENTITY, "")
 
-      when(mockConfig.adrSetContactPreferencesUrl(eqTo(appaId))).thenReturn(mockUrl)
+      when(mockConfig.setContactPreferenceUrl(eqTo(appaId))).thenReturn(mockUrl)
 
       when(requestBuilder.execute[Either[UpstreamErrorResponse, HttpResponse]](any(), any()))
         .thenReturn(Future.successful(Right(invalidStatusCodeResponse)))
 
       when(
         requestBuilder.withBody(
-          eqTo(Json.toJson(contactPreferencesRequest))
+          eqTo(Json.toJson(contactPreferenceRequest))
         )(any(), any(), any())
       )
         .thenReturn(requestBuilder)
 
       when(connector.httpClient.post(any())(any())).thenReturn(requestBuilder)
 
-      whenReady(connector.setContactPreferences(appaId, contactPreferencesRequest).value) { result =>
+      whenReady(connector.setContactPreference(appaId, contactPreferenceRequest).value) { result =>
         result.swap.toOption.get must include("Unexpected status code: 422")
 
         verify(connector.httpClient, times(1))

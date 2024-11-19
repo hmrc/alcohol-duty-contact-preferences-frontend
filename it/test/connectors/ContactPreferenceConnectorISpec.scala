@@ -33,23 +33,22 @@ package connectors
  */
 
 import com.github.tomakehurst.wiremock.client.WireMock._
-import models.preferences.ContactPreferences
+import models.preferences.ContactPreference
 import org.scalatest.RecoverMethods.recoverToExceptionIf
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import play.api.Application
 import play.api.http.Status.{BAD_GATEWAY, BAD_REQUEST, CREATED, OK}
 import play.api.libs.json.Json
-import org.scalatest.RecoverMethods.recoverToExceptionIf
 
-class ContactPreferencesConnectorISpec extends ISpecBase with WireMockHelper {
+class ContactPreferenceConnectorISpec extends ISpecBase with WireMockHelper {
   override def fakeApplication(): Application = applicationBuilder(None)
     .configure("microservice.services.alcohol-duty-contact-preferences.port" -> server.port())
     .build()
 
-  "ContactPreferencesConnector" - {
-    "getContactPreferences" - {
+  "ContactPreferenceConnector" - {
+    "getContactPreference" - {
       "should successfully retrieve contact preferences" in new SetUp {
-        val contactPreferencesResponse = new ContactPreferences("1", None, None, None)
+        val contactPreferencesResponse = new ContactPreference("1", None, None, None)
         val jsonResponse: String       =
           Json
             .toJson(contactPreferencesResponse)
@@ -64,7 +63,7 @@ class ContactPreferencesConnectorISpec extends ISpecBase with WireMockHelper {
             )
         )
 
-        whenReady(connector.getContactPreferences(appaId)) { result =>
+        whenReady(connector.getContactPreference(appaId)) { result =>
           result mustBe contactPreferencesResponse
         }
       }
@@ -80,7 +79,7 @@ class ContactPreferencesConnectorISpec extends ISpecBase with WireMockHelper {
             )
         )
 
-        whenReady(connector.getContactPreferences(appaId).failed) { e =>
+        whenReady(connector.getContactPreference(appaId).failed) { e =>
           e.getMessage must include("Invalid JSON format")
         }
       }
@@ -94,7 +93,7 @@ class ContactPreferencesConnectorISpec extends ISpecBase with WireMockHelper {
             )
         )
 
-        whenReady(connector.getContactPreferences(appaId).failed) { e =>
+        whenReady(connector.getContactPreference(appaId).failed) { e =>
           e.getMessage must include("Unexpected response")
         }
       }
@@ -108,22 +107,22 @@ class ContactPreferencesConnectorISpec extends ISpecBase with WireMockHelper {
             )
         )
 
-        whenReady(connector.getContactPreferences(appaId).failed) { e =>
+        whenReady(connector.getContactPreference(appaId).failed) { e =>
           e.getMessage must include("Unexpected status code: 201")
         }
       }
     }
 
-    "submitReturn" - {
+    "setContactPreference" - {
       "should successfully submit a return" in new SetUp {
         val jsonResponse: String =
           Json
-            .toJson(contactPreferencesResponse)
+            .toJson(contactPreferenceResponse)
             .toString() // TODO Return the appropriate response when we have the API spec
 
         server.stubFor(
           post(urlMatching(updateUrl))
-            .withRequestBody(equalToJson(Json.stringify(Json.toJson(contactPreferencesRequest))))
+            .withRequestBody(equalToJson(Json.stringify(Json.toJson(contactPreferenceRequest))))
             .willReturn(
               aResponse()
                 .withStatus(OK)
@@ -131,12 +130,12 @@ class ContactPreferencesConnectorISpec extends ISpecBase with WireMockHelper {
             )
         )
 
-        whenReady(connector.setContactPreferences(appaId, contactPreferencesRequest).value) {
+        whenReady(connector.setContactPreference(appaId, contactPreferenceRequest).value) {
           case Right(details) =>
-            details.paperlessReference shouldBe contactPreferencesResponse.paperlessReference
-            details.emailAddress       shouldBe contactPreferencesResponse.emailAddress
-            details.emailStatus        shouldBe contactPreferencesResponse.emailStatus
-            details.emailBounced       shouldBe contactPreferencesResponse.emailBounced
+            details.paperlessReference shouldBe contactPreferenceResponse.paperlessReference
+            details.emailAddress       shouldBe contactPreferenceResponse.emailAddress
+            details.emailStatus        shouldBe contactPreferenceResponse.emailStatus
+            details.emailBounced       shouldBe contactPreferenceResponse.emailBounced
           case _              => fail("Test failed: result did not match expected value")
         }
       }
@@ -145,7 +144,7 @@ class ContactPreferencesConnectorISpec extends ISpecBase with WireMockHelper {
         val invalidJsonResponse = """{ "invalid": "json" }"""
         server.stubFor(
           post(urlMatching(updateUrl))
-            .withRequestBody(equalToJson(Json.stringify(Json.toJson(contactPreferencesRequest))))
+            .withRequestBody(equalToJson(Json.stringify(Json.toJson(contactPreferenceRequest))))
             .willReturn(
               aResponse()
                 .withStatus(OK)
@@ -153,7 +152,7 @@ class ContactPreferencesConnectorISpec extends ISpecBase with WireMockHelper {
             )
         )
 
-        whenReady(connector.setContactPreferences(appaId, contactPreferencesRequest).value) { result =>
+        whenReady(connector.setContactPreference(appaId, contactPreferenceRequest).value) { result =>
           result.swap.toOption.get must include("Invalid JSON format")
         }
       }
@@ -161,7 +160,7 @@ class ContactPreferencesConnectorISpec extends ISpecBase with WireMockHelper {
       "fail when update contact preferences returns an error" in new SetUp {
         server.stubFor(
           post(urlMatching(updateUrl))
-            .withRequestBody(equalToJson(Json.stringify(Json.toJson(contactPreferencesRequest))))
+            .withRequestBody(equalToJson(Json.stringify(Json.toJson(contactPreferenceRequest))))
             .willReturn(
               aResponse()
                 .withBody("upstreamErrorResponse")
@@ -170,7 +169,7 @@ class ContactPreferencesConnectorISpec extends ISpecBase with WireMockHelper {
         )
 
         recoverToExceptionIf[Exception] {
-          connector.setContactPreferences(appaId, contactPreferencesRequest).value
+          connector.setContactPreference(appaId, contactPreferenceRequest).value
         } map { ex =>
           ex.getMessage must include("Unexpected response")
         }
@@ -179,7 +178,7 @@ class ContactPreferencesConnectorISpec extends ISpecBase with WireMockHelper {
       "fail when an unexpected status code is returned" in new SetUp {
         server.stubFor(
           post(urlMatching(updateUrl))
-            .withRequestBody(equalToJson(Json.stringify(Json.toJson(contactPreferencesRequest))))
+            .withRequestBody(equalToJson(Json.stringify(Json.toJson(contactPreferenceRequest))))
             .willReturn(
               aResponse()
                 .withBody("invalidStatusCodeResponse")
@@ -187,7 +186,7 @@ class ContactPreferencesConnectorISpec extends ISpecBase with WireMockHelper {
             )
         )
         recoverToExceptionIf[Exception] {
-          connector.setContactPreferences(appaId, contactPreferencesRequest).value
+          connector.setContactPreference(appaId, contactPreferenceRequest).value
         } map { ex =>
           ex.getMessage must include("Unexpected status code: 201")
         }
@@ -197,7 +196,7 @@ class ContactPreferencesConnectorISpec extends ISpecBase with WireMockHelper {
 
   class SetUp {
     val connector: ContactPreferencesConnector = app.injector.instanceOf[ContactPreferencesConnector]
-    val getUrl                                 = s"/alcohol-duty-contact-preferences/contactPreferences/$appaId"
-    val updateUrl                              = s"/alcohol-duty-contact-preferences/update/contactPreferences/$appaId"
+    val getUrl                                 = s"/alcohol-duty-contact-preferences/contactPreference/$appaId"
+    val updateUrl                              = s"/alcohol-duty-contact-preferences/update/contactPreference/$appaId"
   }
 }

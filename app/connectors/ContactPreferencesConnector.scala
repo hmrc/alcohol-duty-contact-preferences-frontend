@@ -18,7 +18,7 @@ package connectors
 
 import cats.data.EitherT
 import config.FrontendAppConfig
-import models.preferences.ContactPreferences
+import models.preferences.ContactPreference
 import play.api.Logging
 import play.api.http.Status.OK
 import play.api.libs.json.Json
@@ -36,38 +36,40 @@ class ContactPreferencesConnector @Inject() (
     extends HttpReadsInstances
     with Logging {
 
-  def getContactPreferences(appaId: String)(implicit hc: HeaderCarrier): Future[ContactPreferences] =
+  def getContactPreference(appaId: String)(implicit hc: HeaderCarrier): Future[ContactPreference] =
     httpClient
-      .get(url"${config.adrGetContactPreferencesUrl(appaId)}")
+      .get(url"${config.getContactPreferenceUrl(appaId)}")
       .execute[Either[UpstreamErrorResponse, HttpResponse]]
       .flatMap {
         case Right(response) if response.status == OK =>
-          Try(response.json.as[ContactPreferences]) match {
+          Try(response.json.as[ContactPreference]) match {
             case Success(data)      =>
-              Future.successful(data) // TODO Return the appropriate response when we have the updated API spec
+              Future.successful(
+                data
+              ) // TODO Return the appropriate response when we have the updated API spec and back end coded
             case Failure(exception) => Future.failed(new Exception(s"Invalid JSON format $exception"))
           }
         case Left(errorResponse)                      => Future.failed(new Exception(s"Unexpected response: ${errorResponse.message}"))
         case Right(response)                          => Future.failed(new Exception(s"Unexpected status code: ${response.status}"))
       }
 
-  def setContactPreferences(appaId: String, contactPreferenceRequest: ContactPreferences)(implicit
+  def setContactPreference(appaId: String, contactPreferenceRequest: ContactPreference)(implicit
     hc: HeaderCarrier
-  ): EitherT[Future, String, ContactPreferences] =
+  ): EitherT[Future, String, ContactPreference] =
     EitherT {
       httpClient
-        .post(url"${config.adrSetContactPreferencesUrl(appaId)}")
+        .post(url"${config.setContactPreferenceUrl(appaId)}")
         .withBody(
           Json.toJson(contactPreferenceRequest)
         )
         .execute[Either[UpstreamErrorResponse, HttpResponse]]
         .map {
           case Right(response) if response.status == OK =>
-            Try(response.json.as[ContactPreferences]) match {
+            Try(response.json.as[ContactPreference]) match {
               case Success(data)      =>
-                Right[String, ContactPreferences](
+                Right[String, ContactPreference](
                   data
-                ) // TODO Return the appropriate response when we have the API spec
+                ) // TODO Return the appropriate response when we have the API spec and back end coded
               case Failure(exception) =>
                 logger.warn(s"Invalid JSON format", exception)
                 Left(s"Invalid JSON format $exception")

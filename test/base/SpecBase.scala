@@ -18,7 +18,7 @@ package base
 
 import controllers.actions._
 import models.UserAnswers
-import models.preferences.ContactPreferences
+import models.preferences.ContactPreference
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -50,8 +50,8 @@ trait SpecBase
 
   def emptyUserAnswers: UserAnswers                        = UserAnswers(userAnswersId)
   val fakeIdentifierUserDetails: FakeIdentifierUserDetails = FakeIdentifierUserDetails(appaId, groupId, internalId)
-  val contactPreferencesRequest: ContactPreferences        = new ContactPreferences("1", None, None, None)
-  val contactPreferencesResponse: ContactPreferences       = new ContactPreferences("1", None, None, None)
+  val contactPreferenceRequest: ContactPreference          = new ContactPreference("1", None, None, None)
+  val contactPreferenceResponse: ContactPreference         = new ContactPreference("1", None, None, None)
 
   def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 

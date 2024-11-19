@@ -35,7 +35,7 @@ package connectors
 import controllers.actions._
 import generators.ModelGenerators
 import models.UserAnswers
-import models.preferences.ContactPreferences
+import models.preferences.ContactPreference
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -65,8 +65,8 @@ trait ISpecBase
   val groupId: String    = "groupid"
   val internalId: String = "id"
 
-  val contactPreferencesRequest: ContactPreferences  = new ContactPreferences("1", None, None, None)
-  val contactPreferencesResponse: ContactPreferences = new ContactPreferences("1", None, None, None)
+  val contactPreferenceRequest: ContactPreference  = new ContactPreference("1", None, None, None)
+  val contactPreferenceResponse: ContactPreference = new ContactPreference("1", None, None, None)
 
   val fakeIdentifierUserDetails: FakeIdentifierUserDetails = FakeIdentifierUserDetails(appaId, groupId, internalId)
 
