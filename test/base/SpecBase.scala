@@ -18,6 +18,7 @@ package base
 
 import controllers.actions._
 import models.UserAnswers
+import models.preferences.ContactPreferences
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -27,6 +28,9 @@ import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
+import uk.gov.hmrc.http.HeaderCarrier
+
+import scala.concurrent.ExecutionContext
 
 trait SpecBase
     extends AnyFreeSpec
@@ -46,6 +50,8 @@ trait SpecBase
 
   def emptyUserAnswers: UserAnswers                        = UserAnswers(userAnswersId)
   val fakeIdentifierUserDetails: FakeIdentifierUserDetails = FakeIdentifierUserDetails(appaId, groupId, internalId)
+  val contactPreferencesRequest: ContactPreferences        = new ContactPreferences("1", None, None, None)
+  val contactPreferencesResponse: ContactPreferences       = new ContactPreferences("1", None, None, None)
 
   def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
@@ -57,4 +63,7 @@ trait SpecBase
         bind[FakeIdentifierUserDetails].toInstance(fakeIdentifierUserDetails),
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers))
       )
+
+  implicit val hc: HeaderCarrier    = HeaderCarrier()
+  implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 }

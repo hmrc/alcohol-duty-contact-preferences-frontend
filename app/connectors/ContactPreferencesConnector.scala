@@ -16,10 +16,12 @@
 
 package connectors
 
+import cats.data.EitherT
 import config.FrontendAppConfig
 import models.preferences.ContactPreferences
 import play.api.Logging
 import play.api.http.Status.OK
+import play.api.libs.json.Json
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReadsInstances, HttpResponse, StringContextOps, UpstreamErrorResponse}
 
@@ -41,10 +43,41 @@ class ContactPreferencesConnector @Inject() (
       .flatMap {
         case Right(response) if response.status == OK =>
           Try(response.json.as[ContactPreferences]) match {
-            case Success(data) => Future.successful(data)
+            case Success(data)      =>
+              Future.successful(data) // TODO Return the appropriate response when we have the updated API spec
             case Failure(exception) => Future.failed(new Exception(s"Invalid JSON format $exception"))
           }
         case Left(errorResponse)                      => Future.failed(new Exception(s"Unexpected response: ${errorResponse.message}"))
         case Right(response)                          => Future.failed(new Exception(s"Unexpected status code: ${response.status}"))
       }
+
+  def setContactPreferences(appaId: String, contactPreferenceRequest: ContactPreferences)(implicit
+    hc: HeaderCarrier
+  ): EitherT[Future, String, ContactPreferences] =
+    EitherT {
+      httpClient
+        .post(url"${config.adrSetContactPreferencesUrl(appaId)}")
+        .withBody(
+          Json.toJson(contactPreferenceRequest)
+        )
+        .execute[Either[UpstreamErrorResponse, HttpResponse]]
+        .map {
+          case Right(response) if response.status == OK =>
+            Try(response.json.as[ContactPreferences]) match {
+              case Success(data)      =>
+                Right[String, ContactPreferences](
+                  data
+                ) // TODO Return the appropriate response when we have the API spec
+              case Failure(exception) =>
+                logger.warn(s"Invalid JSON format", exception)
+                Left(s"Invalid JSON format $exception")
+            }
+          case Left(errorResponse)                      =>
+            logger.warn(s"Unable to update contact preference. Unexpected response: ${errorResponse.message}")
+            Left(s"Unable to update contact preference. Unexpected response: ${errorResponse.message}")
+          case Right(response)                          =>
+            logger.warn(s"Unable to update contact preference. Unexpected status code: ${response.status}")
+            Left(s"Unable to update contact preference. Unexpected status code: ${response.status}")
+        }
+    }
 }

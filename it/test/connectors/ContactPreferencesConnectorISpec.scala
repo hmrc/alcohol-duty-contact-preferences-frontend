@@ -34,9 +34,12 @@ package connectors
 
 import com.github.tomakehurst.wiremock.client.WireMock._
 import models.preferences.ContactPreferences
+import org.scalatest.RecoverMethods.recoverToExceptionIf
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import play.api.Application
-import play.api.http.Status.{BAD_GATEWAY, CREATED, OK}
+import play.api.http.Status.{BAD_GATEWAY, BAD_REQUEST, CREATED, OK}
 import play.api.libs.json.Json
+import org.scalatest.RecoverMethods.recoverToExceptionIf
 
 class ContactPreferencesConnectorISpec extends ISpecBase with WireMockHelper {
   override def fakeApplication(): Application = applicationBuilder(None)
@@ -47,7 +50,10 @@ class ContactPreferencesConnectorISpec extends ISpecBase with WireMockHelper {
     "getContactPreferences" - {
       "should successfully retrieve contact preferences" in new SetUp {
         val contactPreferencesResponse = new ContactPreferences("1", None, None, None)
-        val jsonResponse: String       = Json.toJson(contactPreferencesResponse).toString()
+        val jsonResponse: String       =
+          Json
+            .toJson(contactPreferencesResponse)
+            .toString() // TODO Return the appropriate response when we have the API spec
 
         server.stubFor(
           get(urlMatching(getUrl))
@@ -65,10 +71,14 @@ class ContactPreferencesConnectorISpec extends ISpecBase with WireMockHelper {
 
       "should fail when invalid JSON is returned" in new SetUp {
         val invalidJsonResponse = """{ "invalid": "json" }"""
-        server.stubFor(get(urlMatching(getUrl))
-          .willReturn(aResponse()
-            .withStatus(OK)
-            .withBody(invalidJsonResponse)))
+        server.stubFor(
+          get(urlMatching(getUrl))
+            .willReturn(
+              aResponse()
+                .withStatus(OK)
+                .withBody(invalidJsonResponse)
+            )
+        )
 
         whenReady(connector.getContactPreferences(appaId).failed) { e =>
           e.getMessage must include("Invalid JSON format")
@@ -103,11 +113,91 @@ class ContactPreferencesConnectorISpec extends ISpecBase with WireMockHelper {
         }
       }
     }
+
+    "submitReturn" - {
+      "should successfully submit a return" in new SetUp {
+        val jsonResponse: String =
+          Json
+            .toJson(contactPreferencesResponse)
+            .toString() // TODO Return the appropriate response when we have the API spec
+
+        server.stubFor(
+          post(urlMatching(updateUrl))
+            .withRequestBody(equalToJson(Json.stringify(Json.toJson(contactPreferencesRequest))))
+            .willReturn(
+              aResponse()
+                .withStatus(OK)
+                .withBody(jsonResponse)
+            )
+        )
+
+        whenReady(connector.setContactPreferences(appaId, contactPreferencesRequest).value) {
+          case Right(details) =>
+            details.paperlessReference shouldBe contactPreferencesResponse.paperlessReference
+            details.emailAddress       shouldBe contactPreferencesResponse.emailAddress
+            details.emailStatus        shouldBe contactPreferencesResponse.emailStatus
+            details.emailBounced       shouldBe contactPreferencesResponse.emailBounced
+          case _              => fail("Test failed: result did not match expected value")
+        }
+      }
+
+      "should fail when invalid JSON is returned" in new SetUp {
+        val invalidJsonResponse = """{ "invalid": "json" }"""
+        server.stubFor(
+          post(urlMatching(updateUrl))
+            .withRequestBody(equalToJson(Json.stringify(Json.toJson(contactPreferencesRequest))))
+            .willReturn(
+              aResponse()
+                .withStatus(OK)
+                .withBody(invalidJsonResponse)
+            )
+        )
+
+        whenReady(connector.setContactPreferences(appaId, contactPreferencesRequest).value) { result =>
+          result.swap.toOption.get must include("Invalid JSON format")
+        }
+      }
+
+      "fail when update contact preferences returns an error" in new SetUp {
+        server.stubFor(
+          post(urlMatching(updateUrl))
+            .withRequestBody(equalToJson(Json.stringify(Json.toJson(contactPreferencesRequest))))
+            .willReturn(
+              aResponse()
+                .withBody("upstreamErrorResponse")
+                .withStatus(BAD_GATEWAY)
+            )
+        )
+
+        recoverToExceptionIf[Exception] {
+          connector.setContactPreferences(appaId, contactPreferencesRequest).value
+        } map { ex =>
+          ex.getMessage must include("Unexpected response")
+        }
+      }
+
+      "fail when an unexpected status code is returned" in new SetUp {
+        server.stubFor(
+          post(urlMatching(updateUrl))
+            .withRequestBody(equalToJson(Json.stringify(Json.toJson(contactPreferencesRequest))))
+            .willReturn(
+              aResponse()
+                .withBody("invalidStatusCodeResponse")
+                .withStatus(BAD_REQUEST)
+            )
+        )
+        recoverToExceptionIf[Exception] {
+          connector.setContactPreferences(appaId, contactPreferencesRequest).value
+        } map { ex =>
+          ex.getMessage must include("Unexpected status code: 201")
+        }
+      }
+    }
   }
 
   class SetUp {
     val connector: ContactPreferencesConnector = app.injector.instanceOf[ContactPreferencesConnector]
-    val getUrl                                 = s"/alcohol-duty-contact-preferences/contactPreferences/$idType/$appaId/$regime"
-    val updateUrl                              = s"/alcohol-duty-contact-preferences/update/contactPreferences/$idType/$appaId/$regime"
+    val getUrl                                 = s"/alcohol-duty-contact-preferences/contactPreferences/$appaId"
+    val updateUrl                              = s"/alcohol-duty-contact-preferences/update/contactPreferences/$appaId"
   }
 }

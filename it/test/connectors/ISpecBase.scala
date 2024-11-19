@@ -64,10 +64,9 @@ trait ISpecBase
   val appaId: String     = "appaid"
   val groupId: String    = "groupid"
   val internalId: String = "id"
-  val idType: String     = "ZAD"
-  val regime: String     = "AD"
 
-  val contactPreferencesRequest: ContactPreferences = new ContactPreferences("1", None, None, None)
+  val contactPreferencesRequest: ContactPreferences  = new ContactPreferences("1", None, None, None)
+  val contactPreferencesResponse: ContactPreferences = new ContactPreferences("1", None, None, None)
 
   val fakeIdentifierUserDetails: FakeIdentifierUserDetails = FakeIdentifierUserDetails(appaId, groupId, internalId)
 

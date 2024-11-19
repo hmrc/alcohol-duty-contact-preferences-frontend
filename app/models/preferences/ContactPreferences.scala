@@ -19,11 +19,11 @@ package models.preferences
 import play.api.libs.json.{Json, OFormat}
 
 case class ContactPreferences(
-                                      paperlessReference: String,
-                                      emailAddress: Option[String],
-                                      emailStatus: Option[String],
-                                      emailBounced: Option[Boolean]
-                                    )
+  paperlessReference: String,
+  emailAddress: Option[String],
+  emailStatus: Option[String],
+  emailBounced: Option[Boolean]
+)
 
 case object ContactPreferences {
   implicit val contactPreferencesRequestFormat: OFormat[ContactPreferences] = Json.format[ContactPreferences]
