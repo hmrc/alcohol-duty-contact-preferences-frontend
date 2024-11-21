@@ -60,5 +60,5 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
     s"$contactPreferencesHost/alcohol-duty-contact-preferences/contact-preference/$appaId"
 
   def setContactPreferenceUrl(appaId: String): String =
-    s"$contactPreferencesHost/alcohol-duty-contact-preferences/update/contact-preference/$appaId"
+    s"$contactPreferencesHost/alcohol-duty-contact-preferences/update-contact-preference/$appaId"
 }

@@ -43,10 +43,7 @@ class ContactPreferencesConnector @Inject() (
       .flatMap {
         case Right(response) if response.status == OK =>
           Try(response.json.as[ContactPreference]) match {
-            case Success(data)      =>
-              Future.successful(
-                data
-              ) // TODO Return the appropriate response when we have the updated API spec and back end coded
+            case Success(data)      => throw new NotImplementedError("Not yet implemented!")
             case Failure(exception) => Future.failed(new Exception(s"Invalid JSON format $exception"))
           }
         case Left(errorResponse)                      => Future.failed(new Exception(s"Unexpected response: ${errorResponse.message}"))
@@ -66,10 +63,7 @@ class ContactPreferencesConnector @Inject() (
         .map {
           case Right(response) if response.status == OK =>
             Try(response.json.as[ContactPreference]) match {
-              case Success(data)      =>
-                Right[String, ContactPreference](
-                  data
-                ) // TODO Return the appropriate response when we have the API spec and back end coded
+              case Success(data)      => throw new NotImplementedError("Not yet implemented!")
               case Failure(exception) =>
                 logger.warn(s"Invalid JSON format", exception)
                 Left(s"Invalid JSON format $exception")
