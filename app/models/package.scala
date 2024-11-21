@@ -142,6 +142,7 @@ package object models {
                   }
                 }
             }
+        case _                                                                         => JsError("Something went wrong.")
       }
   }
 }
