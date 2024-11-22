@@ -22,7 +22,6 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchersSugar.eqTo
 import org.mockito.Mockito.{times, verify, when}
 import org.mockito.MockitoSugar.mock
-import org.scalatest.Ignore
 import org.scalatest.concurrent.ScalaFutures
 import play.api.http.Status.{BAD_GATEWAY, CREATED, OK, UNPROCESSABLE_ENTITY}
 import play.api.libs.json.Json
