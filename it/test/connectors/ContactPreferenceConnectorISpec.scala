@@ -35,7 +35,6 @@ package connectors
 import com.github.tomakehurst.wiremock.client.WireMock._
 import models.preferences.ContactPreference
 import org.scalatest.RecoverMethods.recoverToExceptionIf
-import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import play.api.Application
 import play.api.http.Status.{BAD_GATEWAY, BAD_REQUEST, CREATED, OK}
 import play.api.libs.json.Json
