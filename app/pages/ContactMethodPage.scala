@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,13 @@
  * limitations under the License.
  */
 
-package models.preferences
+package pages
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.JsPath
 
-case class ContactPreference(
-  paperlessReference: Boolean,
-  emailAddress: Option[String],
-  emailVerification: Option[Boolean],
-  bouncedEmail: Option[Boolean]
-)
+case object ContactMethodPage extends QuestionPage[Boolean] {
 
-object ContactPreference {
-  import models.JsonHelpers.booleanReads
-  import models.JsonHelpers.booleanWrites
+  override def path: JsPath = JsPath \ toString
 
-  implicit val contactPreferencesRequestFormat: OFormat[ContactPreference] = Json.format[ContactPreference]
+  override def toString: String = "contactMethodQuestion"
 }

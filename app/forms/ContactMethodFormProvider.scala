@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-package models.preferences
+package forms
 
-import play.api.libs.json.{Json, OFormat}
+import forms.mappings.Mappings
+import play.api.data.Form
 
-case class ContactPreference(
-  paperlessReference: Boolean,
-  emailAddress: Option[String],
-  emailVerification: Option[Boolean],
-  bouncedEmail: Option[Boolean]
-)
+import javax.inject.Inject
 
-object ContactPreference {
-  import models.JsonHelpers.booleanReads
-  import models.JsonHelpers.booleanWrites
+class ContactMethodFormProvider @Inject() extends Mappings {
 
-  implicit val contactPreferencesRequestFormat: OFormat[ContactPreference] = Json.format[ContactPreference]
+  def apply(): Form[Boolean] =
+    Form(
+      "contactMethodQuestion" -> boolean("contactMethodQuestion.error.required")
+    )
 }
