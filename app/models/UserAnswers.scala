@@ -76,7 +76,7 @@ object UserAnswers {
     import play.api.libs.functional.syntax._
 
     (
-      (__ \ "_id").read[String] and
+      (__ \ "appaId").read[String] and
         (__ \ "paperlessReference").read[Boolean] and
         (__ \ "emailAddress").readNullable[String] and
         (__ \ "emailVerification").readNullable[Boolean] and
@@ -93,7 +93,7 @@ object UserAnswers {
     import play.api.libs.functional.syntax._
 
     (
-      (__ \ "_id").write[String] and
+      (__ \ "appaId").write[String] and
         (__ \ "paperlessReference").write[Boolean] and
         (__ \ "emailAddress").writeNullable[String] and
         (__ \ "emailVerification").writeNullable[Boolean] and
