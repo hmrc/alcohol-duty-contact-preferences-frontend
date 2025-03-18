@@ -29,9 +29,7 @@ final case class UserAnswers(
   paperlessReference: Boolean,
   emailVerification: Option[Boolean],
   bouncedEmail: Option[Boolean],
-  //                              sensitiveUserInformation: SensitiveUserInformation,
-  emailAddress: Option[String],
-  emailEntered: Option[String] = None,
+  decryptedSensitiveUserInformation: DecryptedSensitiveUserInformation,
   data: JsObject = Json.obj(),
   startedTime: Instant,
   lastUpdated: Instant
@@ -83,9 +81,7 @@ object UserAnswers {
         (__ \ "paperlessReference").read[Boolean] and
         (__ \ "emailVerification").readNullable[Boolean] and
         (__ \ "bouncedEmail").readNullable[Boolean] and
-        //        (__ \ "sensitiveUserInformation").read[SensitiveUserInformation] and
-        (__ \ "emailAddress").readNullable[String] and
-        (__ \ "emailEntered").readNullable[String] and
+        (__ \ "decryptedSensitiveUserInformation").read[DecryptedSensitiveUserInformation] and
         (__ \ "data").read[JsObject] and
         (__ \ "startedTime").read(MongoJavatimeFormats.instantFormat) and
         (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
@@ -102,9 +98,7 @@ object UserAnswers {
         (__ \ "paperlessReference").write[Boolean] and
         (__ \ "emailVerification").writeNullable[Boolean] and
         (__ \ "bouncedEmail").writeNullable[Boolean] and
-        //        (__ \ "sensitiveUserInformation").write[SensitiveUserInformation] and
-        (__ \ "emailAddress").writeNullable[String] and
-        (__ \ "emailEntered").writeNullable[String] and
+        (__ \ "decryptedSensitiveUserInformation").write[DecryptedSensitiveUserInformation] and
         (__ \ "data").write[JsObject] and
         (__ \ "startedTime").write(MongoJavatimeFormats.instantFormat) and
         (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)

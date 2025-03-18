@@ -31,18 +31,18 @@ import java.time.Instant
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class ContactMethodController @Inject()(
-                                         override val messagesApi: MessagesApi,
-                                         navigator: Navigator,
-                                         identify: IdentifierAction,
-                                         getData: DataRetrievalAction,
-                                         requireData: DataRequiredAction,
-                                         formProvider: ContactMethodFormProvider,
-                                         userAnswersConnector: UserAnswersConnector,
-                                         val controllerComponents: MessagesControllerComponents,
-                                         view: ContactMethodView
-                                       )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+class ContactMethodController @Inject() (
+  override val messagesApi: MessagesApi,
+  navigator: Navigator,
+  identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
+  formProvider: ContactMethodFormProvider,
+  userAnswersConnector: UserAnswersConnector,
+  val controllerComponents: MessagesControllerComponents,
+  view: ContactMethodView
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
   val form = formProvider()
@@ -54,9 +54,9 @@ class ContactMethodController @Inject()(
         //          _ <- userAnswersConnector.createUserAnswers(request.appaId)
         //        } yield Ok(view(form, mode))
         Future.successful(Ok(view(form, mode)))
-      case CheckMode =>
+      case CheckMode  =>
         val preparedForm = request.userAnswers.flatMap(_.get(ContactMethodPage)) match {
-          case None => form
+          case None        => form
           case Some(value) => form.fill(value)
         }
         Future.successful(Ok(view(preparedForm, mode)))
