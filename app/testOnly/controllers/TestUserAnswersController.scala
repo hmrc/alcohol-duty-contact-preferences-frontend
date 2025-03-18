@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,29 +14,31 @@
  * limitations under the License.
  */
 
-package controllers
+package testOnly.controllers
 
+import com.google.inject.Inject
 import connectors.UserAnswersConnector
-import controllers.actions.{DataRetrievalAction, IdentifierAction}
+import controllers.actions.IdentifierAction
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
-import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
-class KeepAliveController @Inject() (
+class TestUserAnswersController @Inject() (
+  override val messagesApi: MessagesApi,
   val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
-  getData: DataRetrievalAction,
   userAnswersConnector: UserAnswersConnector
 )(implicit ec: ExecutionContext)
-    extends FrontendBaseController {
+    extends FrontendBaseController
+    with I18nSupport {
 
-  def keepAlive(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    request.userAnswers
-      .map { answers =>
-        userAnswersConnector.keepAlive(answers.appaId).map(_ => Ok)
-      }
-      .getOrElse(Future.successful(Ok))
+  def onPageLoad(): Action[AnyContent] = identify.async { implicit request =>
+    for {
+      _            <- userAnswersConnector.createUserAnswers(request.appaId)
+      emailAddress <- userAnswersConnector.get(request.appaId)
+    } yield Ok(s"test successful, email address: $emailAddress")
   }
+
 }
