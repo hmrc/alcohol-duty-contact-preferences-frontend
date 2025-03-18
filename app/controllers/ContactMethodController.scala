@@ -16,9 +16,10 @@
 
 package controllers
 
+import connectors.UserAnswersConnector
 import controllers.actions._
 import forms.ContactMethodFormProvider
-import models.Mode
+import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.Navigator
 import pages.ContactMethodPage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -26,37 +27,40 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.ContactMethodView
 
+import java.time.Instant
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class ContactMethodController @Inject() (
-  override val messagesApi: MessagesApi,
-  navigator: Navigator,
-  identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
-  formProvider: ContactMethodFormProvider,
-  val controllerComponents: MessagesControllerComponents,
-  view: ContactMethodView
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+class ContactMethodController @Inject()(
+                                         override val messagesApi: MessagesApi,
+                                         navigator: Navigator,
+                                         identify: IdentifierAction,
+                                         getData: DataRetrievalAction,
+                                         requireData: DataRequiredAction,
+                                         formProvider: ContactMethodFormProvider,
+                                         userAnswersConnector: UserAnswersConnector,
+                                         val controllerComponents: MessagesControllerComponents,
+                                         view: ContactMethodView
+                                       )(implicit ec: ExecutionContext)
+  extends FrontendBaseController
     with I18nSupport {
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData) { implicit request =>
-    val preparedForm = request.userAnswers match {
-      case None     =>
-        // TODO: create user answers
-        form
-      case Some(ua) =>
-        ua.get(ContactMethodPage) match {
-          case None        => form
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
+    mode match {
+      case NormalMode =>
+        //        for {
+        //          _ <- userAnswersConnector.createUserAnswers(request.appaId)
+        //        } yield Ok(view(form, mode))
+        Future.successful(Ok(view(form, mode)))
+      case CheckMode =>
+        val preparedForm = request.userAnswers.flatMap(_.get(ContactMethodPage)) match {
+          case None => form
           case Some(value) => form.fill(value)
         }
+        Future.successful(Ok(view(preparedForm, mode)))
     }
-
-    Ok(view(preparedForm, mode))
   }
 
   // andThen requireData
@@ -65,11 +69,23 @@ class ContactMethodController @Inject() (
       .bindFromRequest()
       .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-        value => Future.successful(Ok(s"Form submission successful with value $value"))
-//    for {
-//      updatedAnswers <- Future.fromTry(request.userAnswers.set($className$Page, value))
-//      _              <- sessionRepository.set(updatedAnswers)
-//    } yield Redirect(navigator.nextPage($className$Page, mode, updatedAnswers))
+        value => {
+          val dummyUserAnswers = UserAnswers(
+            request.appaId,
+            request.userId,
+            paperlessReference = false,
+            emailVerification = Some(true),
+            bouncedEmail = Some(false),
+            emailAddress = Some("email"),
+            startedTime = Instant.now,
+            lastUpdated = Instant.now()
+          ).set(ContactMethodPage, value)
+          Future.successful(Redirect(navigator.nextPage(ContactMethodPage, mode, dummyUserAnswers.get)))
+        }
+        //          for {
+        //            updatedAnswers <- Future.fromTry(request.userAnswers.set(ContactMethodPage, value))
+        //            _ <- userAnswersConnector.set(updatedAnswers)
+        //          } yield Redirect(navigator.nextPage(ContactMethodPage, mode, updatedAnswers))
       )
   }
 }

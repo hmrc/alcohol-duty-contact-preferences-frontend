@@ -24,18 +24,18 @@ import java.time.Instant
 import scala.util.{Failure, Success, Try}
 
 final case class UserAnswers(
-                              appaId: String,
-                              userId: String,
-                              paperlessReference: Boolean,
-                              emailVerification: Option[Boolean],
-                              bouncedEmail: Option[Boolean],
-                              //                              sensitiveUserInformation: SensitiveUserInformation,
-                              emailAddress: Option[String],
-                              emailEntered: Option[String] = None,
-                              data: JsObject = Json.obj(),
-                              startedTime: Instant,
-                              lastUpdated: Instant
-                            ) {
+  appaId: String,
+  userId: String,
+  paperlessReference: Boolean,
+  emailVerification: Option[Boolean],
+  bouncedEmail: Option[Boolean],
+  //                              sensitiveUserInformation: SensitiveUserInformation,
+  emailAddress: Option[String],
+  emailEntered: Option[String] = None,
+  data: JsObject = Json.obj(),
+  startedTime: Instant,
+  lastUpdated: Instant
+) {
 
   def get[A](page: Gettable[A])(implicit rds: Reads[A]): Option[A] =
     Reads.optionNoError(Reads.at(page.path)).reads(data).getOrElse(None)
@@ -45,7 +45,7 @@ final case class UserAnswers(
     val updatedData = data.setObject(page.path, Json.toJson(value)) match {
       case JsSuccess(jsValue, _) =>
         Success(jsValue)
-      case JsError(errors) =>
+      case JsError(errors)       =>
         Failure(JsResultException(errors))
     }
 
@@ -60,7 +60,7 @@ final case class UserAnswers(
     val updatedData = data.removeObject(page.path) match {
       case JsSuccess(jsValue, _) =>
         Success(jsValue)
-      case JsError(_) =>
+      case JsError(_)            =>
         Success(data)
     }
 
@@ -89,7 +89,7 @@ object UserAnswers {
         (__ \ "data").read[JsObject] and
         (__ \ "startedTime").read(MongoJavatimeFormats.instantFormat) and
         (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
-      )(UserAnswers.apply _)
+    )(UserAnswers.apply _)
   }
 
   val writes: OWrites[UserAnswers] = {
@@ -108,7 +108,7 @@ object UserAnswers {
         (__ \ "data").write[JsObject] and
         (__ \ "startedTime").write(MongoJavatimeFormats.instantFormat) and
         (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
-      )(unlift(UserAnswers.unapply))
+    )(unlift(UserAnswers.unapply))
   }
 
   implicit val format: OFormat[UserAnswers] = OFormat(reads, writes)

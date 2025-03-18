@@ -45,9 +45,9 @@ class Navigator @Inject() () {
   }
 
   private def contactMethodRoute(userAnswers: UserAnswers, mode: Mode): Call = {
-    val selectedEmail                = userAnswers.get(pages.ContactMethodPage)
-    val paperlessReference           = true
-    val currentEmail: Option[String] = Some("john.doe@example.com")
+    val selectedEmail      = userAnswers.get(pages.ContactMethodPage)
+    val paperlessReference = userAnswers.paperlessReference
+    val currentEmail       = userAnswers.emailAddress
     (selectedEmail, paperlessReference, currentEmail) match {
       case (Some(true), false, None)    =>
         // TODO: next page is /what-email-address

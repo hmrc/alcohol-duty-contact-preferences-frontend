@@ -25,18 +25,18 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import scala.concurrent.ExecutionContext
 
-class TestUserAnswersController @Inject()(
-                                           override val messagesApi: MessagesApi,
-                                           val controllerComponents: MessagesControllerComponents,
-                                           identify: IdentifierAction,
-                                           userAnswersConnector: UserAnswersConnector
-                                         )(implicit ec: ExecutionContext)
-  extends FrontendBaseController
+class TestUserAnswersController @Inject() (
+  override val messagesApi: MessagesApi,
+  val controllerComponents: MessagesControllerComponents,
+  identify: IdentifierAction,
+  userAnswersConnector: UserAnswersConnector
+)(implicit ec: ExecutionContext)
+    extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = identify.async { implicit request =>
     for {
-      _ <- userAnswersConnector.createUserAnswers(request.appaId)
+      _  <- userAnswersConnector.createUserAnswers(request.appaId)
       ua <- userAnswersConnector.get(request.appaId)
     } yield Ok(s"test successful, email address: $ua")
   }
