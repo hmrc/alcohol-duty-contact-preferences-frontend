@@ -53,4 +53,4 @@ contactMethod.title = How would you like to be contacted?
 contactMethod.heading = How would you like to be contacted?
 contactMethod.email = Email me when I have a message in my account
 contactMethod.post = Send me letters by post
-contactMethodQuestion.error.required = Select how you would like to be contacted
+contactMethod.error.required = Select how you would like to be contacted

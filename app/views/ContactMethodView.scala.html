@@ -28,7 +28,7 @@
 
 @layout(pageTitle = title(form, messages("contactMethod.title"))) {
 
-    @formHelper(action = controllers.routes.ContactMethodController.onSubmit(), Symbol("autoComplete") -> "off") {
+    @formHelper(action = routes.ContactMethodController.onSubmit(), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -36,15 +36,15 @@
 
         @govukRadios(
             RadiosViewModel(
-                field = form("contactMethodQuestion"),
+                field = form("contactMethodEmail"),
                 items = Seq(
                     RadioItem(
-                        id = Some("contactMethodQuestion"),
+                        id = Some("contactMethodEmail"),
                         value = Some("true"),
                         content = Text(messages("contactMethod.email"))
                     ),
                     RadioItem(
-                        id = Some(s"contactMethodQuestion-post"),
+                        id = Some(s"contactMethodPost"),
                         value = Some("false"),
                         content = Text(messages("contactMethod.post"))
                     )
@@ -54,7 +54,7 @@
         )
 
         @govukButton(
-            ButtonViewModel("saveAndContinueButton",messages("site.continue"))
+            ButtonViewModel("continueButton", messages("site.continue"))
         )
     }
 }
