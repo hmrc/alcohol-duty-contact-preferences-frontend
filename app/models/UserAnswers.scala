@@ -26,11 +26,10 @@ import scala.util.{Failure, Success, Try}
 final case class UserAnswers(
   appaId: String,
   paperlessReference: Boolean,
-  emailAddress: Option[String],
   emailVerification: Option[Boolean],
   bouncedEmail: Option[Boolean],
+  sensitiveUserInformation: SensitiveUserInformation,
   data: JsObject = Json.obj(),
-  emailEntered: Option[String] = None,
   startedTime: Instant,
   lastUpdated: Instant
 ) {
@@ -78,11 +77,10 @@ object UserAnswers {
     (
       (__ \ "appaId").read[String] and
         (__ \ "paperlessReference").read[Boolean] and
-        (__ \ "emailAddress").readNullable[String] and
         (__ \ "emailVerification").readNullable[Boolean] and
         (__ \ "bouncedEmail").readNullable[Boolean] and
+        (__ \ "sensitiveUserInformation").read[SensitiveUserInformation] and
         (__ \ "data").read[JsObject] and
-        (__ \ "emailEntered").readNullable[String] and
         (__ \ "startedTime").read(MongoJavatimeFormats.instantFormat) and
         (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
     )(UserAnswers.apply _)
@@ -95,11 +93,10 @@ object UserAnswers {
     (
       (__ \ "appaId").write[String] and
         (__ \ "paperlessReference").write[Boolean] and
-        (__ \ "emailAddress").writeNullable[String] and
         (__ \ "emailVerification").writeNullable[Boolean] and
         (__ \ "bouncedEmail").writeNullable[Boolean] and
+        (__ \ "sensitiveUserInformation").write[SensitiveUserInformation] and
         (__ \ "data").write[JsObject] and
-        (__ \ "emailEntered").writeNullable[String] and
         (__ \ "startedTime").write(MongoJavatimeFormats.instantFormat) and
         (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
     )(unlift(UserAnswers.unapply))
