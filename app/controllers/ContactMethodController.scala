@@ -35,8 +35,8 @@ class ContactMethodController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  val controllerComponents: MessagesControllerComponents,
   formProvider: ContactMethodFormProvider,
+  val controllerComponents: MessagesControllerComponents,
   view: ContactMethodView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -66,6 +66,10 @@ class ContactMethodController @Inject() (
       .fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
         value => Future.successful(Ok(s"Form submission successful with value $value"))
+//    for {
+//      updatedAnswers <- Future.fromTry(request.userAnswers.set($className$Page, value))
+//      _              <- sessionRepository.set(updatedAnswers)
+//    } yield Redirect(navigator.nextPage($className$Page, mode, updatedAnswers))
       )
   }
 }

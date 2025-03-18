@@ -37,6 +37,7 @@
         @govukRadios(
             RadiosViewModel(
                 field = form("contactMethodEmail"),
+                legend = LegendViewModel(messages("contactMethod.heading")).withSize(LegendSize.Large),
                 items = Seq(
                     RadioItem(
                         id = Some("contactMethodEmail"),
@@ -48,8 +49,7 @@
                         value = Some("false"),
                         content = Text(messages("contactMethod.post"))
                     )
-                ),
-                legend = LegendViewModel(messages("contactMethod.heading")).withSize(LegendSize.Large)
+                )
             )
         )
 

@@ -49,22 +49,30 @@ class Navigator @Inject() () {
     val paperlessReference           = true
     val currentEmail: Option[String] = Some("john.doe@example.com")
     (selectedEmail, paperlessReference, currentEmail) match {
-      case (Some(true), false, None)    => // selected email, on post, no email in system
+      case (Some(true), false, None)    =>
+        // TODO: next page is /what-email-address
+        println(
+          "User selected email and is currently on post with no email in ETMP. Should redirect to /what-email-address"
+        )
         routes.IndexController.onPageLoad()
-//        controllers.adjustment.routes.SpoiltAlcoholicProductTypeController.onPageLoad(mode)
-      // /what-email-address
-      case (Some(true), false, Some(_)) => // selected email, on post, has email in system
+      case (Some(true), false, Some(_)) =>
+        // TODO: next page is /existing-email
+        println(
+          "User selected email and is currently on post but has an email in ETMP. Should redirect to /existing-email"
+        )
         routes.IndexController.onPageLoad()
-      // /existing-email
-      case (Some(true), true, Some(_))  => // selected email, on email
+      case (Some(true), true, Some(_))  =>
+        // TODO: next page is /enrolled-emails
+        println("User selected email and is currently on email. Should redirect to /enrolled-emails")
         routes.IndexController.onPageLoad()
-      // /enrolled-emails
-      case (Some(false), true, Some(_)) => // selected paper, on email
+      case (Some(false), true, Some(_)) =>
+        // TODO: next page is /check-answers
+        println("User selected post and is currently on email. Should redirect to /check-answers")
         routes.IndexController.onPageLoad()
-      // /check-answers
-      case (Some(false), false, _)      => // selected paper, on paper
+      case (Some(false), false, _)      =>
+        // TODO: next page is /enrolled-letters
+        println("User selected post and is currently on post. Should redirect to /enrolled-letters")
         routes.IndexController.onPageLoad()
-      // /enrolled-letters
       case _                            =>
         routes.JourneyRecoveryController.onPageLoad()
     }

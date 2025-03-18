@@ -10,8 +10,8 @@ GET         /refresh-session                             controllers.KeepAliveCo
 
 GET         /there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
-GET         /contact-preference/method                   controllers.ContactMethodController.onPageLoad(mode: Mode = NormalMode)
-POST        /contact-preference/method                   controllers.ContactMethodController.onSubmit(mode: Mode = NormalMode)
+GET         /method                                      controllers.ContactMethodController.onPageLoad(mode: Mode = NormalMode)
+POST        /method                                      controllers.ContactMethodController.onSubmit(mode: Mode = NormalMode)
 
 GET         /check-your-answers                          controllers.CheckYourAnswersController.onPageLoad()
 
