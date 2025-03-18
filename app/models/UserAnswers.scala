@@ -25,9 +25,14 @@ import scala.util.{Failure, Success, Try}
 
 final case class UserAnswers(
   appaId: String,
-  sensitiveString: String,
+  paperlessReference: Boolean,
+  emailAddress: Option[String],
+  emailVerification: Option[Boolean],
+  bouncedEmail: Option[Boolean],
   data: JsObject = Json.obj(),
-  lastUpdated: Instant = Instant.now
+  emailEntered: Option[String] = None,
+  startedTime: Instant,
+  lastUpdated: Instant
 ) {
 
   def get[A](page: Gettable[A])(implicit rds: Reads[A]): Option[A] =
@@ -72,8 +77,13 @@ object UserAnswers {
 
     (
       (__ \ "_id").read[String] and
-        (__ \ "sensitiveString").read[String] and
+        (__ \ "paperlessReference").read[Boolean] and
+        (__ \ "emailAddress").readNullable[String] and
+        (__ \ "emailVerification").readNullable[Boolean] and
+        (__ \ "bouncedEmail").readNullable[Boolean] and
         (__ \ "data").read[JsObject] and
+        (__ \ "emailEntered").readNullable[String] and
+        (__ \ "startedTime").read(MongoJavatimeFormats.instantFormat) and
         (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
     )(UserAnswers.apply _)
   }
@@ -84,10 +94,15 @@ object UserAnswers {
 
     (
       (__ \ "_id").write[String] and
-        (__ \ "sensitiveString").write[String] and
+        (__ \ "paperlessReference").write[Boolean] and
+        (__ \ "emailAddress").writeNullable[String] and
+        (__ \ "emailVerification").writeNullable[Boolean] and
+        (__ \ "bouncedEmail").writeNullable[Boolean] and
         (__ \ "data").write[JsObject] and
+        (__ \ "emailEntered").writeNullable[String] and
+        (__ \ "startedTime").write(MongoJavatimeFormats.instantFormat) and
         (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
-    )(ua => (ua.appaId, ua.sensitiveString, ua.data, ua.lastUpdated))
+    )(unlift(UserAnswers.unapply))
   }
 
   implicit val format: OFormat[UserAnswers] = OFormat(reads, writes)

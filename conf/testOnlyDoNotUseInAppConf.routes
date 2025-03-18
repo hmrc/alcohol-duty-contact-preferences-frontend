@@ -11,5 +11,5 @@
 
 # Add all the application routes to the prod.routes file
 ->        /                                                      prod.Routes
-->        /alcohol-duty-contact-preferences-frontend/test-only/  test.Routes
+->        /manage-alcohol-duty/contact-preferences/test-only/    test.Routes
 
