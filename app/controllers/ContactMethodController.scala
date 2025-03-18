@@ -19,7 +19,7 @@ package controllers
 import connectors.UserAnswersConnector
 import controllers.actions._
 import forms.ContactMethodFormProvider
-import models.{CheckMode, Mode, NormalMode, UserAnswers}
+import models.{CheckMode, DecryptedSensitiveUserInformation, Mode, NormalMode, UserAnswers}
 import navigation.Navigator
 import pages.ContactMethodPage
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -50,10 +50,9 @@ class ContactMethodController @Inject() (
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
     mode match {
       case NormalMode =>
-        //        for {
-        //          _ <- userAnswersConnector.createUserAnswers(request.appaId)
-        //        } yield Ok(view(form, mode))
-        Future.successful(Ok(view(form, mode)))
+        for {
+          _ <- userAnswersConnector.createUserAnswers(request.appaId)
+        } yield Ok(view(form, mode))
       case CheckMode  =>
         val preparedForm = request.userAnswers.flatMap(_.get(ContactMethodPage)) match {
           case None        => form
@@ -76,7 +75,7 @@ class ContactMethodController @Inject() (
             paperlessReference = false,
             emailVerification = Some(true),
             bouncedEmail = Some(false),
-            emailAddress = Some("email"),
+            DecryptedSensitiveUserInformation(emailAddress = Some("email")),
             startedTime = Instant.now,
             lastUpdated = Instant.now()
           ).set(ContactMethodPage, value)

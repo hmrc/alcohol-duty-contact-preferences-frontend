@@ -16,23 +16,61 @@
 
 package controllers.actions
 
-import javax.inject.Inject
+import connectors.UserAnswersConnector
+import controllers.routes
 import models.requests.{IdentifierRequest, OptionalDataRequest}
-import play.api.mvc.ActionTransformer
-import repositories.SessionRepository
+import play.api.Logging
+import play.api.http.Status.{LOCKED, NOT_FOUND}
+import play.api.mvc.Results.Redirect
+import play.api.mvc.{ActionRefiner, Result}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class DataRetrievalActionImpl @Inject() (
-  val sessionRepository: SessionRepository
+  val userAnswersConnector: UserAnswersConnector
 )(implicit val executionContext: ExecutionContext)
-    extends DataRetrievalAction {
+    extends DataRetrievalAction
+    with Logging {
 
-  override protected def transform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] =
-    // TODO - need to create an appropriate cache key (APPAID?)
-    sessionRepository.get(request.userId).map {
-      OptionalDataRequest(request.request, request.appaId, request.groupId, request.userId, _)
-    }
+  override protected def refine[A](request: IdentifierRequest[A]): Future[Either[Result, OptionalDataRequest[A]]] = {
+
+    val headerCarrier: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
+
+    userAnswersConnector
+      .get(request.appaId)(headerCarrier)
+      .map {
+        case Right(ua)                              =>
+          Right(
+            OptionalDataRequest(
+              request.request,
+              request.appaId,
+              request.groupId,
+              request.userId,
+              Some(ua)
+            )
+          )
+        case Left(ex) if ex.statusCode == NOT_FOUND =>
+          logger.info(s"User answers for ${request.appaId} not found")
+          Right(
+            OptionalDataRequest(
+              request.request,
+              request.appaId,
+              request.groupId,
+              request.userId,
+              None
+            )
+          )
+//        case Left(ex) if ex.statusCode == LOCKED    =>
+//          logger.info(s"User answers for ${request.appaId} locked")
+//          Left(Redirect(routes.ReturnLockedController.onPageLoad()))
+        case Left(ex)                               =>
+          logger.warn("Data retrieval failed with exception: ", ex)
+          Left(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+      }
+  }
 }
 
-trait DataRetrievalAction extends ActionTransformer[IdentifierRequest, OptionalDataRequest]
+trait DataRetrievalAction extends ActionRefiner[IdentifierRequest, OptionalDataRequest]
