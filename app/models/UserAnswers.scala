@@ -24,10 +24,18 @@ import java.time.Instant
 import scala.util.{Failure, Success, Try}
 
 final case class UserAnswers(
-  id: String,
-  data: JsObject = Json.obj(),
-  lastUpdated: Instant = Instant.now
-) {
+                              appaId: String,
+                              userId: String,
+                              paperlessReference: Boolean,
+                              emailVerification: Option[Boolean],
+                              bouncedEmail: Option[Boolean],
+                              //                              sensitiveUserInformation: SensitiveUserInformation,
+                              emailAddress: Option[String],
+                              emailEntered: Option[String] = None,
+                              data: JsObject = Json.obj(),
+                              startedTime: Instant,
+                              lastUpdated: Instant
+                            ) {
 
   def get[A](page: Gettable[A])(implicit rds: Reads[A]): Option[A] =
     Reads.optionNoError(Reads.at(page.path)).reads(data).getOrElse(None)
@@ -37,7 +45,7 @@ final case class UserAnswers(
     val updatedData = data.setObject(page.path, Json.toJson(value)) match {
       case JsSuccess(jsValue, _) =>
         Success(jsValue)
-      case JsError(errors)       =>
+      case JsError(errors) =>
         Failure(JsResultException(errors))
     }
 
@@ -52,7 +60,7 @@ final case class UserAnswers(
     val updatedData = data.removeObject(page.path) match {
       case JsSuccess(jsValue, _) =>
         Success(jsValue)
-      case JsError(_)            =>
+      case JsError(_) =>
         Success(data)
     }
 
@@ -70,10 +78,18 @@ object UserAnswers {
     import play.api.libs.functional.syntax._
 
     (
-      (__ \ "_id").read[String] and
+      (__ \ "appaId").read[String] and
+        (__ \ "userId").read[String] and
+        (__ \ "paperlessReference").read[Boolean] and
+        (__ \ "emailVerification").readNullable[Boolean] and
+        (__ \ "bouncedEmail").readNullable[Boolean] and
+        //        (__ \ "sensitiveUserInformation").read[SensitiveUserInformation] and
+        (__ \ "emailAddress").readNullable[String] and
+        (__ \ "emailEntered").readNullable[String] and
         (__ \ "data").read[JsObject] and
+        (__ \ "startedTime").read(MongoJavatimeFormats.instantFormat) and
         (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
-    )(UserAnswers.apply _)
+      )(UserAnswers.apply _)
   }
 
   val writes: OWrites[UserAnswers] = {
@@ -81,10 +97,18 @@ object UserAnswers {
     import play.api.libs.functional.syntax._
 
     (
-      (__ \ "_id").write[String] and
+      (__ \ "appaId").write[String] and
+        (__ \ "userId").write[String] and
+        (__ \ "paperlessReference").write[Boolean] and
+        (__ \ "emailVerification").writeNullable[Boolean] and
+        (__ \ "bouncedEmail").writeNullable[Boolean] and
+        //        (__ \ "sensitiveUserInformation").write[SensitiveUserInformation] and
+        (__ \ "emailAddress").writeNullable[String] and
+        (__ \ "emailEntered").writeNullable[String] and
         (__ \ "data").write[JsObject] and
+        (__ \ "startedTime").write(MongoJavatimeFormats.instantFormat) and
         (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
-    )(ua => (ua.id, ua.data, ua.lastUpdated))
+      )(unlift(UserAnswers.unapply))
   }
 
   implicit val format: OFormat[UserAnswers] = OFormat(reads, writes)

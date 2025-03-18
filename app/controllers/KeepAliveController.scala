@@ -16,9 +16,9 @@
 
 package controllers
 
+import connectors.UserAnswersConnector
 import controllers.actions.{DataRetrievalAction, IdentifierAction}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import repositories.SessionRepository
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
@@ -28,14 +28,14 @@ class KeepAliveController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
-  sessionRepository: SessionRepository
+  userAnswersConnector: UserAnswersConnector
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController {
 
   def keepAlive(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
     request.userAnswers
       .map { answers =>
-        sessionRepository.keepAlive(answers.id).map(_ => Ok)
+        userAnswersConnector.keepAlive(answers.appaId).map(_ => Ok)
       }
       .getOrElse(Future.successful(Ok))
   }
