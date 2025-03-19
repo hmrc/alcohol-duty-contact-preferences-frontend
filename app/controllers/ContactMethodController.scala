@@ -62,29 +62,17 @@ class ContactMethodController @Inject() (
     }
   }
 
-  // andThen requireData
-  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    form
-      .bindFromRequest()
-      .fold(
-        formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-        value => {
-          val dummyUserAnswers = UserAnswers(
-            request.appaId,
-            request.userId,
-            paperlessReference = false,
-            emailVerification = Some(true),
-            bouncedEmail = Some(false),
-            DecryptedSensitiveUserInformation(emailAddress = Some("email")),
-            startedTime = Instant.now,
-            lastUpdated = Instant.now()
-          ).set(ContactMethodPage, value)
-          Future.successful(Redirect(navigator.nextPage(ContactMethodPage, mode, dummyUserAnswers.get)))
-        }
-        //          for {
-        //            updatedAnswers <- Future.fromTry(request.userAnswers.set(ContactMethodPage, value))
-        //            _ <- userAnswersConnector.set(updatedAnswers)
-        //          } yield Redirect(navigator.nextPage(ContactMethodPage, mode, updatedAnswers))
-      )
+  def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
+    implicit request =>
+      form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
+          value =>
+            for {
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(ContactMethodPage, value))
+              _              <- userAnswersConnector.set(updatedAnswers)
+            } yield Redirect(navigator.nextPage(ContactMethodPage, mode, updatedAnswers))
+        )
   }
 }

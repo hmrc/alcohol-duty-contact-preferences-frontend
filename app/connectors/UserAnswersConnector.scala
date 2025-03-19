@@ -38,6 +38,13 @@ class UserAnswersConnector @Inject() (
       .get(url"${config.ecpUserAnswersGetUrl(appaId)}")
       .execute[Either[UpstreamErrorResponse, UserAnswers]]
 
+  def set(userAnswers: UserAnswers)(implicit hc: HeaderCarrier): Future[HttpResponse] =
+    httpClient
+      .put(url"${config.ecpUserAnswersUrl()}")
+      .setHeader("Csrf-Token" -> "nocheck")
+      .withBody(Json.toJson(userAnswers))
+      .execute[HttpResponse]
+
   def createUserAnswers(
     appaId: String
   )(implicit hc: HeaderCarrier): Future[Either[UpstreamErrorResponse, UserAnswers]] =
