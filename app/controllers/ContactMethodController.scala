@@ -55,14 +55,9 @@ class ContactMethodController @Inject() (
           _ <- userAnswersConnector.createUserAnswers(UserDetails(request.appaId, request.userId))
         } yield Ok(view(form, mode))
       case CheckMode  =>
-        request.userAnswers match {
-          case None     => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
-          case Some(ua) =>
-            val preparedForm = ua.get(ContactMethodPage) match {
-              case None        => form
-              case Some(value) => form.fill(value)
-            }
-            Future.successful(Ok(view(preparedForm, mode)))
+        request.userAnswers.flatMap(_.get(ContactMethodPage)) match {
+          case None        => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+          case Some(value) => Future.successful(Ok(view(form.fill(value), mode)))
         }
     }
   }

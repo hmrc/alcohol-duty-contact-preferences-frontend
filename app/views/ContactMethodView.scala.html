@@ -28,7 +28,7 @@
 
 @layout(pageTitle = title(form, messages("contactMethod.title"))) {
 
-    @formHelper(action = routes.ContactMethodController.onSubmit(), Symbol("autoComplete") -> "off") {
+    @formHelper(action = routes.ContactMethodController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
