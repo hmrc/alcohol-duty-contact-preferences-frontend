@@ -19,6 +19,7 @@ package testOnly.controllers
 import com.google.inject.Inject
 import connectors.UserAnswersConnector
 import controllers.actions.IdentifierAction
+import models.UserDetails
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -36,9 +37,9 @@ class TestUserAnswersController @Inject() (
 
   def onPageLoad(): Action[AnyContent] = identify.async { implicit request =>
     for {
-      _  <- userAnswersConnector.createUserAnswers(request.appaId)
+      _  <- userAnswersConnector.createUserAnswers(UserDetails(request.appaId, request.userId))
       ua <- userAnswersConnector.get(request.appaId)
-    } yield Ok(s"test successful, email address: $ua")
+    } yield Ok(s"test successful, user answers: $ua")
   }
 
 }

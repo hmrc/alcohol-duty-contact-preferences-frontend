@@ -17,7 +17,7 @@
 package connectors
 
 import config.FrontendAppConfig
-import models.UserAnswers
+import models.{UserAnswers, UserDetails}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReadsInstances, HttpResponse, StringContextOps, UpstreamErrorResponse}
@@ -46,11 +46,11 @@ class UserAnswersConnector @Inject() (
       .execute[HttpResponse]
 
   def createUserAnswers(
-    appaId: String
+    userDetails: UserDetails
   )(implicit hc: HeaderCarrier): Future[Either[UpstreamErrorResponse, UserAnswers]] =
     httpClient
       .post(url"${config.ecpUserAnswersUrl()}")
-      .withBody(Json.toJson(appaId))
+      .withBody(Json.toJson(userDetails))
       .setHeader("Csrf-Token" -> "nocheck")
       .execute[Either[UpstreamErrorResponse, UserAnswers]]
 
