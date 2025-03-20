@@ -61,8 +61,8 @@ class AuthenticatedIdentifierAction @Inject() (
 
     authorised(predicate).retrieve(internalId and groupIdentifier and allEnrolments) {
       case optInternalId ~ optGroupId ~ enrolments =>
-        val internalId: String = getOrElseFailIllegalState(optInternalId, "Unable to retrieve internalId")
-        val groupId: String    = getOrElseFailIllegalState(optGroupId, "Unable to retrieve groupIdentifier")
+        val internalId: String = getOrElseFailWithUnauthorised(optInternalId, "Unable to retrieve internalId")
+        val groupId: String    = getOrElseFailWithUnauthorised(optGroupId, "Unable to retrieve groupIdentifier")
         val appaId             = getAppaId(enrolments)
         block(IdentifierRequest(request, appaId, groupId, internalId))
     } recover {
@@ -86,35 +86,18 @@ class AuthenticatedIdentifierAction @Inject() (
   }
 
   private def getAppaId(enrolments: Enrolments): String = {
-    val adrEnrolments: Enrolment  = getOrElseFailIllegalState(
+    val adrEnrolments: Enrolment  = getOrElseFailWithUnauthorised(
       enrolments.enrolments.find(_.key == config.enrolmentServiceName),
       s"Unable to retrieve enrolment: ${config.enrolmentServiceName}"
     )
     val appaIdOpt: Option[String] =
       adrEnrolments.getIdentifier(config.enrolmentIdentifierKey).map(_.value)
-    getOrElseFailUnauthorized(appaIdOpt)
+    getOrElseFailWithUnauthorised(appaIdOpt, "Unable to retrieve APPAID from enrolments")
   }
 
-  private def getOrElseFailIllegalState[T](o: Option[T], failureMessage: String): T =
+  def getOrElseFailWithUnauthorised[T](o: Option[T], failureMessage: String): T =
     o.getOrElse {
       logger.warn(s"Identifier Action failed with error: $failureMessage")
       throw new IllegalStateException(failureMessage)
     }
-
-  private def getOrElseFailUnauthorized[T](maybeAppId: Option[T]): T = {
-    val msg: String = s"Unable to retrieve enrolment: ${config.enrolmentServiceName}"
-
-    maybeAppId match {
-      case Some(appaId) =>
-        if (appaId.toString.isBlank) {
-          logger.warn(s"Identifier Action failed with error: $msg")
-          throw new UnauthorizedException(msg)
-        } else {
-          appaId
-        }
-      case None         =>
-        logger.warn(s"Identifier Action failed with error: $msg")
-        throw new UnauthorizedException(msg)
-    }
-  }
 }

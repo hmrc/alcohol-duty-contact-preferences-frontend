@@ -18,6 +18,8 @@ package config
 
 object Constants {
 
+  val ukTimeZoneStringId = "Europe/London"
+
   object Css {
     val bodyCssClass = "govuk-body"
 

@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package generators
+package common
 
-import org.scalacheck.Gen
+import models.UserAnswers
+import pages.ContactMethodPage
 
-trait ModelGenerators {
-  def appaIdGen: Gen[String] = Gen.listOfN(10, Gen.numChar).map(id => s"XMADP${id.mkString}")
+trait TestPages extends TestData {
+  def contactMethodPage(userAnswers: UserAnswers, emailSelected: Boolean): UserAnswers =
+    userAnswers.set(ContactMethodPage, emailSelected).get
 }

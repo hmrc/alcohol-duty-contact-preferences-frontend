@@ -16,17 +16,22 @@
 
 package base
 
+import common.{TestData, TestPages}
+import config.FrontendAppConfig
 import controllers.actions._
+import generators.ModelGenerators
 import models.UserAnswers
-import models.preferences.ContactPreference
+import org.mockito.MockitoSugar
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
-import org.scalatest.{OptionValues, TryValues}
+import org.scalatest.{BeforeAndAfterEach, OptionValues, TryValues}
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.mvc.Results
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -38,20 +43,18 @@ trait SpecBase
     with TryValues
     with OptionValues
     with ScalaFutures
-    with IntegrationPatience {
+    with Results
+    with GuiceOneAppPerSuite
+    with MockitoSugar
+    with IntegrationPatience
+    with ModelGenerators
+    with TestData
+    with TestPages
+    with BeforeAndAfterEach {
 
-  val userAnswersId: String = "id"
-  val appaIdKey: String     = "APPAID"
-  val state: String         = "Activated"
-  val enrolment: String     = "HMRC-AD-ORG"
-  val appaId: String        = "appaid" // TODO appaIdGen.sample.get
-  val groupId: String       = "groupid"
-  val internalId: String    = "id"
+  def getMessages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
-  def emptyUserAnswers: UserAnswers                        = UserAnswers(userAnswersId)
-  val fakeIdentifierUserDetails: FakeIdentifierUserDetails = FakeIdentifierUserDetails(appaId, groupId, internalId)
-  val contactPreferenceRequest: ContactPreference          = new ContactPreference("1", None, None, None)
-  val contactPreferenceResponse: ContactPreference         = new ContactPreference("1", None, None, None)
+  val fakeIdentifierUserDetails: FakeIdentifierUserDetails = FakeIdentifierUserDetails(appaId, groupId, userId)
 
   def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
@@ -63,6 +66,11 @@ trait SpecBase
         bind[FakeIdentifierUserDetails].toInstance(fakeIdentifierUserDetails),
         bind[DataRetrievalAction].toInstance(new FakeDataRetrievalAction(userAnswers))
       )
+
+  def FakeRequestWithoutSession()                            = play.api.test.FakeRequest()
+  def FakeRequestWithoutSession(verb: String, route: String) = play.api.test.FakeRequest(verb, route)
+
+  lazy val appConfig: FrontendAppConfig = app.injector.instanceOf[FrontendAppConfig]
 
   implicit val hc: HeaderCarrier    = HeaderCarrier()
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global

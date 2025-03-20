@@ -30,18 +30,63 @@ class NavigatorSpec extends SpecBase {
     "in Normal mode" - {
 
       "must go from a page that doesn't exist in the route map to Index" in {
-
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, NormalMode, UserAnswers("id")) mustBe routes.IndexController.onPageLoad()
+        navigator.nextPage(UnknownPage, NormalMode, emptyUserAnswers) mustBe routes.IndexController.onPageLoad()
+      }
+
+      "from the Contact Method page" - {
+        "must go to the What Email Address page if the user is currently on post, has selected email and has no email in ETMP" in {
+          navigator.nextPage(
+            ContactMethodPage,
+            NormalMode,
+            emptyUserAnswersPostNoEmail.set(ContactMethodPage, true).success.value
+          ) mustBe routes.IndexController.onPageLoad()
+          // TODO: change to correct route when page is created
+        }
+
+        "must go to the Existing Email page if the user is currently on post, has selected email and has an email in ETMP" in {
+          navigator.nextPage(
+            ContactMethodPage,
+            NormalMode,
+            emptyUserAnswers.copy(paperlessReference = false).set(ContactMethodPage, true).success.value
+          ) mustBe routes.IndexController.onPageLoad()
+          // TODO: change to correct route when page is created
+        }
+
+        "must go to the Enrolled Emails page if the user is currently on email and has selected email" in {
+          navigator.nextPage(
+            ContactMethodPage,
+            NormalMode,
+            emptyUserAnswers.set(ContactMethodPage, true).success.value
+          ) mustBe routes.IndexController.onPageLoad()
+          // TODO: change to correct route when page is created
+        }
+
+        "must go to the Check Answers page if the user is currently on email and has selected post" in {
+          navigator.nextPage(
+            ContactMethodPage,
+            NormalMode,
+            emptyUserAnswers.set(ContactMethodPage, false).success.value
+          ) mustBe routes.IndexController.onPageLoad()
+          // TODO: change to correct route when page is created
+        }
+
+        "must go to the Enrolled Letters page if the user is currently on post and has selected post" in {
+          navigator.nextPage(
+            ContactMethodPage,
+            NormalMode,
+            emptyUserAnswersPostNoEmail.set(ContactMethodPage, false).success.value
+          ) mustBe routes.IndexController.onPageLoad()
+          // TODO: change to correct route when page is created
+        }
       }
     }
 
     "in Check mode" - {
 
       "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
-
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, CheckMode, UserAnswers("id")) mustBe routes.CheckYourAnswersController
+        navigator.nextPage(UnknownPage, CheckMode, emptyUserAnswers) mustBe routes.CheckYourAnswersController
           .onPageLoad()
       }
     }
