@@ -19,16 +19,14 @@ package controllers
 import connectors.UserAnswersConnector
 import controllers.actions._
 import forms.ContactMethodFormProvider
-import models.{CheckMode, DecryptedSensitiveUserInformation, Mode, NormalMode, UserAnswers, UserDetails}
+import models.{CheckMode, Mode, NormalMode, UserDetails}
 import navigation.Navigator
 import pages.ContactMethodPage
 import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.Results.Redirect
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.ContactMethodView
 
-import java.time.Instant
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -51,9 +49,18 @@ class ContactMethodController @Inject() (
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
     mode match {
       case NormalMode =>
-        for {
-          _ <- userAnswersConnector.createUserAnswers(UserDetails(request.appaId, request.userId))
-        } yield Ok(view(form, mode))
+        request.userAnswers match {
+          case None     =>
+            for {
+              _ <- userAnswersConnector.createUserAnswers(UserDetails(request.appaId, request.userId))
+            } yield Ok(view(form, mode))
+          case Some(ua) =>
+            val preparedForm = ua.get(ContactMethodPage) match {
+              case None        => form
+              case Some(value) => form.fill(value)
+            }
+            Future.successful(Ok(view(preparedForm, mode)))
+        }
       case CheckMode  =>
         request.userAnswers.flatMap(_.get(ContactMethodPage)) match {
           case None        => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))

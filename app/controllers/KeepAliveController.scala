@@ -27,16 +27,11 @@ import scala.concurrent.{ExecutionContext, Future}
 class KeepAliveController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
-  getData: DataRetrievalAction,
   userAnswersConnector: UserAnswersConnector
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController {
 
-  def keepAlive(): Action[AnyContent] = (identify andThen getData).async { implicit request =>
-    request.userAnswers
-      .map { answers =>
-        userAnswersConnector.keepAlive(answers.appaId).map(_ => Ok)
-      }
-      .getOrElse(Future.successful(Ok))
+  def keepAlive(): Action[AnyContent] = identify.async { implicit request =>
+    userAnswersConnector.keepAlive(request.appaId).map(_ => Ok)
   }
 }
