@@ -114,15 +114,14 @@ class UserAnswersConnectorISpec extends ISpecBase with WireMockHelper {
     }
 
     "releaseLock" - {
-      "must call the release lock endpoint" in new SetUp{
+      "must call the release lock endpoint" in new SetUp {
         server.stubFor(
           delete(urlMatching(releaseLockUrl))
             .willReturn(aResponse().withStatus(OK))
         )
 
-        whenReady(connector.releaseLock(appaId)) {
-          result =>
-            result.status mustBe OK
+        whenReady(connector.releaseLock(appaId)) { result =>
+          result.status mustBe OK
         }
       }
 
