@@ -14,12 +14,32 @@
  * limitations under the License.
  */
 
-package common
+package forms
 
-import models.UserAnswers
-import pages.ContactMethodPage
+import forms.behaviours.BooleanFieldBehaviours
+import play.api.data.FormError
 
-trait TestPages extends TestData {
-  def contactMethodPage(userAnswers: UserAnswers, emailSelected: Boolean): UserAnswers =
-    userAnswers.set(ContactMethodPage, emailSelected).get
+class ContactMethodFormProviderSpec extends BooleanFieldBehaviours {
+
+  val requiredKey = "contactMethod.error.required"
+  val invalidKey  = "error.boolean"
+
+  val form = new ContactMethodFormProvider()()
+
+  ".value" - {
+
+    val fieldName = "contactMethodEmail"
+
+    behave like booleanField(
+      form,
+      fieldName,
+      invalidError = FormError(fieldName, invalidKey)
+    )
+
+    behave like mandatoryField(
+      form,
+      fieldName,
+      requiredError = FormError(fieldName, requiredKey)
+    )
+  }
 }

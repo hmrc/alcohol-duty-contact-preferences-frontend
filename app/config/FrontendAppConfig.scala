@@ -67,4 +67,10 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
 
   def ecpUserAnswersUrl(): String =
     s"$contactPreferencesHost/alcohol-duty-contact-preferences/user-answers"
+
+  def ecpReleaseUserAnswersLockUrl(appaId: String): String =
+    s"$contactPreferencesHost/alcohol-duty-contact-preferences/user-answers/lock/$appaId"
+
+  def ecpUserAnswersLockKeepAliveUrl(appaId: String): String =
+    s"$contactPreferencesHost/alcohol-duty-contact-preferences/user-answers/lock/$appaId/ttl"
 }
