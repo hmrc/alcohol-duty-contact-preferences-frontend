@@ -17,318 +17,219 @@
 package controllers.actions
 
 import base.SpecBase
-import com.google.inject.Inject
 import config.FrontendAppConfig
 import controllers.routes
-import play.api.mvc.{Action, AnyContent, BodyParsers, Results}
+import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchersSugar.eqTo
+import play.api.mvc.{BodyParsers, Request, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
+import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
+import uk.gov.hmrc.auth.core.CredentialStrength.strong
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.auth.core.authorise.Predicate
-import uk.gov.hmrc.auth.core.retrieve.{Retrieval, ~}
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.{allEnrolments, groupIdentifier, internalId => retriveInternalId}
+import uk.gov.hmrc.auth.core.retrieve.~
+import uk.gov.hmrc.http.UnauthorizedException
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class IdentifierActionSpec extends SpecBase {
 
-  class Harness(authAction: IdentifierAction) {
-    def onPageLoad(): Action[AnyContent] = authAction(_ => Results.Ok)
+  val loginUrl                = "loginUrl"
+  val loginContinueUrl        = "continueUrl"
+  val testContent             = "Test"
+  val enrolment               = "HMRC-AD-ORG"
+  val appaIdKey               = "APPAID"
+  val state                   = "Activated"
+  val enrolments              = Enrolments(Set(Enrolment(enrolment, Seq(EnrolmentIdentifier(appaIdKey, appaId)), state)))
+  val emptyEnrolments         = Enrolments(Set.empty)
+  val enrolmentsWithoutAppaId = Enrolments(Set(Enrolment(enrolment, Seq.empty, state)))
+
+  val mockAppConfig: FrontendAppConfig       = mock[FrontendAppConfig]
+  val defaultBodyParser: BodyParsers.Default = app.injector.instanceOf[BodyParsers.Default]
+  val mockAuthConnector: AuthConnector       = mock[AuthConnector]
+
+  val identifierAction = new AuthenticatedIdentifierAction(mockAuthConnector, mockAppConfig, defaultBodyParser)
+
+  val testAction: Request[_] => Future[Result] = { _ =>
+    Future(Ok(testContent))
   }
 
-  "Auth Action" - {
+  "invokeBlock" - {
 
-    "when the user hasn't logged in" - {
-
-      "must redirect the user to log in " in {
-
-        val application = applicationBuilder(userAnswers = None).build()
-
-        running(application) {
-          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
-          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
-
-          val authAction = new AuthenticatedIdentifierAction(
-            new FakeFailingAuthConnector(new MissingBearerToken),
-            appConfig,
-            bodyParsers
+    "execute the block and return OK if authorised" in {
+      when(mockAppConfig.enrolmentServiceName).thenReturn(enrolment)
+      when(mockAppConfig.enrolmentIdentifierKey).thenReturn(appaIdKey)
+      when(
+        mockAuthConnector.authorise(
+          eqTo(
+            AuthProviders(GovernmentGateway)
+              and Enrolment(enrolment)
+              and CredentialStrength(strong)
+              and Organisation
+              and ConfidenceLevel.L50
+          ),
+          eqTo(
+            retriveInternalId and groupIdentifier and allEnrolments
           )
-          val controller = new Harness(authAction)
-          val result     = controller.onPageLoad()(FakeRequest())
+        )(any(), any())
+      )
+        .thenReturn(Future(new ~(new ~(Some(userId), Some(groupId)), enrolments)))
 
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result).value must startWith(appConfig.loginUrl)
-        }
+      val result: Future[Result] = identifierAction.invokeBlock(FakeRequest(), testAction)
+
+      status(result) mustBe OK
+      contentAsString(result) mustBe testContent
+    }
+
+    "execute the block and throw IllegalStateException if cannot get the internalId" in {
+      when(mockAppConfig.enrolmentServiceName).thenReturn(enrolment)
+      when(mockAppConfig.enrolmentIdentifierKey).thenReturn(appaIdKey)
+      when(
+        mockAuthConnector.authorise(
+          eqTo(
+            AuthProviders(GovernmentGateway)
+              and Enrolment(enrolment)
+              and CredentialStrength(strong)
+              and Organisation
+              and ConfidenceLevel.L50
+          ),
+          eqTo(
+            retriveInternalId and groupIdentifier and allEnrolments
+          )
+        )(any(), any())
+      )
+        .thenReturn(Future(new ~(new ~(None, Some(groupId)), enrolments)))
+
+      intercept[IllegalStateException] {
+        await(identifierAction.invokeBlock(FakeRequest(), testAction))
       }
     }
 
-    "the user's session has expired" - {
-
-      "must redirect the user to log in " in {
-
-        val application = applicationBuilder(userAnswers = None).build()
-
-        running(application) {
-          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
-          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
-
-          val authAction = new AuthenticatedIdentifierAction(
-            new FakeFailingAuthConnector(new BearerTokenExpired),
-            appConfig,
-            bodyParsers
+    "execute the block and throw IllegalStateException if cannot get the groupId" in {
+      when(mockAppConfig.enrolmentServiceName).thenReturn(enrolment)
+      when(mockAppConfig.enrolmentIdentifierKey).thenReturn(appaIdKey)
+      when(
+        mockAuthConnector.authorise(
+          eqTo(
+            AuthProviders(GovernmentGateway)
+              and Enrolment(enrolment)
+              and CredentialStrength(strong)
+              and Organisation
+              and ConfidenceLevel.L50
+          ),
+          eqTo(
+            retriveInternalId and groupIdentifier and allEnrolments
           )
-          val controller = new Harness(authAction)
-          val result     = controller.onPageLoad()(FakeRequest())
+        )(any(), any())
+      )
+        .thenReturn(Future(new ~(new ~(Some(userId), None), enrolments)))
 
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result).value must startWith(appConfig.loginUrl)
-        }
+      intercept[IllegalStateException] {
+        await(identifierAction.invokeBlock(FakeRequest(), testAction))
       }
     }
 
-    "the user doesn't have sufficient enrolments" - {
-
-      "must redirect the user to the unauthorised page" in {
-
-        val application = applicationBuilder(userAnswers = None).build()
-
-        running(application) {
-          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
-          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
-
-          val authAction = new AuthenticatedIdentifierAction(
-            new FakeFailingAuthConnector(new InsufficientEnrolments),
-            appConfig,
-            bodyParsers
+    "execute the block and throw IllegalStateException if cannot get the enrolment" in {
+      when(mockAppConfig.enrolmentServiceName).thenReturn(enrolment)
+      when(mockAppConfig.enrolmentIdentifierKey).thenReturn(appaIdKey)
+      when(
+        mockAuthConnector.authorise(
+          eqTo(
+            AuthProviders(GovernmentGateway)
+              and Enrolment(enrolment)
+              and CredentialStrength(strong)
+              and Organisation
+              and ConfidenceLevel.L50
+          ),
+          eqTo(
+            retriveInternalId and groupIdentifier and allEnrolments
           )
-          val controller = new Harness(authAction)
-          val result     = controller.onPageLoad()(FakeRequest())
+        )(any(), any())
+      )
+        .thenReturn(Future(new ~(new ~(Some(userId), Some(groupId)), emptyEnrolments)))
 
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result).value mustBe routes.UnauthorisedController.onPageLoad().url
-        }
+      intercept[IllegalStateException] {
+        await(identifierAction.invokeBlock(FakeRequest(), testAction))
       }
     }
 
-    "the user doesn't have sufficient confidence level" - {
-
-      "must redirect the user to the unauthorised page" in {
-
-        val application = applicationBuilder(userAnswers = None).build()
-
-        running(application) {
-          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
-          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
-
-          val authAction = new AuthenticatedIdentifierAction(
-            new FakeFailingAuthConnector(new InsufficientConfidenceLevel),
-            appConfig,
-            bodyParsers
+    "execute the block and throw IllegalStateException if cannot get the APPAID enrolment" in {
+      when(mockAppConfig.enrolmentServiceName).thenReturn(enrolment)
+      when(mockAppConfig.enrolmentIdentifierKey).thenReturn(appaIdKey)
+      when(
+        mockAuthConnector.authorise(
+          eqTo(
+            AuthProviders(GovernmentGateway)
+              and Enrolment(enrolment)
+              and CredentialStrength(strong)
+              and Organisation
+              and ConfidenceLevel.L50
+          ),
+          eqTo(
+            retriveInternalId and groupIdentifier and allEnrolments
           )
-          val controller = new Harness(authAction)
-          val result     = controller.onPageLoad()(FakeRequest())
+        )(any(), any())
+      )
+        .thenReturn(Future(new ~(new ~(Some(userId), Some(groupId)), enrolmentsWithoutAppaId)))
 
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result).value mustBe routes.UnauthorisedController.onPageLoad().url
-        }
+      intercept[IllegalStateException] {
+        await(identifierAction.invokeBlock(FakeRequest(), testAction))
       }
     }
 
-    "the user used an unaccepted auth provider" - {
+    "redirect to the unauthorised page if not authorised" in {
+      List(
+        InsufficientEnrolments(),
+        InsufficientConfidenceLevel(),
+        UnsupportedAuthProvider(),
+        UnsupportedAffinityGroup(),
+        UnsupportedCredentialRole(),
+        IncorrectCredentialStrength(),
+        new UnauthorizedException("")
+      ).foreach { exception =>
+        when(mockAppConfig.enrolmentServiceName).thenReturn(enrolment)
+        when(mockAuthConnector.authorise[Unit](any(), any())(any(), any())).thenReturn(Future.failed(exception))
 
-      "must redirect the user to the unauthorised page" in {
+        val result: Future[Result] = identifierAction.invokeBlock(FakeRequest(), testAction)
 
-        val application = applicationBuilder(userAnswers = None).build()
-
-        running(application) {
-          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
-          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
-
-          val authAction = new AuthenticatedIdentifierAction(
-            new FakeFailingAuthConnector(new UnsupportedAuthProvider),
-            appConfig,
-            bodyParsers
-          )
-          val controller = new Harness(authAction)
-          val result     = controller.onPageLoad()(FakeRequest())
-
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result).value mustBe routes.UnauthorisedController.onPageLoad().url
-        }
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe routes.UnauthorisedController.onPageLoad.url
       }
     }
 
-    "the user has an unsupported affinity group" - {
+    "redirect to the login page if no longer authorised or never logged in" in {
+      List(
+        BearerTokenExpired(),
+        MissingBearerToken(),
+        InvalidBearerToken(),
+        SessionRecordNotFound()
+      ).foreach { exception =>
+        when(mockAppConfig.enrolmentServiceName).thenReturn(enrolment)
+        when(mockAppConfig.loginUrl).thenReturn(loginUrl)
+        when(mockAppConfig.loginContinueUrl).thenReturn(loginContinueUrl)
+        when(mockAuthConnector.authorise[Unit](any(), any())(any(), any())).thenReturn(Future.failed(exception))
 
-      "must redirect the user to the unauthorised page" in {
+        val result: Future[Result] = identifierAction.invokeBlock(FakeRequest(), testAction)
 
-        val application = applicationBuilder(userAnswers = None).build()
-
-        running(application) {
-          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
-          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
-
-          val authAction = new AuthenticatedIdentifierAction(
-            new FakeFailingAuthConnector(new UnsupportedAffinityGroup),
-            appConfig,
-            bodyParsers
-          )
-          val controller = new Harness(authAction)
-          val result     = controller.onPageLoad()(FakeRequest())
-
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad().url)
-        }
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result).value mustBe s"$loginUrl?continue=$loginContinueUrl"
       }
     }
 
-    "the user has an unsupported credential role" - {
+    "return the exception if there is any other exception" in {
+      val msg = "Test Exception"
 
-      "must redirect the user to the unauthorised page" in {
+      when(mockAppConfig.enrolmentServiceName).thenReturn(enrolment)
+      when(mockAuthConnector.authorise[Unit](any(), any())(any(), any()))
+        .thenReturn(Future.failed(new RuntimeException(msg)))
 
-        val application = applicationBuilder(userAnswers = None).build()
-
-        running(application) {
-          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
-          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
-
-          val authAction = new AuthenticatedIdentifierAction(
-            new FakeFailingAuthConnector(new UnsupportedCredentialRole),
-            appConfig,
-            bodyParsers
-          )
-          val controller = new Harness(authAction)
-          val result     = controller.onPageLoad()(FakeRequest())
-
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad().url)
-        }
+      val result = intercept[RuntimeException] {
+        await(identifierAction.invokeBlock(FakeRequest(), testAction))
       }
-    }
 
-    "the user does not have an APPAID" - {
-
-      "must redirect the user to the unauthorised page" in {
-
-        val application = applicationBuilder(userAnswers = None).build()
-
-        running(application) {
-          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
-          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
-
-          val authAction = new AuthenticatedIdentifierAction(
-            new FakeAuthConnector(Seq.empty, Some(internalId), Some(groupId)),
-            appConfig,
-            bodyParsers
-          )
-          val controller = new Harness(authAction)
-          val result     = controller.onPageLoad()(FakeRequest())
-
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad().url)
-        }
-      }
-    }
-
-    "the users APPAID is blank" - {
-
-      "must redirect the user to the unauthorised page" in {
-
-        val application = applicationBuilder(userAnswers = None).build()
-
-        running(application) {
-          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
-          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
-
-          val authAction = new AuthenticatedIdentifierAction(
-            new FakeAuthConnector(Seq(EnrolmentIdentifier(appaIdKey, "")), Some(internalId), Some(groupId)),
-            appConfig,
-            bodyParsers
-          )
-          val controller = new Harness(authAction)
-          val result     = controller.onPageLoad()(FakeRequest())
-
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.UnauthorisedController.onPageLoad().url)
-        }
-      }
-    }
-
-    "the users internal id can't be found" - {
-
-      "must raise" in {
-
-        val application = applicationBuilder(userAnswers = None).build()
-
-        running(application) {
-          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
-          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
-
-          val authAction = new AuthenticatedIdentifierAction(
-            new FakeAuthConnector(Seq(EnrolmentIdentifier(appaIdKey, appaId)), None, Some(groupId)),
-            appConfig,
-            bodyParsers
-          )
-
-          val controller = new Harness(authAction)
-          intercept[IllegalStateException] {
-            await(controller.onPageLoad()(FakeRequest()))
-          }
-
-        }
-      }
-    }
-
-    "the users group id can't be found" - {
-
-      "must raise" in {
-
-        val application = applicationBuilder(userAnswers = None).build()
-
-        running(application) {
-          val bodyParsers = application.injector.instanceOf[BodyParsers.Default]
-          val appConfig   = application.injector.instanceOf[FrontendAppConfig]
-
-          val authAction = new AuthenticatedIdentifierAction(
-            new FakeAuthConnector(Seq(EnrolmentIdentifier(appaIdKey, appaId)), Some(internalId), None),
-            appConfig,
-            bodyParsers
-          )
-
-          val controller = new Harness(authAction)
-          intercept[IllegalStateException] {
-            await(controller.onPageLoad()(FakeRequest()))
-          }
-
-        }
-      }
+      result.getMessage mustBe msg
     }
   }
-}
-
-class FakeAuthConnector @Inject() (
-  identifiers: Seq[EnrolmentIdentifier],
-  internalId: Option[String],
-  groupId: Option[String]
-) extends AuthConnector {
-  val appaId: String         = "SOMEAPPAID"
-  val state: String          = "Activated"
-  val enrolment: String      = "HMRC-AD-ORG"
-  val enrolments: Enrolments = Enrolments(Set(Enrolment(enrolment, identifiers, state)))
-
-  override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(implicit
-    hc: HeaderCarrier,
-    ec: ExecutionContext
-  ): Future[A] =
-    Future.successful(new ~(new ~(internalId, groupId), enrolments)).asInstanceOf[Future[A]]
-}
-
-class FakeFailingAuthConnector @Inject() (exceptionToReturn: Throwable) extends AuthConnector {
-  val serviceUrl: String = ""
-
-  override def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(implicit
-    hc: HeaderCarrier,
-    ec: ExecutionContext
-  ): Future[A] =
-    Future.failed(exceptionToReturn)
 }

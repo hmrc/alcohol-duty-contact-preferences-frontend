@@ -1,4 +1,4 @@
-service.name = alcohol-duty-contact-preferences-frontend
+service.name = Manage your Alcohol Duty
 
 site.back = Back
 site.remove = Remove
@@ -47,3 +47,10 @@ signedOut.guidance = We did not save your answers.
 
 unauthorised.title = You can’t access this service with this account
 unauthorised.heading = You can’t access this service with this account
+unauthorised.guidance = [Add guidance]
+
+contactPreference.title = How would you like to be contacted?
+contactPreference.heading = How would you like to be contacted?
+contactPreference.email = Email me when I have a message in my account
+contactPreference.post = Send me letters by post
+contactPreference.error.required = Select how you would like to be contacted

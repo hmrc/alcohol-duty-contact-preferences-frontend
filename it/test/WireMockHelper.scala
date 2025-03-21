@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-package connectors
-
 /*
  * Copyright 2024 HM Revenue & Customs
  *

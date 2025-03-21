@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-package connectors
-
 /*
  * Copyright 2023 HM Revenue & Customs
  *
@@ -32,10 +30,10 @@ package connectors
  * limitations under the License.
  */
 
+import common.TestData
 import controllers.actions._
 import generators.ModelGenerators
 import models.UserAnswers
-import models.preferences.ContactPreference
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
@@ -59,16 +57,10 @@ trait ISpecBase
     with GuiceOneAppPerSuite
     with MockitoSugar
     with IntegrationPatience
-    with ModelGenerators {
+    with ModelGenerators
+    with TestData {
 
-  val appaId: String     = "appaid"
-  val groupId: String    = "groupid"
-  val internalId: String = "id"
-
-  val contactPreferenceRequest: ContactPreference  = new ContactPreference("1", None, None, None)
-  val contactPreferenceResponse: ContactPreference = new ContactPreference("1", None, None, None)
-
-  val fakeIdentifierUserDetails: FakeIdentifierUserDetails = FakeIdentifierUserDetails(appaId, groupId, internalId)
+  val fakeIdentifierUserDetails: FakeIdentifierUserDetails = FakeIdentifierUserDetails(appaId, groupId, userId)
 
   protected def applicationBuilder(userAnswers: Option[UserAnswers] = None): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()

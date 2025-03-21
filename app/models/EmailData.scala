@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package models.preferences
+package models
 
 import play.api.libs.json.{Json, OFormat}
 
-case class ContactPreference(
-  paperlessReference: String,
+case class EmailData(
   emailAddress: Option[String],
-  emailStatus: Option[String],
-  emailBounced: Option[Boolean]
+  emailEntered: Option[String] = None
 )
 
-case object ContactPreference {
-  implicit val contactPreferencesRequestFormat: OFormat[ContactPreference] = Json.format[ContactPreference]
+object EmailData {
+  implicit val format: OFormat[EmailData] = Json.format[EmailData]
 }
