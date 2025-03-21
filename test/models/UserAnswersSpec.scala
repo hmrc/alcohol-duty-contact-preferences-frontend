@@ -29,7 +29,7 @@ class UserAnswersSpec extends SpecBase {
 
   "UserAnswers" - {
     val json =
-      s"""{"appaId":"$appaId","userId":"$userId","paperlessReference":true,"emailVerification":true,"bouncedEmail":false,"decryptedSensitiveUserInformation":{"emailAddress":"john.doe@example.com"},"data":{},"startedTime":{"$$date":{"$$numberLong":"1718118467838"}},"lastUpdated":{"$$date":{"$$numberLong":"1718118467838"}}}"""
+      s"""{"appaId":"$appaId","userId":"$userId","paperlessReference":true,"emailVerification":true,"bouncedEmail":false,"emailData":{"emailAddress":"john.doe@example.com"},"data":{},"startedTime":{"$$date":{"$$numberLong":"1718118467838"}},"lastUpdated":{"$$date":{"$$numberLong":"1718118467838"}}}"""
 
     "must set a value for a given page and get the same value" in {
 

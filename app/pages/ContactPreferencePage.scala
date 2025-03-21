@@ -22,5 +22,5 @@ case object ContactPreferencePage extends QuestionPage[Boolean] {
 
   override def path: JsPath = JsPath \ toString
 
-  override def toString: String = "contactMethodEmail"
+  override def toString: String = "contactPreferenceEmail"
 }

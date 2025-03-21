@@ -38,7 +38,7 @@ trait TestData extends ModelGenerators {
     paperlessReference = true,
     emailVerification = Some(true),
     bouncedEmail = Some(false),
-    decryptedSensitiveUserInformation = DecryptedSensitiveUserInformation(emailAddress = Some(emailAddress)),
+    emailData = EmailData(emailAddress = Some(emailAddress)),
     startedTime = Instant.now(clock),
     lastUpdated = Instant.now(clock)
   )
@@ -49,7 +49,7 @@ trait TestData extends ModelGenerators {
     paperlessReference = false,
     emailVerification = None,
     bouncedEmail = None,
-    decryptedSensitiveUserInformation = DecryptedSensitiveUserInformation(emailAddress = None),
+    emailData = EmailData(emailAddress = None),
     startedTime = Instant.now(clock),
     lastUpdated = Instant.now(clock)
   )

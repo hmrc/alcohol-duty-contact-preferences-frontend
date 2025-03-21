@@ -34,7 +34,7 @@ class NavigatorSpec extends SpecBase {
         navigator.nextPage(UnknownPage, NormalMode, emptyUserAnswers) mustBe routes.IndexController.onPageLoad()
       }
 
-      "from the Contact Method page" - {
+      "from the Contact Preference page" - {
         "must go to the What Email Address page if the user is currently on post, has selected email and has no email in ETMP" in {
           navigator.nextPage(
             ContactPreferencePage,

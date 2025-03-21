@@ -18,11 +18,11 @@ package models
 
 import play.api.libs.json.{Json, OFormat}
 
-case class DecryptedSensitiveUserInformation(
+case class EmailData(
   emailAddress: Option[String],
   emailEntered: Option[String] = None
 )
 
-object DecryptedSensitiveUserInformation {
-  implicit val format: OFormat[DecryptedSensitiveUserInformation] = Json.format[DecryptedSensitiveUserInformation]
+object EmailData {
+  implicit val format: OFormat[EmailData] = Json.format[EmailData]
 }
