@@ -17,9 +17,9 @@
 package common
 
 import models.UserAnswers
-import pages.ContactMethodPage
+import pages.ContactPreferencePage
 
 trait TestPages extends TestData {
   def contactMethodPage(userAnswers: UserAnswers, emailSelected: Boolean): UserAnswers =
-    userAnswers.set(ContactMethodPage, emailSelected).get
+    userAnswers.set(ContactPreferencePage, emailSelected).get
 }

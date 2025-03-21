@@ -18,34 +18,34 @@ package controllers
 
 import base.SpecBase
 import connectors.UserAnswersConnector
-import forms.ContactMethodFormProvider
+import forms.ContactPreferenceFormProvider
 import models.{CheckMode, NormalMode}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
-import pages.ContactMethodPage
+import pages.ContactPreferencePage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HttpResponse
-import views.html.ContactMethodView
+import views.html.ContactPreferenceView
 
 import scala.concurrent.Future
 
-class ContactMethodControllerSpec extends SpecBase {
+class ContactPreferenceControllerSpec extends SpecBase {
 
   def onwardRoute = Call("GET", "/foo")
 
-  lazy val contactMethodNormalRoute = routes.ContactMethodController.onPageLoad(NormalMode).url
-  lazy val contactMethodCheckRoute  = routes.ContactMethodController.onPageLoad(CheckMode).url
+  lazy val contactPreferenceNormalRoute = routes.ContactPreferenceController.onPageLoad(NormalMode).url
+  lazy val contactPreferenceCheckRoute  = routes.ContactPreferenceController.onPageLoad(CheckMode).url
 
-  val formProvider = new ContactMethodFormProvider()
+  val formProvider = new ContactPreferenceFormProvider()
   val form         = formProvider()
 
   val mockUserAnswersConnector = mock[UserAnswersConnector]
   val mockHttpResponse         = mock[HttpResponse]
 
-  "ContactMethodController" - {
+  "ContactPreferenceController" - {
 
     "onPageLoad in normal mode" - {
       "must create user answers, then return OK and the correct view for a GET if user answers do not exist" - {
@@ -60,11 +60,11 @@ class ContactMethodControllerSpec extends SpecBase {
           .build()
 
         running(application) {
-          val request = FakeRequest(GET, contactMethodNormalRoute)
+          val request = FakeRequest(GET, contactPreferenceNormalRoute)
 
           val result = route(application, request).value
 
-          val view = application.injector.instanceOf[ContactMethodView]
+          val view = application.injector.instanceOf[ContactPreferenceView]
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(form, NormalMode)(request, getMessages(application)).toString
@@ -75,11 +75,11 @@ class ContactMethodControllerSpec extends SpecBase {
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
         running(application) {
-          val request = FakeRequest(GET, contactMethodNormalRoute)
+          val request = FakeRequest(GET, contactPreferenceNormalRoute)
 
           val result = route(application, request).value
 
-          val view = application.injector.instanceOf[ContactMethodView]
+          val view = application.injector.instanceOf[ContactPreferenceView]
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(form, NormalMode)(request, getMessages(application)).toString
@@ -87,16 +87,16 @@ class ContactMethodControllerSpec extends SpecBase {
       }
 
       "must populate the view correctly on a GET if user answers already exist and the question has previously been answered" in {
-        val userAnswers = emptyUserAnswers.set(ContactMethodPage, true).success.value
+        val userAnswers = emptyUserAnswers.set(ContactPreferencePage, true).success.value
 
         val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
         running(application) {
-          val request = FakeRequest(GET, contactMethodNormalRoute)
+          val request = FakeRequest(GET, contactPreferenceNormalRoute)
 
           val result = route(application, request).value
 
-          val view = application.injector.instanceOf[ContactMethodView]
+          val view = application.injector.instanceOf[ContactPreferenceView]
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(form.fill(true), NormalMode)(
@@ -109,16 +109,16 @@ class ContactMethodControllerSpec extends SpecBase {
 
     "onPageLoad in check mode" - {
       "must populate the view correctly on a GET" in {
-        val userAnswers = emptyUserAnswers.set(ContactMethodPage, true).success.value
+        val userAnswers = emptyUserAnswers.set(ContactPreferencePage, true).success.value
 
         val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
         running(application) {
-          val request = FakeRequest(GET, contactMethodCheckRoute)
+          val request = FakeRequest(GET, contactPreferenceCheckRoute)
 
           val result = route(application, request).value
 
-          val view = application.injector.instanceOf[ContactMethodView]
+          val view = application.injector.instanceOf[ContactPreferenceView]
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(form.fill(true), CheckMode)(request, getMessages(application)).toString
@@ -129,7 +129,7 @@ class ContactMethodControllerSpec extends SpecBase {
         val application = applicationBuilder(userAnswers = None).build()
 
         running(application) {
-          val request = FakeRequest(GET, contactMethodCheckRoute)
+          val request = FakeRequest(GET, contactPreferenceCheckRoute)
 
           val result = route(application, request).value
 
@@ -142,7 +142,7 @@ class ContactMethodControllerSpec extends SpecBase {
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
         running(application) {
-          val request = FakeRequest(GET, contactMethodCheckRoute)
+          val request = FakeRequest(GET, contactPreferenceCheckRoute)
 
           val result = route(application, request).value
 
@@ -165,8 +165,8 @@ class ContactMethodControllerSpec extends SpecBase {
 
         running(application) {
           val request =
-            FakeRequest(POST, contactMethodNormalRoute)
-              .withFormUrlEncodedBody(("contactMethodEmail", "true"))
+            FakeRequest(POST, contactPreferenceNormalRoute)
+              .withFormUrlEncodedBody(("contactPreferenceEmail", "true"))
 
           val result = route(application, request).value
 
@@ -180,12 +180,12 @@ class ContactMethodControllerSpec extends SpecBase {
 
         running(application) {
           val request =
-            FakeRequest(POST, contactMethodNormalRoute)
-              .withFormUrlEncodedBody(("contactMethodEmail", ""))
+            FakeRequest(POST, contactPreferenceNormalRoute)
+              .withFormUrlEncodedBody(("contactPreferenceEmail", ""))
 
-          val boundForm = form.bind(Map("contactMethodEmail" -> ""))
+          val boundForm = form.bind(Map("contactPreferenceEmail" -> ""))
 
-          val view = application.injector.instanceOf[ContactMethodView]
+          val view = application.injector.instanceOf[ContactPreferenceView]
 
           val result = route(application, request).value
 
@@ -199,8 +199,8 @@ class ContactMethodControllerSpec extends SpecBase {
 
         running(application) {
           val request =
-            FakeRequest(POST, contactMethodNormalRoute)
-              .withFormUrlEncodedBody(("contactMethodEmail", "true"))
+            FakeRequest(POST, contactPreferenceNormalRoute)
+              .withFormUrlEncodedBody(("contactPreferenceEmail", "true"))
 
           val result = route(application, request).value
 

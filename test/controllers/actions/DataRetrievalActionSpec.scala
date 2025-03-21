@@ -86,28 +86,7 @@ class DataRetrievalActionSpec extends SpecBase {
 
     "when the UserAnswersConnector returns an error" - {
 
-//      "must redirect to the Return Locked controller if the error status is Locked" in {
-//
-//        val mockUpstreamErrorResponse = mock[UpstreamErrorResponse]
-//        when(mockUpstreamErrorResponse.statusCode).thenReturn(LOCKED)
-//
-//        val userAnswersConnector = mock[UserAnswersConnector]
-//        when(userAnswersConnector.get(eqTo(appaId))(any())) thenReturn Future(
-//          Left(mockUpstreamErrorResponse)
-//        )
-//        val action               = new Harness(userAnswersConnector)
-//
-//        val result = action.actionRefine(IdentifierRequest(FakeRequest(), appaId, groupId, userId))
-//
-//        val redirectResult = result.map {
-//          case Left(res) => res
-//          case _         => fail()
-//        }
-//        status(redirectResult) mustBe SEE_OTHER
-//        redirectLocation(redirectResult).value mustEqual controllers.routes.ReturnLockedController.onPageLoad().url
-//      }
-
-      "must redirect to the Journey Recovery controller if the error status is not Bad Request" in {
+      "must redirect to the Journey Recovery controller" in {
 
         val mockUpstreamErrorResponse = mock[UpstreamErrorResponse]
         when(mockUpstreamErrorResponse.statusCode).thenReturn(BAD_REQUEST)

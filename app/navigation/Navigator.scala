@@ -27,9 +27,9 @@ import play.api.Logging
 class Navigator @Inject() () extends Logging {
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case pages.ContactMethodPage =>
-      userAnswers => contactMethodRoute(userAnswers, NormalMode)
-    case _                       =>
+    case pages.ContactPreferencePage =>
+      userAnswers => contactPreferenceRoute(userAnswers, NormalMode)
+    case _                           =>
       _ => routes.IndexController.onPageLoad()
   }
 
@@ -44,8 +44,8 @@ class Navigator @Inject() () extends Logging {
       checkRouteMap(page)(userAnswers)
   }
 
-  private def contactMethodRoute(userAnswers: UserAnswers, mode: Mode): Call = {
-    val selectedEmail      = userAnswers.get(pages.ContactMethodPage)
+  private def contactPreferenceRoute(userAnswers: UserAnswers, mode: Mode): Call = {
+    val selectedEmail      = userAnswers.get(pages.ContactPreferencePage)
     val paperlessReference = userAnswers.paperlessReference
     val currentEmail       = userAnswers.decryptedSensitiveUserInformation.emailAddress
     (selectedEmail, paperlessReference, currentEmail) match {

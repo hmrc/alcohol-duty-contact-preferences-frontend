@@ -10,11 +10,11 @@ GET         /refresh-session                             controllers.KeepAliveCo
 
 GET         /there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
-GET         /method                                      controllers.ContactMethodController.onPageLoad(mode: Mode = NormalMode)
-POST        /method                                      controllers.ContactMethodController.onSubmit(mode: Mode = NormalMode)
-# CheckMode routes needed to prevent compilation error on line 31 of ContactMethodView
-GET         /change-method                               controllers.ContactMethodController.onPageLoad(mode: Mode = CheckMode)
-POST        /change-method                               controllers.ContactMethodController.onSubmit(mode: Mode = CheckMode)
+GET         /method                                      controllers.ContactPreferenceController.onPageLoad(mode: Mode = NormalMode)
+POST        /method                                      controllers.ContactPreferenceController.onSubmit(mode: Mode = NormalMode)
+# CheckMode routes needed to prevent compilation error on line 31 of ContactPreferenceView
+GET         /change-method                               controllers.ContactPreferenceController.onPageLoad(mode: Mode = CheckMode)
+POST        /change-method                               controllers.ContactPreferenceController.onSubmit(mode: Mode = CheckMode)
 
 GET         /check-your-answers                          controllers.CheckYourAnswersController.onPageLoad()
 

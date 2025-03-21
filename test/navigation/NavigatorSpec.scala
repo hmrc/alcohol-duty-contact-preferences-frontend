@@ -37,45 +37,45 @@ class NavigatorSpec extends SpecBase {
       "from the Contact Method page" - {
         "must go to the What Email Address page if the user is currently on post, has selected email and has no email in ETMP" in {
           navigator.nextPage(
-            ContactMethodPage,
+            ContactPreferencePage,
             NormalMode,
-            emptyUserAnswersPostNoEmail.set(ContactMethodPage, true).success.value
+            emptyUserAnswersPostNoEmail.set(ContactPreferencePage, true).success.value
           ) mustBe routes.IndexController.onPageLoad()
           // TODO: change to correct route when page is created
         }
 
         "must go to the Existing Email page if the user is currently on post, has selected email and has an email in ETMP" in {
           navigator.nextPage(
-            ContactMethodPage,
+            ContactPreferencePage,
             NormalMode,
-            emptyUserAnswers.copy(paperlessReference = false).set(ContactMethodPage, true).success.value
+            emptyUserAnswers.copy(paperlessReference = false).set(ContactPreferencePage, true).success.value
           ) mustBe routes.IndexController.onPageLoad()
           // TODO: change to correct route when page is created
         }
 
         "must go to the Enrolled Emails page if the user is currently on email and has selected email" in {
           navigator.nextPage(
-            ContactMethodPage,
+            ContactPreferencePage,
             NormalMode,
-            emptyUserAnswers.set(ContactMethodPage, true).success.value
+            emptyUserAnswers.set(ContactPreferencePage, true).success.value
           ) mustBe routes.IndexController.onPageLoad()
           // TODO: change to correct route when page is created
         }
 
         "must go to the Check Answers page if the user is currently on email and has selected post" in {
           navigator.nextPage(
-            ContactMethodPage,
+            ContactPreferencePage,
             NormalMode,
-            emptyUserAnswers.set(ContactMethodPage, false).success.value
+            emptyUserAnswers.set(ContactPreferencePage, false).success.value
           ) mustBe routes.IndexController.onPageLoad()
           // TODO: change to correct route when page is created
         }
 
         "must go to the Enrolled Letters page if the user is currently on post and has selected post" in {
           navigator.nextPage(
-            ContactMethodPage,
+            ContactPreferencePage,
             NormalMode,
-            emptyUserAnswersPostNoEmail.set(ContactMethodPage, false).success.value
+            emptyUserAnswersPostNoEmail.set(ContactPreferencePage, false).success.value
           ) mustBe routes.IndexController.onPageLoad()
           // TODO: change to correct route when page is created
         }

@@ -16,30 +16,15 @@
 
 package forms
 
-import forms.behaviours.BooleanFieldBehaviours
-import play.api.data.FormError
+import forms.mappings.Mappings
+import play.api.data.Form
 
-class ContactMethodFormProviderSpec extends BooleanFieldBehaviours {
+import javax.inject.Inject
 
-  val requiredKey = "contactMethod.error.required"
-  val invalidKey  = "error.boolean"
+class ContactPreferenceFormProvider @Inject() extends Mappings {
 
-  val form = new ContactMethodFormProvider()()
-
-  ".value" - {
-
-    val fieldName = "contactMethodEmail"
-
-    behave like booleanField(
-      form,
-      fieldName,
-      invalidError = FormError(fieldName, invalidKey)
+  def apply(): Form[Boolean] =
+    Form(
+      "contactPreferenceEmail" -> boolean("contactPreference.error.required")
     )
-
-    behave like mandatoryField(
-      form,
-      fieldName,
-      requiredError = FormError(fieldName, requiredKey)
-    )
-  }
 }

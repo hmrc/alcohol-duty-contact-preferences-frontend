@@ -18,28 +18,28 @@ package controllers
 
 import connectors.UserAnswersConnector
 import controllers.actions._
-import forms.ContactMethodFormProvider
+import forms.ContactPreferenceFormProvider
 import models.{CheckMode, Mode, NormalMode, UserDetails}
 import navigation.Navigator
-import pages.ContactMethodPage
+import pages.ContactPreferencePage
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.ContactMethodView
+import views.html.ContactPreferenceView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class ContactMethodController @Inject() (
+class ContactPreferenceController @Inject() (
   override val messagesApi: MessagesApi,
   navigator: Navigator,
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  formProvider: ContactMethodFormProvider,
+  formProvider: ContactPreferenceFormProvider,
   userAnswersConnector: UserAnswersConnector,
   val controllerComponents: MessagesControllerComponents,
-  view: ContactMethodView
+  view: ContactPreferenceView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with I18nSupport {
@@ -55,14 +55,14 @@ class ContactMethodController @Inject() (
               _ <- userAnswersConnector.createUserAnswers(UserDetails(request.appaId, request.userId))
             } yield Ok(view(form, mode))
           case Some(ua) =>
-            val preparedForm = ua.get(ContactMethodPage) match {
+            val preparedForm = ua.get(ContactPreferencePage) match {
               case None        => form
               case Some(value) => form.fill(value)
             }
             Future.successful(Ok(view(preparedForm, mode)))
         }
       case CheckMode  =>
-        request.userAnswers.flatMap(_.get(ContactMethodPage)) match {
+        request.userAnswers.flatMap(_.get(ContactPreferencePage)) match {
           case None        => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
           case Some(value) => Future.successful(Ok(view(form.fill(value), mode)))
         }
@@ -77,9 +77,9 @@ class ContactMethodController @Inject() (
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value =>
             for {
-              updatedAnswers <- Future.fromTry(request.userAnswers.set(ContactMethodPage, value))
+              updatedAnswers <- Future.fromTry(request.userAnswers.set(ContactPreferencePage, value))
               _              <- userAnswersConnector.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(ContactMethodPage, mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(ContactPreferencePage, mode, updatedAnswers))
         )
   }
 }

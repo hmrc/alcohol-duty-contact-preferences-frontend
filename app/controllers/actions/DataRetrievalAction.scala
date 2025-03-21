@@ -20,7 +20,7 @@ import connectors.UserAnswersConnector
 import controllers.routes
 import models.requests.{IdentifierRequest, OptionalDataRequest}
 import play.api.Logging
-import play.api.http.Status.{LOCKED, NOT_FOUND}
+import play.api.http.Status.NOT_FOUND
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionRefiner, Result}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -63,9 +63,6 @@ class DataRetrievalActionImpl @Inject() (
               None
             )
           )
-//        case Left(ex) if ex.statusCode == LOCKED    =>
-//          logger.info(s"User answers for ${request.appaId} locked")
-//          Left(Redirect(routes.ReturnLockedController.onPageLoad()))
         case Left(ex)                               =>
           logger.warn("Data retrieval failed with exception: ", ex)
           Left(Redirect(routes.JourneyRecoveryController.onPageLoad()))
