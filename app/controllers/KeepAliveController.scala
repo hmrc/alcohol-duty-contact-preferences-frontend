@@ -16,7 +16,6 @@
 
 package controllers
 
-import connectors.UserAnswersConnector
 import controllers.actions.IdentifierAction
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -26,12 +25,11 @@ import scala.concurrent.ExecutionContext
 
 class KeepAliveController @Inject() (
   val controllerComponents: MessagesControllerComponents,
-  identify: IdentifierAction,
-  userAnswersConnector: UserAnswersConnector
+  identify: IdentifierAction
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController {
 
-  def keepAlive(): Action[AnyContent] = identify.async { implicit request =>
-    userAnswersConnector.keepAlive(request.appaId).map(_ => Ok)
+  def keepAlive(): Action[AnyContent] = identify { implicit request =>
+    Ok
   }
 }

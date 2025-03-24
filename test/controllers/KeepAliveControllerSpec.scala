@@ -17,15 +17,8 @@
 package controllers
 
 import base.SpecBase
-import connectors.UserAnswersConnector
-import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchersSugar.eqTo
-import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.HttpResponse
-
-import scala.concurrent.Future
 
 class KeepAliveControllerSpec extends SpecBase {
 
@@ -35,12 +28,8 @@ class KeepAliveControllerSpec extends SpecBase {
 
       "must keep the answers alive and return OK" in {
 
-        val mockUserAnswersConnector = mock[UserAnswersConnector]
-        when(mockUserAnswersConnector.keepAlive(eqTo(appaId))(any())) thenReturn Future.successful(mock[HttpResponse])
-
         val application =
           applicationBuilder(Some(emptyUserAnswers))
-            .overrides(bind[UserAnswersConnector].toInstance(mockUserAnswersConnector))
             .build()
 
         running(application) {
@@ -58,12 +47,8 @@ class KeepAliveControllerSpec extends SpecBase {
 
       "must return OK" in {
 
-        val mockUserAnswersConnector = mock[UserAnswersConnector]
-        when(mockUserAnswersConnector.keepAlive(eqTo(appaId))(any())) thenReturn Future.successful(mock[HttpResponse])
-
         val application =
           applicationBuilder(None)
-            .overrides(bind[UserAnswersConnector].toInstance(mockUserAnswersConnector))
             .build()
 
         running(application) {

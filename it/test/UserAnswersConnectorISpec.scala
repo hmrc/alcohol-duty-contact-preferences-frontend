@@ -112,60 +112,11 @@ class UserAnswersConnectorISpec extends ISpecBase with WireMockHelper {
         }
       }
     }
-
-    "releaseLock" - {
-      "must call the release lock endpoint" in new SetUp {
-        server.stubFor(
-          delete(urlMatching(releaseLockUrl))
-            .willReturn(aResponse().withStatus(OK))
-        )
-
-        whenReady(connector.releaseLock(appaId)) { result =>
-          result.status mustBe OK
-        }
-      }
-
-      "return an error when the upstream service returns an error" in new SetUp {
-        server.stubFor(
-          delete(urlMatching(releaseLockUrl))
-            .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR))
-        )
-
-        whenReady(connector.releaseLock(appaId)) { result =>
-          result.status mustBe INTERNAL_SERVER_ERROR
-        }
-      }
-    }
-
-    "keepAlive" - {
-      "must call the keep alive endpoint" in new SetUp {
-        server.stubFor(
-          put(urlMatching(keepAliveUrl))
-            .willReturn(aResponse().withStatus(OK))
-        )
-
-        whenReady(connector.keepAlive(appaId)) { response =>
-          response.status mustBe OK
-        }
-      }
-
-      "return an error when the upstream service returns an error" in new SetUp {
-        server.stubFor(
-          put(urlMatching(keepAliveUrl))
-            .willReturn(aResponse().withStatus(INTERNAL_SERVER_ERROR))
-        )
-        whenReady(connector.keepAlive(appaId)) { response =>
-          response.status mustBe INTERNAL_SERVER_ERROR
-        }
-      }
-    }
   }
 
   class SetUp {
     val connector         = app.injector.instanceOf[UserAnswersConnector]
     val userAnswersGetUrl = s"/alcohol-duty-contact-preferences/user-answers/$appaId"
     val userAnswersUrl    = "/alcohol-duty-contact-preferences/user-answers"
-    val releaseLockUrl    = s"/alcohol-duty-contact-preferences/user-answers/lock/$appaId"
-    val keepAliveUrl      = s"/alcohol-duty-contact-preferences/user-answers/lock/$appaId/ttl"
   }
 }

@@ -53,16 +53,4 @@ class UserAnswersConnector @Inject() (
       .withBody(Json.toJson(userDetails))
       .setHeader("Csrf-Token" -> "nocheck")
       .execute[Either[UpstreamErrorResponse, UserAnswers]]
-
-  def releaseLock(appaId: String)(implicit hc: HeaderCarrier): Future[HttpResponse] =
-    httpClient
-      .delete(url"${config.ecpReleaseUserAnswersLockUrl(appaId)}")
-      .setHeader("Csrf-Token" -> "nocheck")
-      .execute[HttpResponse]
-
-  def keepAlive(appaId: String)(implicit hc: HeaderCarrier): Future[HttpResponse] =
-    httpClient
-      .put(url"${config.ecpUserAnswersLockKeepAliveUrl(appaId)}")
-      .setHeader("Csrf-Token" -> "nocheck")
-      .execute[HttpResponse]
 }

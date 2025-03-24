@@ -52,7 +52,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
 
   val timeout: Int                   = configuration.get[Int]("timeout-dialog.timeout")
   val countdown: Int                 = configuration.get[Int]("timeout-dialog.countdown")
-  val cacheTtl: Long                 = configuration.get[Int]("mongodb.timeToLiveInSeconds")
   val enrolmentServiceName: String   = configuration.get[String]("enrolment.serviceName")
   val enrolmentIdentifierKey: String = configuration.get[String]("enrolment.identifierKey")
 
@@ -61,10 +60,4 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
 
   def ecpUserAnswersUrl(): String =
     s"$contactPreferencesHost/alcohol-duty-contact-preferences/user-answers"
-
-  def ecpReleaseUserAnswersLockUrl(appaId: String): String =
-    s"$contactPreferencesHost/alcohol-duty-contact-preferences/user-answers/lock/$appaId"
-
-  def ecpUserAnswersLockKeepAliveUrl(appaId: String): String =
-    s"$contactPreferencesHost/alcohol-duty-contact-preferences/user-answers/lock/$appaId/ttl"
 }

@@ -89,56 +89,6 @@ class UserAnswersConnectorSpec extends SpecBase {
     }
   }
 
-  "releaseLock" - {
-    "must call the release lock endpoint" in new SetUp {
-      val releaseLockUrl = "http://user-answers/release-lock"
-
-      when(mockConfig.ecpReleaseUserAnswersLockUrl(eqTo(appaId))).thenReturn(releaseLockUrl)
-
-      when(connector.httpClient.delete(any())(any())).thenReturn(requestBuilder)
-
-      when(requestBuilder.setHeader("Csrf-Token" -> "nocheck"))
-        .thenReturn(requestBuilder)
-
-      when(requestBuilder.execute[HttpResponse](any(), any()))
-        .thenReturn(Future.successful(mockHttpResponse))
-
-      whenReady(connector.releaseLock(appaId)) { response =>
-        response mustBe mockHttpResponse
-      }
-
-      verify(connector.httpClient, atLeastOnce).delete(eqTo(url"$releaseLockUrl"))(any())
-    }
-  }
-
-  "keepAlive" - {
-    "must call the keep alive endpoint" in new SetUp {
-      val keepAliveUrl = s"http://alcohol-duty-contact-preferences/user-answers/lock/$appaId/ttl"
-
-      when(mockConfig.ecpUserAnswersLockKeepAliveUrl(eqTo(appaId))).thenReturn(keepAliveUrl)
-
-      when {
-        connector.httpClient
-          .put(eqTo(url"$keepAliveUrl"))(any())
-      } thenReturn requestBuilder
-
-      when(requestBuilder.withBody(eqTo(Json.toJson(emptyUserAnswers)))(any(), any(), any()))
-        .thenReturn(requestBuilder)
-
-      when(requestBuilder.setHeader("Csrf-Token" -> "nocheck"))
-        .thenReturn(requestBuilder)
-
-      when(requestBuilder.execute[HttpResponse](any(), any()))
-        .thenReturn(Future.successful(mockHttpResponse))
-
-      whenReady(connector.keepAlive(appaId)) { response =>
-        response mustBe mockHttpResponse
-      }
-
-      verify(connector.httpClient, atLeastOnce).put(eqTo(url"$keepAliveUrl"))(any())
-    }
-  }
-
   class SetUp {
     val mockConfig: FrontendAppConfig  = mock[FrontendAppConfig]
     val httpClient: HttpClientV2       = mock[HttpClientV2]

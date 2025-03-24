@@ -17,7 +17,6 @@
 package controllers.auth
 
 import config.FrontendAppConfig
-import connectors.UserAnswersConnector
 import controllers.actions.IdentifierAction
 import play.api.Logging
 import play.api.i18n.I18nSupport
@@ -30,16 +29,13 @@ import scala.concurrent.ExecutionContext
 class AuthController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   config: FrontendAppConfig,
-  userAnswersConnector: UserAnswersConnector,
   identify: IdentifierAction
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with Logging
     with I18nSupport {
 
-  def signOut(): Action[AnyContent] = identify.async { implicit request =>
-    userAnswersConnector
-      .releaseLock(request.appaId)
-      .map(_ => Redirect(config.signOutUrl, Map("continue" -> Seq(config.exitSurveyUrl))))
+  def signOut(): Action[AnyContent] = identify { implicit request =>
+    Redirect(config.signOutUrl, Map("continue" -> Seq(config.exitSurveyUrl)))
   }
 }
