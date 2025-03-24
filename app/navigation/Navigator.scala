@@ -46,8 +46,8 @@ class Navigator @Inject() () extends Logging {
 
   private def contactPreferenceRoute(userAnswers: UserAnswers, mode: Mode): Call = {
     val selectedEmail      = userAnswers.get(pages.ContactPreferencePage)
-    val paperlessReference = userAnswers.paperlessReference
-    val currentEmail       = userAnswers.emailData.emailAddress
+    val paperlessReference = userAnswers.subscriptionSummary.paperlessReference
+    val currentEmail       = userAnswers.subscriptionSummary.emailAddress
     (selectedEmail, paperlessReference, currentEmail) match {
       case (Some(true), false, None)    =>
         // TODO: next page is /what-email-address

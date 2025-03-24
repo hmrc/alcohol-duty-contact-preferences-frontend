@@ -16,6 +16,7 @@
 
 package models
 
+import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import queries.{Gettable, Settable}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
@@ -26,13 +27,12 @@ import scala.util.{Failure, Success, Try}
 final case class UserAnswers(
   appaId: String,
   userId: String,
-  paperlessReference: Boolean,
-  emailVerification: Option[Boolean],
-  bouncedEmail: Option[Boolean],
-  emailData: EmailData,
+  subscriptionSummary: SubscriptionSummary,
+  emailAddress: Option[String],
   data: JsObject = Json.obj(),
   startedTime: Instant,
-  lastUpdated: Instant
+  lastUpdated: Instant,
+  validUntil: Option[Instant] = None
 ) {
 
   def get[A](page: Gettable[A])(implicit rds: Reads[A]): Option[A] =
@@ -71,39 +71,27 @@ final case class UserAnswers(
 
 object UserAnswers {
 
-  val reads: Reads[UserAnswers] = {
+  implicit val format: OFormat[UserAnswers] = (
+    (__ \ "appaId").format[String] and
+      (__ \ "userId").format[String] and
+      (__ \ "subscriptionSummary").format[SubscriptionSummary] and
+      (__ \ "emailAddress").formatNullable[String] and
+      (__ \ "data").formatWithDefault[JsObject](Json.obj()) and
+      (__ \ "startedTime").format(MongoJavatimeFormats.instantFormat) and
+      (__ \ "lastUpdated").format(MongoJavatimeFormats.instantFormat) and
+      (__ \ "validUntil").formatNullable(MongoJavatimeFormats.instantFormat)
+  )(UserAnswers.apply, unlift(UserAnswers.unapply))
 
-    import play.api.libs.functional.syntax._
+}
 
-    (
-      (__ \ "appaId").read[String] and
-        (__ \ "userId").read[String] and
-        (__ \ "paperlessReference").read[Boolean] and
-        (__ \ "emailVerification").readNullable[Boolean] and
-        (__ \ "bouncedEmail").readNullable[Boolean] and
-        (__ \ "emailData").read[EmailData] and
-        (__ \ "data").read[JsObject] and
-        (__ \ "startedTime").read(MongoJavatimeFormats.instantFormat) and
-        (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
-    )(UserAnswers.apply _)
-  }
+case class SubscriptionSummary(
+  paperlessReference: Boolean,
+  emailAddress: Option[String],
+  emailVerification: Option[Boolean],
+  bouncedEmail: Option[Boolean]
+)
 
-  val writes: OWrites[UserAnswers] = {
-
-    import play.api.libs.functional.syntax._
-
-    (
-      (__ \ "appaId").write[String] and
-        (__ \ "userId").write[String] and
-        (__ \ "paperlessReference").write[Boolean] and
-        (__ \ "emailVerification").writeNullable[Boolean] and
-        (__ \ "bouncedEmail").writeNullable[Boolean] and
-        (__ \ "emailData").write[EmailData] and
-        (__ \ "data").write[JsObject] and
-        (__ \ "startedTime").write(MongoJavatimeFormats.instantFormat) and
-        (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
-    )(unlift(UserAnswers.unapply))
-  }
-
-  implicit val format: OFormat[UserAnswers] = OFormat(reads, writes)
+object SubscriptionSummary {
+  implicit val subscriptionSummaryFormat: OFormat[SubscriptionSummary] =
+    Json.format[SubscriptionSummary]
 }

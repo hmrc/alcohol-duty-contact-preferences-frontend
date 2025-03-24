@@ -19,9 +19,11 @@ package controllers
 import connectors.UserAnswersConnector
 import controllers.actions._
 import forms.ContactPreferenceFormProvider
-import models.{CheckMode, Mode, NormalMode, UserDetails}
+import models.{CheckMode, Mode, NormalMode, UserAnswers, UserDetails}
 import navigation.Navigator
 import pages.ContactPreferencePage
+import play.api.Logging
+import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -42,7 +44,8 @@ class ContactPreferenceController @Inject() (
   view: ContactPreferenceView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
   val form = formProvider()
 
@@ -50,16 +53,14 @@ class ContactPreferenceController @Inject() (
     mode match {
       case NormalMode =>
         request.userAnswers match {
-          case None     =>
-            for {
-              _ <- userAnswersConnector.createUserAnswers(UserDetails(request.appaId, request.userId))
-            } yield Ok(view(form, mode))
-          case Some(ua) =>
-            val preparedForm = ua.get(ContactPreferencePage) match {
-              case None        => form
-              case Some(value) => form.fill(value)
+          case None                  =>
+            userAnswersConnector.createUserAnswers(UserDetails(request.appaId, request.userId)).map {
+              case Right(ua)   => Ok(view(getPreparedForm(ua), mode))
+              case Left(error) =>
+                logger.warn(s"Error creating user answers: ${error.message}")
+                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
             }
-            Future.successful(Ok(view(preparedForm, mode)))
+          case Some(existingAnswers) => Future.successful(Ok(view(getPreparedForm(existingAnswers), mode)))
         }
       case CheckMode  =>
         request.userAnswers.flatMap(_.get(ContactPreferencePage)) match {
@@ -81,5 +82,10 @@ class ContactPreferenceController @Inject() (
               _              <- userAnswersConnector.set(updatedAnswers)
             } yield Redirect(navigator.nextPage(ContactPreferencePage, mode, updatedAnswers))
         )
+  }
+
+  private def getPreparedForm(ua: UserAnswers): Form[Boolean] = ua.get(ContactPreferencePage) match {
+    case None        => form
+    case Some(value) => form.fill(value)
   }
 }
