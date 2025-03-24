@@ -20,6 +20,6 @@ import models.UserAnswers
 import pages.ContactPreferencePage
 
 trait TestPages extends TestData {
-  def contactMethodPage(userAnswers: UserAnswers, emailSelected: Boolean): UserAnswers =
+  def contactPreferencePage(userAnswers: UserAnswers, emailSelected: Boolean): UserAnswers =
     userAnswers.set(ContactPreferencePage, emailSelected).get
 }
