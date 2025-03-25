@@ -28,23 +28,23 @@ import uk.gov.hmrc.http.{HttpResponse, StringContextOps, UpstreamErrorResponse}
 import scala.concurrent.Future
 
 class UserAnswersConnectorSpec extends SpecBase {
-  "GET must" - {
+  "GET" - {
     "must successfully fetch user answers" in new SetUp {
       val mockUrl = s"http://alcohol-duty-contact-preferences/user-answers/$appaId"
       when(mockConfig.ecpUserAnswersGetUrl(any())).thenReturn(mockUrl)
 
       when(requestBuilder.execute[Either[UpstreamErrorResponse, UserAnswers]](any(), any()))
-        .thenReturn(Future.successful(Right(emptyUserAnswers)))
+        .thenReturn(Future.successful(Right(userAnswers)))
 
       when(connector.httpClient.get(any())(any())).thenReturn(requestBuilder)
 
       whenReady(connector.get(appaId)) {
-        _ mustBe Right(emptyUserAnswers)
+        _ mustBe Right(userAnswers)
       }
     }
   }
 
-  "POST must" - {
+  "POST" - {
     "must successfully write user answers" in new SetUp {
       val postUrl = "http://alcohol-duty-contact-preferences/user-answers"
 
@@ -74,7 +74,7 @@ class UserAnswersConnectorSpec extends SpecBase {
 
       when(connector.httpClient.put(any())(any())).thenReturn(requestBuilder)
 
-      when(requestBuilder.withBody(eqTo(Json.toJson(emptyUserAnswers)))(any(), any(), any()))
+      when(requestBuilder.withBody(eqTo(Json.toJson(userAnswers)))(any(), any(), any()))
         .thenReturn(requestBuilder)
 
       when(requestBuilder.setHeader("Csrf-Token" -> "nocheck"))
@@ -83,7 +83,7 @@ class UserAnswersConnectorSpec extends SpecBase {
       when(requestBuilder.execute[HttpResponse](any(), any()))
         .thenReturn(Future.successful(mockHttpResponse))
 
-      connector.set(emptyUserAnswers)
+      connector.set(userAnswers)
 
       verify(connector.httpClient, atLeastOnce).put(eqTo(url"$putUrl"))(any())
     }

@@ -29,14 +29,14 @@ class UserAnswersConnectorISpec extends ISpecBase with WireMockHelper {
 
     "get must" - {
       "successfully fetch user answers" in new SetUp {
-        val jsonResponse = Json.toJson(emptyUserAnswers).toString()
+        val jsonResponse = Json.toJson(userAnswers).toString()
         server.stubFor(
           get(urlMatching(userAnswersGetUrl))
             .willReturn(aResponse().withStatus(OK).withBody(jsonResponse))
         )
 
         whenReady(connector.get(appaId)) { result =>
-          result mustBe Right(emptyUserAnswers)
+          result mustBe Right(userAnswers)
         }
       }
 
@@ -61,13 +61,13 @@ class UserAnswersConnectorISpec extends ISpecBase with WireMockHelper {
             .willReturn(
               aResponse()
                 .withStatus(CREATED)
-                .withBody(Json.stringify(Json.toJson(emptyUserAnswers)))
+                .withBody(Json.stringify(Json.toJson(userAnswers)))
             )
         )
 
         whenReady(connector.createUserAnswers(userDetails)) {
           case Right(userAnswersResponse) =>
-            userAnswersResponse mustBe emptyUserAnswers
+            userAnswersResponse mustBe userAnswers
           case Left(_)                    =>
             fail("Expected Right(UserAnswers), but got Left(UpstreamErrorResponse)")
         }
@@ -91,11 +91,11 @@ class UserAnswersConnectorISpec extends ISpecBase with WireMockHelper {
       "successfully write user answers" in new SetUp {
         server.stubFor(
           put(urlMatching(userAnswersUrl))
-            .withRequestBody(equalToJson(Json.stringify(Json.toJson(emptyUserAnswers))))
+            .withRequestBody(equalToJson(Json.stringify(Json.toJson(userAnswers))))
             .willReturn(aResponse().withStatus(OK))
         )
 
-        whenReady(connector.set(emptyUserAnswers)) { result =>
+        whenReady(connector.set(userAnswers)) { result =>
           result.status mustBe OK
         }
       }
@@ -103,11 +103,11 @@ class UserAnswersConnectorISpec extends ISpecBase with WireMockHelper {
       "fail to write user answers when the service returns an error" in new SetUp {
         server.stubFor(
           put(urlMatching(userAnswersUrl))
-            .withRequestBody(equalToJson(Json.stringify(Json.toJson(emptyUserAnswers))))
+            .withRequestBody(equalToJson(Json.stringify(Json.toJson(userAnswers))))
             .willReturn(aResponse().withStatus(SERVICE_UNAVAILABLE))
         )
 
-        whenReady(connector.set(emptyUserAnswers)) { result =>
+        whenReady(connector.set(userAnswers)) { result =>
           result.status mustBe SERVICE_UNAVAILABLE
         }
       }

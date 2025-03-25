@@ -20,16 +20,19 @@ import base.SpecBase
 import play.api.libs.json.{JsPath, Json}
 import queries.{Gettable, Settable}
 
+import java.time.Instant
 import scala.util.Success
 
 class UserAnswersSpec extends SpecBase {
+  val ua = userAnswers.copy(validUntil = Some(Instant.now(clock).plusMillis(1)))
+
   case object TestPage extends Gettable[String] with Settable[String] {
     override def path: JsPath = JsPath \ toString
   }
 
   "UserAnswers" - {
     val json =
-      s"""{"appaId":"$appaId","userId":"$userId","paperlessReference":true,"emailVerification":true,"bouncedEmail":false,"emailData":{"emailAddress":"john.doe@example.com"},"data":{},"startedTime":{"$$date":{"$$numberLong":"1718118467838"}},"lastUpdated":{"$$date":{"$$numberLong":"1718118467838"}}}"""
+      s"""{"appaId":"$appaId","userId":"$userId","subscriptionSummary":{"paperlessReference":true,"emailAddress":"john.doe@example.com","emailVerification":true,"bouncedEmail":false},"emailAddress":"john.doe@example.com","data":{"contactPreferenceEmail":true},"startedTime":{"$$date":{"$$numberLong":"1718118467838"}},"lastUpdated":{"$$date":{"$$numberLong":"1718118467838"}},"validUntil":{"$$date":{"$$numberLong":"1718118467839"}}}"""
 
     "must set a value for a given page and get the same value" in {
 
@@ -57,8 +60,8 @@ class UserAnswersSpec extends SpecBase {
         .value
 
       val updatedUserAnswers = userAnswers.remove(TestPage) match {
-        case Success(ua) => ua
-        case _           => fail()
+        case Success(updatedUA) => updatedUA
+        case _                  => fail()
       }
 
       val actualValueOption = updatedUserAnswers.get(TestPage)
@@ -66,11 +69,11 @@ class UserAnswersSpec extends SpecBase {
     }
 
     "must serialise to json" in {
-      Json.toJson(emptyUserAnswers).toString() mustBe json
+      Json.toJson(ua).toString() mustBe json
     }
 
     "must deserialise from json" in {
-      Json.parse(json).as[UserAnswers] mustBe emptyUserAnswers
+      Json.parse(json).as[UserAnswers] mustBe ua
     }
   }
 }

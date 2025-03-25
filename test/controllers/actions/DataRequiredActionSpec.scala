@@ -59,7 +59,7 @@ class DataRequiredActionSpec extends SpecBase {
       val harness = new Harness
 
       val optionalDataRequest =
-        OptionalDataRequest(identifierRequest, appaId, groupId, userId, Some(emptyUserAnswers))
+        OptionalDataRequest(identifierRequest, appaId, groupId, userId, Some(userAnswers))
 
       val result =
         harness
@@ -69,7 +69,7 @@ class DataRequiredActionSpec extends SpecBase {
       result.isRight mustBe true
       result.map { dataRequest =>
         dataRequest.request mustEqual identifierRequest
-        dataRequest.userAnswers mustEqual emptyUserAnswers
+        dataRequest.userAnswers mustEqual userAnswers
         dataRequest.appaId mustEqual appaId
         dataRequest.groupId mustEqual groupId
         dataRequest.userId mustEqual userId

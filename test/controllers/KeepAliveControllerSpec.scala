@@ -29,7 +29,7 @@ class KeepAliveControllerSpec extends SpecBase {
       "must keep the answers alive and return OK" in {
 
         val application =
-          applicationBuilder(Some(emptyUserAnswers))
+          applicationBuilder(Some(userAnswers))
             .build()
 
         running(application) {

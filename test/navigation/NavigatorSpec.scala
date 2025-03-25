@@ -31,7 +31,7 @@ class NavigatorSpec extends SpecBase {
 
       "must go from a page that doesn't exist in the route map to Index" in {
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, NormalMode, emptyUserAnswers) mustBe routes.IndexController.onPageLoad()
+        navigator.nextPage(UnknownPage, NormalMode, userAnswers) mustBe routes.IndexController.onPageLoad()
       }
 
       "from the Contact Preference page" - {
@@ -39,7 +39,7 @@ class NavigatorSpec extends SpecBase {
           navigator.nextPage(
             ContactPreferencePage,
             NormalMode,
-            emptyUserAnswersPostNoEmail.set(ContactPreferencePage, true).success.value
+            userAnswersPostNoEmail.set(ContactPreferencePage, true).success.value
           ) mustBe routes.IndexController.onPageLoad()
           // TODO: change to correct route when page is created
         }
@@ -48,7 +48,7 @@ class NavigatorSpec extends SpecBase {
           navigator.nextPage(
             ContactPreferencePage,
             NormalMode,
-            emptyUserAnswers.copy(paperlessReference = false).set(ContactPreferencePage, true).success.value
+            userAnswersPostWithEmail.set(ContactPreferencePage, true).success.value
           ) mustBe routes.IndexController.onPageLoad()
           // TODO: change to correct route when page is created
         }
@@ -57,7 +57,7 @@ class NavigatorSpec extends SpecBase {
           navigator.nextPage(
             ContactPreferencePage,
             NormalMode,
-            emptyUserAnswers.set(ContactPreferencePage, true).success.value
+            userAnswers.set(ContactPreferencePage, true).success.value
           ) mustBe routes.IndexController.onPageLoad()
           // TODO: change to correct route when page is created
         }
@@ -66,7 +66,7 @@ class NavigatorSpec extends SpecBase {
           navigator.nextPage(
             ContactPreferencePage,
             NormalMode,
-            emptyUserAnswers.set(ContactPreferencePage, false).success.value
+            userAnswers.set(ContactPreferencePage, false).success.value
           ) mustBe routes.IndexController.onPageLoad()
           // TODO: change to correct route when page is created
         }
@@ -75,7 +75,7 @@ class NavigatorSpec extends SpecBase {
           navigator.nextPage(
             ContactPreferencePage,
             NormalMode,
-            emptyUserAnswersPostNoEmail.set(ContactPreferencePage, false).success.value
+            userAnswersPostNoEmail.set(ContactPreferencePage, false).success.value
           ) mustBe routes.IndexController.onPageLoad()
           // TODO: change to correct route when page is created
         }
@@ -86,7 +86,7 @@ class NavigatorSpec extends SpecBase {
 
       "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, CheckMode, emptyUserAnswers) mustBe routes.CheckYourAnswersController
+        navigator.nextPage(UnknownPage, CheckMode, userAnswers) mustBe routes.CheckYourAnswersController
           .onPageLoad()
       }
     }

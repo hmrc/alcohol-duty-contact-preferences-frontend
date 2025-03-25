@@ -62,7 +62,7 @@ class DataRetrievalActionSpec extends SpecBase {
 
       "must build a userAnswers object and add it to the request" in {
         val userAnswersConnector = mock[UserAnswersConnector]
-        when(userAnswersConnector.get(eqTo(appaId))(any)) thenReturn Future(Right(emptyUserAnswers))
+        when(userAnswersConnector.get(eqTo(appaId))(any)) thenReturn Future(Right(userAnswers))
         val action               = new Harness(userAnswersConnector)
 
         val result =

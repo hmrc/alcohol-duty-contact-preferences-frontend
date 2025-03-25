@@ -22,7 +22,6 @@ import forms.ContactPreferenceFormProvider
 import models.{CheckMode, NormalMode}
 import navigation.{FakeNavigator, Navigator}
 import org.mockito.ArgumentMatchers.any
-import pages.ContactPreferencePage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -48,9 +47,9 @@ class ContactPreferenceControllerSpec extends SpecBase {
   "ContactPreferenceController" - {
 
     "onPageLoad in normal mode" - {
-      "must create user answers, then return OK and the correct view for a GET if user answers do not exist" - {
+      "must create user answers, then return OK and the correct view (populated from subscription data) for a GET if user answers do not exist" - {
         when(mockUserAnswersConnector.createUserAnswers(any())(any())) thenReturn Future.successful(
-          Right(emptyUserAnswers)
+          Right(userAnswersPostNoEmail)
         )
 
         val application = applicationBuilder(userAnswers = None)
@@ -67,28 +66,14 @@ class ContactPreferenceControllerSpec extends SpecBase {
           val view = application.injector.instanceOf[ContactPreferenceView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(form, NormalMode)(request, getMessages(application)).toString
+          contentAsString(result) mustEqual view(form.fill(false), NormalMode)(
+            request,
+            getMessages(application)
+          ).toString
         }
       }
 
-      "must return OK and the correct view for a GET if user answers already exist and the question has not previously been answered" in {
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
-
-        running(application) {
-          val request = FakeRequest(GET, contactPreferenceNormalRoute)
-
-          val result = route(application, request).value
-
-          val view = application.injector.instanceOf[ContactPreferenceView]
-
-          status(result) mustEqual OK
-          contentAsString(result) mustEqual view(form, NormalMode)(request, getMessages(application)).toString
-        }
-      }
-
-      "must populate the view correctly on a GET if user answers already exist and the question has previously been answered" in {
-        val userAnswers = emptyUserAnswers.set(ContactPreferencePage, true).success.value
-
+      "must populate the view correctly on a GET if user answers already exist" in {
         val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
         running(application) {
@@ -109,8 +94,6 @@ class ContactPreferenceControllerSpec extends SpecBase {
 
     "onPageLoad in check mode" - {
       "must populate the view correctly on a GET" in {
-        val userAnswers = emptyUserAnswers.set(ContactPreferencePage, true).success.value
-
         val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
         running(application) {
@@ -156,7 +139,7 @@ class ContactPreferenceControllerSpec extends SpecBase {
       "must redirect to the next page when valid data is submitted" in {
         when(mockUserAnswersConnector.set(any())(any())) thenReturn Future.successful(mockHttpResponse)
 
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+        val application = applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
             bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
             bind[UserAnswersConnector].toInstance(mockUserAnswersConnector)
@@ -176,7 +159,7 @@ class ContactPreferenceControllerSpec extends SpecBase {
       }
 
       "must return a Bad Request and errors when invalid data is submitted" in {
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+        val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
         running(application) {
           val request =

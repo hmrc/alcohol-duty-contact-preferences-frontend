@@ -19,6 +19,7 @@ package common
 import config.Constants.ukTimeZoneStringId
 import generators.ModelGenerators
 import models._
+import play.api.libs.json.{JsObject, Json}
 
 import java.time._
 
@@ -32,24 +33,52 @@ trait TestData extends ModelGenerators {
 
   val emailAddress = "john.doe@example.com"
 
-  val emptyUserAnswers: UserAnswers = UserAnswers(
+  val subscriptionSummaryEmail = SubscriptionSummary(
+    paperlessReference = true,
+    emailAddress = Some(emailAddress),
+    emailVerification = Some(true),
+    bouncedEmail = Some(false)
+  )
+
+  val subscriptionSummaryPostWithEmail = subscriptionSummaryEmail.copy(paperlessReference = false)
+
+  val subscriptionSummaryPostNoEmail = subscriptionSummaryEmail.copy(paperlessReference = false)
+
+  val userAnswers: UserAnswers = UserAnswers(
     appaId = appaId,
     userId = userId,
-    paperlessReference = true,
-    emailVerification = Some(true),
-    bouncedEmail = Some(false),
-    emailData = EmailData(emailAddress = Some(emailAddress)),
+    subscriptionSummary = subscriptionSummaryEmail,
+    emailAddress = Some(emailAddress),
+    data = JsObject(Seq("contactPreferenceEmail" -> Json.toJson(true))),
     startedTime = Instant.now(clock),
     lastUpdated = Instant.now(clock)
   )
 
-  val emptyUserAnswersPostNoEmail: UserAnswers = UserAnswers(
+  val userAnswersPostWithEmail: UserAnswers = UserAnswers(
     appaId = appaId,
     userId = userId,
-    paperlessReference = false,
-    emailVerification = None,
-    bouncedEmail = None,
-    emailData = EmailData(emailAddress = None),
+    subscriptionSummary = subscriptionSummaryPostWithEmail,
+    emailAddress = None,
+    data = JsObject(Seq("contactPreferenceEmail" -> Json.toJson(false))),
+    startedTime = Instant.now(clock),
+    lastUpdated = Instant.now(clock)
+  )
+
+  val userAnswersPostNoEmail: UserAnswers = UserAnswers(
+    appaId = appaId,
+    userId = userId,
+    subscriptionSummary = subscriptionSummaryPostNoEmail,
+    emailAddress = None,
+    data = JsObject(Seq("contactPreferenceEmail" -> Json.toJson(false))),
+    startedTime = Instant.now(clock),
+    lastUpdated = Instant.now(clock)
+  )
+
+  val emptyUserAnswers: UserAnswers = UserAnswers(
+    appaId = appaId,
+    userId = userId,
+    subscriptionSummary = subscriptionSummaryEmail,
+    emailAddress = Some(emailAddress),
     startedTime = Instant.now(clock),
     lastUpdated = Instant.now(clock)
   )
