@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-package controllers
+package forms
 
-import controllers.actions.IdentifierAction
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import forms.mappings.Mappings
+import play.api.data.Form
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
 
-class KeepAliveController @Inject() (
-  val controllerComponents: MessagesControllerComponents,
-  identify: IdentifierAction
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController {
+class ContactPreferenceFormProvider @Inject() extends Mappings {
 
-  def keepAlive(): Action[AnyContent] = identify { implicit request =>
-    Ok
-  }
+  def apply(): Form[Boolean] =
+    Form(
+      "contactPreferenceEmail" -> boolean("contactPreference.error.required")
+    )
 }

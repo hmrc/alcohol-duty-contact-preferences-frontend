@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package generators
+package common
 
-import org.scalacheck.Gen
+import models.UserAnswers
+import pages.ContactPreferencePage
 
-trait ModelGenerators {
-  def appaIdGen: Gen[String] = Gen.listOfN(10, Gen.numChar).map(id => s"XMADP${id.mkString}")
+trait TestPages extends TestData {
+  def contactPreferencePage(userAnswers: UserAnswers, emailSelected: Boolean): UserAnswers =
+    userAnswers.set(ContactPreferencePage, emailSelected).get
 }

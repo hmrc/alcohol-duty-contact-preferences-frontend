@@ -16,6 +16,7 @@
 
 package models
 
+import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import queries.{Gettable, Settable}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
@@ -24,9 +25,14 @@ import java.time.Instant
 import scala.util.{Failure, Success, Try}
 
 final case class UserAnswers(
-  id: String,
+  appaId: String,
+  userId: String,
+  subscriptionSummary: SubscriptionSummary,
+  emailAddress: Option[String],
   data: JsObject = Json.obj(),
-  lastUpdated: Instant = Instant.now
+  startedTime: Instant,
+  lastUpdated: Instant,
+  validUntil: Option[Instant] = None
 ) {
 
   def get[A](page: Gettable[A])(implicit rds: Reads[A]): Option[A] =
@@ -65,27 +71,27 @@ final case class UserAnswers(
 
 object UserAnswers {
 
-  val reads: Reads[UserAnswers] = {
+  implicit val format: OFormat[UserAnswers] = (
+    (__ \ "appaId").format[String] and
+      (__ \ "userId").format[String] and
+      (__ \ "subscriptionSummary").format[SubscriptionSummary] and
+      (__ \ "emailAddress").formatNullable[String] and
+      (__ \ "data").formatWithDefault[JsObject](Json.obj()) and
+      (__ \ "startedTime").format(MongoJavatimeFormats.instantFormat) and
+      (__ \ "lastUpdated").format(MongoJavatimeFormats.instantFormat) and
+      (__ \ "validUntil").formatNullable(MongoJavatimeFormats.instantFormat)
+  )(UserAnswers.apply, unlift(UserAnswers.unapply))
 
-    import play.api.libs.functional.syntax._
+}
 
-    (
-      (__ \ "_id").read[String] and
-        (__ \ "data").read[JsObject] and
-        (__ \ "lastUpdated").read(MongoJavatimeFormats.instantFormat)
-    )(UserAnswers.apply _)
-  }
+case class SubscriptionSummary(
+  paperlessReference: Boolean,
+  emailAddress: Option[String],
+  emailVerification: Option[Boolean],
+  bouncedEmail: Option[Boolean]
+)
 
-  val writes: OWrites[UserAnswers] = {
-
-    import play.api.libs.functional.syntax._
-
-    (
-      (__ \ "_id").write[String] and
-        (__ \ "data").write[JsObject] and
-        (__ \ "lastUpdated").write(MongoJavatimeFormats.instantFormat)
-    )(ua => (ua.id, ua.data, ua.lastUpdated))
-  }
-
-  implicit val format: OFormat[UserAnswers] = OFormat(reads, writes)
+object SubscriptionSummary {
+  implicit val subscriptionSummaryFormat: OFormat[SubscriptionSummary] =
+    Json.format[SubscriptionSummary]
 }

@@ -52,13 +52,12 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
 
   val timeout: Int                   = configuration.get[Int]("timeout-dialog.timeout")
   val countdown: Int                 = configuration.get[Int]("timeout-dialog.countdown")
-  val cacheTtl: Long                 = configuration.get[Int]("mongodb.timeToLiveInSeconds")
   val enrolmentServiceName: String   = configuration.get[String]("enrolment.serviceName")
   val enrolmentIdentifierKey: String = configuration.get[String]("enrolment.identifierKey")
 
-  def getContactPreferenceUrl(appaId: String): String =
-    s"$contactPreferencesHost/alcohol-duty-contact-preferences/contact-preference/$appaId"
+  def ecpUserAnswersGetUrl(appaId: String): String =
+    s"$contactPreferencesHost/alcohol-duty-contact-preferences/user-answers/$appaId"
 
-  def setContactPreferenceUrl(appaId: String): String =
-    s"$contactPreferencesHost/alcohol-duty-contact-preferences/update-contact-preference/$appaId"
+  def ecpUserAnswersUrl(): String =
+    s"$contactPreferencesHost/alcohol-duty-contact-preferences/user-answers"
 }

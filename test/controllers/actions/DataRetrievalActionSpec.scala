@@ -17,18 +17,22 @@
 package controllers.actions
 
 import base.SpecBase
-import models.UserAnswers
+import connectors.UserAnswersConnector
 import models.requests.{IdentifierRequest, OptionalDataRequest}
-import org.mockito.Mockito._
-import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchersSugar.eqTo
+import play.api.http.Status.SEE_OTHER
+import play.api.mvc.Result
 import play.api.test.FakeRequest
-import repositories.SessionRepository
+import play.api.test.Helpers._
+import uk.gov.hmrc.http.UpstreamErrorResponse
+
 import scala.concurrent.Future
 
-class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
+class DataRetrievalActionSpec extends SpecBase {
 
-  class Harness(sessionRepository: SessionRepository) extends DataRetrievalActionImpl(sessionRepository) {
-    def callTransform[A](request: IdentifierRequest[A]): Future[OptionalDataRequest[A]] = transform(request)
+  class Harness(userAnswersConnector: UserAnswersConnector) extends DataRetrievalActionImpl(userAnswersConnector) {
+    def actionRefine[A](request: IdentifierRequest[A]): Future[Either[Result, OptionalDataRequest[A]]] = refine(request)
   }
 
   "Data Retrieval Action" - {
@@ -36,28 +40,71 @@ class DataRetrievalActionSpec extends SpecBase with MockitoSugar {
     "when there is no data in the cache" - {
 
       "must set userAnswers to 'None' in the request" in {
+        val mockUpstreamErrorResponse = mock[UpstreamErrorResponse]
+        when(mockUpstreamErrorResponse.statusCode).thenReturn(NOT_FOUND)
 
-        val sessionRepository = mock[SessionRepository]
-        when(sessionRepository.get("id")) thenReturn Future(None)
-        val action            = new Harness(sessionRepository)
+        val userAnswersConnector = mock[UserAnswersConnector]
+        when(userAnswersConnector.get(eqTo(appaId))(any())) thenReturn Future(
+          Left(mockUpstreamErrorResponse)
+        )
+        val action               = new Harness(userAnswersConnector)
 
-        val result = action.callTransform(IdentifierRequest(FakeRequest(), appaId, groupId, internalId)).futureValue
+        val result = action.actionRefine(IdentifierRequest(FakeRequest(), appaId, groupId, userId)).futureValue
 
-        result.userAnswers must not be defined
+        result.isRight mustBe true
+        result.map { dataRetrievalRequest =>
+          dataRetrievalRequest.userAnswers must not be defined
+        }
       }
     }
 
     "when there is data in the cache" - {
 
       "must build a userAnswers object and add it to the request" in {
+        val userAnswersConnector = mock[UserAnswersConnector]
+        when(userAnswersConnector.get(eqTo(appaId))(any)) thenReturn Future(Right(userAnswers))
+        val action               = new Harness(userAnswersConnector)
 
-        val sessionRepository = mock[SessionRepository]
-        when(sessionRepository.get("id")) thenReturn Future(Some(UserAnswers("id")))
-        val action            = new Harness(sessionRepository)
+        val result =
+          action
+            .actionRefine(
+              IdentifierRequest(
+                FakeRequest(),
+                appaId,
+                groupId,
+                userId
+              )
+            )
+            .futureValue
 
-        val result = action.callTransform(new IdentifierRequest(FakeRequest(), appaId, groupId, internalId)).futureValue
+        result.isRight mustBe true
+        result.map { dataRetrievalRequest =>
+          dataRetrievalRequest.userAnswers mustBe defined
+        }
+      }
+    }
 
-        result.userAnswers mustBe defined
+    "when the UserAnswersConnector returns an error" - {
+
+      "must redirect to the Journey Recovery controller" in {
+
+        val mockUpstreamErrorResponse = mock[UpstreamErrorResponse]
+        when(mockUpstreamErrorResponse.statusCode).thenReturn(BAD_REQUEST)
+
+        val userAnswersConnector = mock[UserAnswersConnector]
+        when(userAnswersConnector.get(eqTo(appaId))(any())) thenReturn Future(
+          Left(mockUpstreamErrorResponse)
+        )
+        val action               = new Harness(userAnswersConnector)
+
+        val result = action.actionRefine(IdentifierRequest(FakeRequest(), appaId, groupId, userId))
+
+        val redirectResult = result.map {
+          case Left(res) => res
+          case _         => fail()
+        }
+        status(redirectResult) mustBe SEE_OTHER
+        redirectLocation(redirectResult).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }
