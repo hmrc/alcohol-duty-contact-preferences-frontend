@@ -47,7 +47,7 @@ class ContactPreferenceControllerSpec extends SpecBase {
   "ContactPreferenceController" - {
 
     "onPageLoad in normal mode" - {
-      "must create user answers, then return OK and the correct view (populated from subscription data) for a GET if user answers do not exist" - {
+      "must create user answers, then return OK and the correct view for a GET if user answers do not exist" - {
         when(mockUserAnswersConnector.createUserAnswers(any())(any())) thenReturn Future.successful(
           Right(userAnswersPostNoEmail)
         )
