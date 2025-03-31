@@ -66,7 +66,7 @@ class ContactPreferenceControllerSpec extends SpecBase {
           val view = application.injector.instanceOf[ContactPreferenceView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(form.fill(false), NormalMode)(
+          contentAsString(result) mustEqual view(form, NormalMode)(
             request,
             getMessages(application)
           ).toString
