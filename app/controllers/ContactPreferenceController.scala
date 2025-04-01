@@ -55,7 +55,7 @@ class ContactPreferenceController @Inject() (
         request.userAnswers match {
           case None                  =>
             userAnswersConnector.createUserAnswers(UserDetails(request.appaId, request.userId)).map {
-              case Right(ua)   => Ok(view(getPreparedForm(ua), mode))
+              case Right(_)    => Ok(view(form, mode))
               case Left(error) =>
                 logger.warn(s"Error creating user answers: ${error.message}")
                 Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
