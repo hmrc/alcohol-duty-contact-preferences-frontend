@@ -20,8 +20,10 @@ import base.SpecBase
 import connectors.UserAnswersConnector
 import forms.ContactPreferenceFormProvider
 import models.{CheckMode, NormalMode}
-import navigation.{FakeNavigator, Navigator}
+import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchersSugar.eqTo
+import pages.ContactPreferencePage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
@@ -41,13 +43,12 @@ class ContactPreferenceControllerSpec extends SpecBase {
   val formProvider = new ContactPreferenceFormProvider()
   val form         = formProvider()
 
-  val mockUserAnswersConnector = mock[UserAnswersConnector]
-  val mockHttpResponse         = mock[HttpResponse]
-
   "ContactPreferenceController" - {
 
     "onPageLoad in normal mode" - {
       "must create user answers, then return OK and the correct view for a GET if user answers do not exist" - {
+        val mockUserAnswersConnector = mock[UserAnswersConnector]
+
         when(mockUserAnswersConnector.createUserAnswers(any())(any())) thenReturn Future.successful(
           Right(userAnswersPostNoEmail)
         )
@@ -70,6 +71,8 @@ class ContactPreferenceControllerSpec extends SpecBase {
             request,
             getMessages(application)
           ).toString
+
+          verify(mockUserAnswersConnector, times(1)).createUserAnswers(eqTo(userDetails))(any())
         }
       }
 
@@ -137,11 +140,15 @@ class ContactPreferenceControllerSpec extends SpecBase {
 
     "onSubmit" - {
       "must redirect to the next page when valid data is submitted" in {
-        when(mockUserAnswersConnector.set(any())(any())) thenReturn Future.successful(mockHttpResponse)
+        val mockUserAnswersConnector = mock[UserAnswersConnector]
+        val mockNavigator            = mock[Navigator]
+
+        when(mockUserAnswersConnector.set(any())(any())) thenReturn Future.successful(mock[HttpResponse])
+        when(mockNavigator.nextPage(eqTo(ContactPreferencePage), any(), any())) thenReturn onwardRoute
 
         val application = applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
-            bind[Navigator].toInstance(new FakeNavigator(onwardRoute)),
+            bind[Navigator].toInstance(mockNavigator),
             bind[UserAnswersConnector].toInstance(mockUserAnswersConnector)
           )
           .build()
@@ -155,6 +162,9 @@ class ContactPreferenceControllerSpec extends SpecBase {
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual onwardRoute.url
+
+          verify(mockUserAnswersConnector, times(1)).set(any())(any())
+          verify(mockNavigator, times(1)).nextPage(eqTo(ContactPreferencePage), eqTo(NormalMode), any())
         }
       }
 
