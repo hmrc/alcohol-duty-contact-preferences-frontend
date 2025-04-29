@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.changePreferences
 
 import base.SpecBase
 import connectors.UserAnswersConnector
+import controllers.routes
 import forms.ContactPreferenceFormProvider
 import models.{CheckMode, NormalMode}
 import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchersSugar.eqTo
-import pages.ContactPreferencePage
+import pages.changePreferences.ContactPreferencePage
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest

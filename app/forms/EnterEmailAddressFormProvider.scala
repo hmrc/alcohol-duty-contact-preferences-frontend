@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
-package common
+package forms
 
-import models.UserAnswers
-import pages.changePreferences.ContactPreferencePage
+import config.Constants.emailAddressRegexString
+import forms.mappings.Mappings
+import play.api.data.Form
 
-trait TestPages extends TestData {
-  def contactPreferencePage(userAnswers: UserAnswers, emailSelected: Boolean): UserAnswers =
-    userAnswers.set(ContactPreferencePage, emailSelected).get
+import javax.inject.Inject
+
+class EnterEmailAddressFormProvider @Inject() extends Mappings {
+
+  def apply(): Form[String] =
+    Form(
+      "emailAddress" -> text("changePreferences.enter-email-address.empty-error")
+        .verifying(regexp(emailAddressRegexString, "contactPreference.error.required"))
+    )
 }

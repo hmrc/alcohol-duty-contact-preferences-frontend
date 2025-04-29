@@ -20,6 +20,7 @@ import base.SpecBase
 import controllers.routes
 import pages._
 import models._
+import pages.changePreferences.ContactPreferencePage
 
 class NavigatorSpec extends SpecBase {
 

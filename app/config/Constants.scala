@@ -20,6 +20,8 @@ object Constants {
 
   val ukTimeZoneStringId = "Europe/London"
 
+  val emailAddressRegexString: String = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$"
+
   object Css {
     val bodyCssClass = "govuk-body"
 

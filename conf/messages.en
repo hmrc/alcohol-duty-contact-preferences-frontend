@@ -54,3 +54,8 @@ contactPreference.heading = How would you like to be contacted?
 contactPreference.email = Email me when I have a message in my account
 contactPreference.post = Send me letters by post
 contactPreference.error.required = Select how you would like to be contacted
+
+changePreferences.enter-email-address.title = What is the email address we should use to contact you about your Alcohol Duty?
+changePreferences.enter-email-address.heading = What is the email address we should use to contact you about your Alcohol Duty?
+changePreferences.enter-email-address.empty-error = Enter an email address
+changePreferences.enter-email-address.format-error = Enter an email address in the correct format, like name@example.com

@@ -19,17 +19,20 @@ package navigation
 import javax.inject.{Inject, Singleton}
 import play.api.mvc.Call
 import controllers.routes
-import pages._
+import pages.{changePreferences, _}
 import models._
+import pages.changePreferences.{ContactPreferencePage, EnterEmailAddressPage}
 import play.api.Logging
 
 @Singleton
 class Navigator @Inject() () extends Logging {
 
   private val normalRoutes: Page => UserAnswers => Call = {
-    case pages.ContactPreferencePage =>
+    case ContactPreferencePage =>
       userAnswers => contactPreferenceRoute(userAnswers, NormalMode)
-    case _                           =>
+    case EnterEmailAddressPage =>
+      userAnswers => contactPreferenceRoute(userAnswers, NormalMode)
+    case _                     =>
       _ => routes.IndexController.onPageLoad()
   }
 
@@ -45,7 +48,7 @@ class Navigator @Inject() () extends Logging {
   }
 
   private def contactPreferenceRoute(userAnswers: UserAnswers, mode: Mode): Call = {
-    val selectedEmail      = userAnswers.get(pages.ContactPreferencePage)
+    val selectedEmail      = userAnswers.get(changePreferences.ContactPreferencePage)
     val paperlessReference = userAnswers.subscriptionSummary.paperlessReference
     val currentEmail       = userAnswers.subscriptionSummary.emailAddress
     (selectedEmail, paperlessReference, currentEmail) match {
@@ -75,6 +78,32 @@ class Navigator @Inject() () extends Logging {
         routes.IndexController.onPageLoad()
       case _                            =>
         routes.JourneyRecoveryController.onPageLoad()
+    }
+  }
+
+  def enterEmailAddressNavigation(
+    emailAddressEnteredDetails: EmailVerificationDetails
+  ): Call = {
+    val (isVerified, isLocked) = (
+      emailAddressEnteredDetails.isVerified,
+      emailAddressEnteredDetails.isLocked
+    )
+
+    (isVerified, isLocked) match {
+      case (true, _)      =>
+        // TODO: next page is /check-answers
+        logger.info("User has a verified email address. Should redirect to /check-answers")
+        routes.IndexController.onPageLoad()
+      case (false, true)  =>
+        // TODO: next page is /confirmation-code-limit
+        logger.info(
+          "User has been locked out for the entered email address. Should redirect to /confirmation-code-limit"
+        )
+        routes.IndexController.onPageLoad()
+      case (false, false) =>
+        // TODO: next page is POST /verify-email
+        logger.info("User must verify the entered email address. Should redirect to /verify-email")
+        routes.IndexController.onPageLoad()
     }
   }
 }

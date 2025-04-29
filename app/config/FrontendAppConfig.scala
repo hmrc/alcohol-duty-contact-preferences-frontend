@@ -58,6 +58,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   def ecpUserAnswersGetUrl(appaId: String): String =
     s"$contactPreferencesHost/alcohol-duty-contact-preferences/user-answers/$appaId"
 
+  def ecpGetEmailVerificationUrl(credId: String): String =
+    s"$contactPreferencesHost/alcohol-duty-contact-preferences/get-email-verification/$credId"
+
   def ecpUserAnswersUrl(): String =
     s"$contactPreferencesHost/alcohol-duty-contact-preferences/user-answers"
 }

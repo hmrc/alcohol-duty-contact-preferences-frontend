@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.changePreferences
 
 import connectors.UserAnswersConnector
 import controllers.actions._
+import controllers.routes
 import forms.ContactPreferenceFormProvider
 import models.{CheckMode, Mode, NormalMode, UserAnswers, UserDetails}
 import navigation.Navigator
-import pages.ContactPreferencePage
+import pages.changePreferences.ContactPreferencePage
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.ContactPreferenceView
+import views.html.changePreferences.ContactPreferenceView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}

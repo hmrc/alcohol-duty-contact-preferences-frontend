@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 
-package common
+package models
 
-import models.UserAnswers
-import pages.changePreferences.ContactPreferencePage
+import play.api.libs.json.{Json, OFormat}
 
-trait TestPages extends TestData {
-  def contactPreferencePage(userAnswers: UserAnswers, emailSelected: Boolean): UserAnswers =
-    userAnswers.set(ContactPreferencePage, emailSelected).get
+case class GetVerificationStatusResponse(
+  emails: List[GetVerificationStatusResponseEmailAddressDetails]
+)
+
+case object GetVerificationStatusResponse {
+  implicit val format: OFormat[GetVerificationStatusResponse] = Json.format[GetVerificationStatusResponse]
 }
+
+case class GetVerificationStatusResponseEmailAddressDetails(
+  emailAddress: String,
+  verified: Boolean,
+  locked: Boolean
+)
