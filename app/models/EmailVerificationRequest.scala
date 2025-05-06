@@ -24,7 +24,6 @@ case class EmailVerificationRequest(
   origin: String,
   deskproServiceName: String,
   accessibilityStatementUrl: String,
-  pageTitle: String,
   backUrl: String,
   email: EmailModel,
   labels: Labels,

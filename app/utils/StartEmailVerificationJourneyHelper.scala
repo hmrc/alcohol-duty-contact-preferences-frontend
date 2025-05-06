@@ -19,7 +19,6 @@ package utils
 import config.FrontendAppConfig
 import controllers.routes
 import models.{EmailModel, EmailVerificationRequest, Labels, LanguageInfo, NormalMode}
-import models.requests.DataRequest
 import play.api.i18n.Messages
 
 import javax.inject.Inject
@@ -57,7 +56,6 @@ class StartEmailVerificationJourneyHelper @Inject() (
       origin = messages("emailVerificationJourney.signature"),
       deskproServiceName = "alcohol-duty-returns-frontend",
       accessibilityStatementUrl = config.accessibilityStatementUrl,
-      pageTitle = messages("service.name"),
       backUrl = enterEmailAddressPageUrl,
       email = email,
       labels = labels,
