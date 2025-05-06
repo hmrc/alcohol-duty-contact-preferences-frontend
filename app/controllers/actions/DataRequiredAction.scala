@@ -35,7 +35,9 @@ class DataRequiredActionImpl @Inject() (implicit val executionContext: Execution
         logger.warn(s"Data required action: Unable to get userAnswers for ${request.appaId}")
         Future.successful(Left(Redirect(routes.JourneyRecoveryController.onPageLoad())))
       case Some(data) =>
-        Future.successful(Right(DataRequest(request.request, request.appaId, request.groupId, request.userId, data)))
+        Future.successful(
+          Right(DataRequest(request.request, request.appaId, request.groupId, request.userId, request.credId, data))
+        )
     }
 }
 

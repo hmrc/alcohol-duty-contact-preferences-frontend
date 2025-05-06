@@ -18,9 +18,9 @@ package connectors
 
 import cats.data.EitherT
 import config.FrontendAppConfig
-import models.{GetVerificationStatusResponse, UserAnswers, UserDetails, VerificationDetails}
+import models.{EmailVerificationRequest, ErrorModel, GetVerificationStatusResponse, RedirectUrl, VerificationDetails}
 import play.api.Logging
-import play.api.http.Status.OK
+import play.api.http.Status.{CREATED, INTERNAL_SERVER_ERROR}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReadsInstances, HttpResponse, StringContextOps, UpstreamErrorResponse}
@@ -38,23 +38,63 @@ class EmailVerificationConnector @Inject() (
 
   def getEmailVerification(verificationDetails: VerificationDetails)(implicit
     hc: HeaderCarrier
-  ): Future[GetVerificationStatusResponse] =
+  ): EitherT[Future, ErrorModel, GetVerificationStatusResponse] = EitherT {
     httpClient
       .get(url"${config.ecpGetEmailVerificationUrl(verificationDetails.credId)}")
       .execute[Either[UpstreamErrorResponse, HttpResponse]]
       .flatMap {
         case Right(response)     =>
           Try(response.json.as[GetVerificationStatusResponse]) match {
-            case Success(successResponse) => Future.successful(successResponse)
+            case Success(successResponse) => Future.successful(Right(successResponse))
             case Failure(exception)       =>
               logger.warn(s"Invalid JSON format, failed to parse as GetVerificationStatusResponse", exception)
-              Future.failed(new InternalError(s"Invalid JSON format $exception"))
+              Future.successful(Left(ErrorModel(INTERNAL_SERVER_ERROR, s"Invalid JSON format $exception")))
           }
         case Left(errorResponse) =>
           logger.warn(
             s"Unexpected response when retrieving email verification details. Status: ${errorResponse.statusCode}, Message: ${errorResponse.message}"
           )
-          Future.failed(new InternalError(s"Unexpected response. Status: ${errorResponse.statusCode}"))
+          Future.successful(
+            Left(ErrorModel(errorResponse.statusCode, s"Unexpected response. Status: ${errorResponse.statusCode}"))
+          )
       }
+  }
+
+  def startEmailVerification(
+    request: EmailVerificationRequest
+  )(implicit hc: HeaderCarrier): EitherT[Future, ErrorModel, RedirectUrl] = EitherT {
+
+    val startEmailVerificationUrl = config.startEmailVerificationUrl
+
+    httpClient
+      .post(url"$startEmailVerificationUrl")
+      .withBody(Json.toJson(request))
+      .execute[HttpResponse]
+      .map { response =>
+        response.status match {
+          case CREATED =>
+            Try(response.json.as[RedirectUrl]) match {
+              case Success(successResponse) =>
+                logger.info(s"Email verification url retrieved successfully")
+                Right(successResponse)
+              case Failure(exception)       =>
+                logger.warn(s"Invalid JSON format, failed to parse response as a RedirectUrl", exception)
+                Left(
+                  ErrorModel(INTERNAL_SERVER_ERROR, s"Invalid JSON format, failed to parse response as a RedirectUrl")
+                )
+            }
+          case _       =>
+            // Not logging response body in case it contains the email address itself (PII)
+            logger.warn(s"Unexpected response from email verification service. Http status: ${response.status}")
+            Left(
+              ErrorModel(
+                response.status,
+                s"Unexpected response from email verification service. Http status: ${response.status}"
+              )
+            )
+        }
+      }
+
+  }
 
 }

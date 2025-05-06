@@ -32,6 +32,10 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   private val contactFormServiceIdentifier        = "alcohol-duty-contact-preferences-frontend"
   private lazy val contactPreferencesHost: String = servicesConfig.baseUrl("alcohol-duty-contact-preferences")
 
+  private val startVerificationProtocol = configuration.get[String]("microservice.services.email-verification.protocol")
+  private val startVerificationHost     = configuration.get[String]("microservice.services.email-verification.host")
+  private val startVerificationPort     = configuration.get[String]("microservice.services.email-verification.port")
+
   def feedbackUrl(implicit request: RequestHeader): String =
     s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=${host + request.uri}"
 
@@ -61,6 +65,11 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   def ecpGetEmailVerificationUrl(credId: String): String =
     s"$contactPreferencesHost/alcohol-duty-contact-preferences/get-email-verification/$credId"
 
+  def startEmailVerificationUrl: String =
+    s"$startVerificationProtocol://$startVerificationHost:$startVerificationPort/email-verification/verify-email"
+
   def ecpUserAnswersUrl(): String =
     s"$contactPreferencesHost/alcohol-duty-contact-preferences/user-answers"
+
+  val accessibilityStatementUrl: String = configuration.get[String]("urls.accessibility-statement")
 }

@@ -28,7 +28,7 @@
 
 @layout(pageTitle = title(form, messages("contactPreference.title"))) {
 
-    @formHelper(action = routes.ContactPreferenceController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.changePreferences.routes.ContactPreferenceController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))

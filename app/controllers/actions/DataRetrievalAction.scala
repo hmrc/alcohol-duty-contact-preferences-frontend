@@ -49,6 +49,7 @@ class DataRetrievalActionImpl @Inject() (
               request.appaId,
               request.groupId,
               request.userId,
+              request.credId,
               Some(ua)
             )
           )
@@ -60,6 +61,7 @@ class DataRetrievalActionImpl @Inject() (
               request.appaId,
               request.groupId,
               request.userId,
+              request.credId,
               None
             )
           )

@@ -16,16 +16,28 @@
 
 package navigation
 
+import connectors.EmailVerificationConnector
+
 import javax.inject.{Inject, Singleton}
-import play.api.mvc.Call
+import play.api.mvc.{Call, Result}
 import controllers.routes
 import pages.{changePreferences, _}
 import models._
+import models.requests.DataRequest
 import pages.changePreferences.{ContactPreferencePage, EnterEmailAddressPage}
 import play.api.Logging
+import play.api.i18n.Messages
+import play.api.mvc.Results.Redirect
+import uk.gov.hmrc.http.HeaderCarrier
+import utils.StartEmailVerificationJourneyHelper
+
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class Navigator @Inject() () extends Logging {
+class Navigator @Inject() (
+  emailVerificationConnector: EmailVerificationConnector,
+  startJourneyHelper: StartEmailVerificationJourneyHelper
+) extends Logging {
 
   private val normalRoutes: Page => UserAnswers => Call = {
     case ContactPreferencePage =>
@@ -36,9 +48,7 @@ class Navigator @Inject() () extends Logging {
       _ => routes.IndexController.onPageLoad()
   }
 
-  private val checkRouteMap: Page => UserAnswers => Call = { case _ =>
-    _ => routes.CheckYourAnswersController.onPageLoad()
-  }
+  private val checkRouteMap: Page => UserAnswers => Call = _ => _ => routes.CheckYourAnswersController.onPageLoad()
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
     case NormalMode =>
@@ -51,13 +61,14 @@ class Navigator @Inject() () extends Logging {
     val selectedEmail      = userAnswers.get(changePreferences.ContactPreferencePage)
     val paperlessReference = userAnswers.subscriptionSummary.paperlessReference
     val currentEmail       = userAnswers.subscriptionSummary.emailAddress
+
     (selectedEmail, paperlessReference, currentEmail) match {
       case (Some(true), false, None)    =>
         // TODO: next page is /what-email-address
         logger.info(
           "User selected email and is currently on post with no email in ETMP. Should redirect to /what-email-address"
         )
-        routes.IndexController.onPageLoad()
+        controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(mode)
       case (Some(true), false, Some(_)) =>
         // TODO: next page is /existing-email
         logger.info(
@@ -82,8 +93,9 @@ class Navigator @Inject() () extends Logging {
   }
 
   def enterEmailAddressNavigation(
-    emailAddressEnteredDetails: EmailVerificationDetails
-  ): Call = {
+    emailAddressEnteredDetails: EmailVerificationDetails,
+    request: DataRequest[_]
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext, messages: Messages): Future[Result] = {
     val (isVerified, isLocked) = (
       emailAddressEnteredDetails.isVerified,
       emailAddressEnteredDetails.isLocked
@@ -93,17 +105,36 @@ class Navigator @Inject() () extends Logging {
       case (true, _)      =>
         // TODO: next page is /check-answers
         logger.info("User has a verified email address. Should redirect to /check-answers")
-        routes.IndexController.onPageLoad()
+        Future.successful(Redirect(routes.IndexController.onPageLoad()))
       case (false, true)  =>
         // TODO: next page is /confirmation-code-limit
         logger.info(
           "User has been locked out for the entered email address. Should redirect to /confirmation-code-limit"
         )
-        routes.IndexController.onPageLoad()
+        Future.successful(Redirect(routes.IndexController.onPageLoad()))
       case (false, false) =>
-        // TODO: next page is POST /verify-email
-        logger.info("User must verify the entered email address. Should redirect to /verify-email")
-        routes.IndexController.onPageLoad()
+        handleEmailVerificationHandoff(request)
     }
   }
+
+  private def handleEmailVerificationHandoff(
+    request: DataRequest[_]
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext, messages: Messages) =
+    request.userAnswers.emailAddress match {
+      case Some(emailAddress: String) =>
+        emailVerificationConnector
+          .startEmailVerification(startJourneyHelper.createRequest("TEST 123", emailAddress))
+          .value
+          .map {
+            case Right(redirectUrl: RedirectUrl) => Redirect(redirectUrl.url)
+            case Left(errorModel: ErrorModel)    =>
+              logger.info(
+                s"Could not start email verification journey. message ${errorModel.message}, status: ${errorModel.status}"
+              )
+              Redirect(routes.JourneyRecoveryController.onPageLoad())
+          }
+      case None                       =>
+        logger.info("Unexpected error. No email address found in user answers")
+        Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+    }
 }

@@ -16,18 +16,16 @@
 
 package controllers.changePreferences
 
-import connectors.UserAnswersConnector
+import cats.data.EitherT
 import controllers.actions._
 import controllers.routes
 import forms.EnterEmailAddressFormProvider
-import models.requests.DataRequest
-import models.{CheckMode, EmailVerificationDetails, Mode, NormalMode, UserAnswers, VerificationDetails}
+import models.{CheckMode, EmailVerificationDetails, ErrorModel, Mode, NormalMode, UserAnswers, VerificationDetails}
 import navigation.Navigator
-import pages.changePreferences.EnterEmailAddressPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import services.EmailVerificationService
+import services.{EmailVerificationService, UserAnswersService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.changePreferences.EnterEmailAddressView
@@ -42,7 +40,7 @@ class EnterEmailAddressController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   formProvider: EnterEmailAddressFormProvider,
-  userAnswersConnector: UserAnswersConnector,
+  userAnswersService: UserAnswersService,
   emailVerificationService: EmailVerificationService,
   val controllerComponents: MessagesControllerComponents,
   view: EnterEmailAddressView
@@ -71,26 +69,31 @@ class EnterEmailAddressController @Inject() (
         .bindFromRequest()
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-          value =>
-            for {
-              newUserAnswers        <- newUserAnswers(request, value)
-              addressEnteredDetails <- updateUserAnswersAndGetVerificationStatus(value, newUserAnswers)
-            } yield Redirect(navigator.enterEmailAddressNavigation(addressEnteredDetails))
+          value => {
+            val updatedUserAnswers = request.userAnswers.copy(emailAddress = Some(value))
+
+            updateUserAnswersAndGetVerificationStatus(value, updatedUserAnswers, request.credId).value.flatMap {
+              case Left(error)                  =>
+                logger.warn(
+                  s"Failed to submit user's entered email address. message: ${error.message}, status: ${error.status}"
+                )
+                Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
+              case Right(addressEnteredDetails) => navigator.enterEmailAddressNavigation(addressEnteredDetails, request)
+            }
+          }
         )
   }
 
-  private def updateUserAnswersAndGetVerificationStatus(value: String, newUserAnswers: UserAnswers)(implicit
-    hc: HeaderCarrier
-  ): Future[EmailVerificationDetails] =
+  private def updateUserAnswersAndGetVerificationStatus(value: String, newUserAnswers: UserAnswers, credId: String)(
+    implicit hc: HeaderCarrier
+  ): EitherT[Future, ErrorModel, EmailVerificationDetails] =
     if (newUserAnswers.verifiedEmailAddresses.contains(value)) {
-      userAnswersConnector.set(newUserAnswers)
-      Future.successful(EmailVerificationDetails(value, isVerified = true, isLocked = false))
+      for {
+        _ <- userAnswersService.set(newUserAnswers)
+      } yield EmailVerificationDetails(value, isVerified = true, isLocked = false)
     } else {
       emailVerificationService
-        .retrieveAddressStatusAndAddToCache(VerificationDetails("TEST TEST"), value, newUserAnswers)
+        .retrieveAddressStatusAndAddToCache(VerificationDetails(credId = credId), value, newUserAnswers)
     }
-
-  def newUserAnswers(request: DataRequest[AnyContent], newEmailAddress: String): Future[UserAnswers] =
-    Future.successful(request.userAnswers.copy(emailAddress = Some(newEmailAddress)))
 
 }

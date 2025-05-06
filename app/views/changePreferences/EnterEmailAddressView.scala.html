@@ -14,6 +14,8 @@
  * limitations under the License.
  *@
 
+@import viewmodels.LabelSize
+
 @this(
         layout: templates.Layout,
         formHelper: FormWithCSRF,
@@ -24,18 +26,20 @@
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("contactPreference.title"))) {
+@layout(pageTitle = title(form, messages("changePreferences.enter-email-address.title"))) {
 
-    @formHelper(action = routes.ContactPreferenceController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.changePreferences.routes.EnterEmailAddressController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        @govukInput(Input(
-            id = "email-address-box",
-            name = "emailAddressBox"
-        ))
+        @govukInput(
+            InputViewModel(
+                field = form("emailAddress"),
+                label = LabelViewModel(messages("changePreferences.enter-email-address.title")).asPageHeading(size = LabelSize.Large),
+            )
+        )
 
         @govukButton(
             ButtonViewModel("continueButton", messages("site.continue"))

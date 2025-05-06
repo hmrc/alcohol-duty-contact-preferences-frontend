@@ -27,6 +27,6 @@ class EnterEmailAddressFormProvider @Inject() extends Mappings {
   def apply(): Form[String] =
     Form(
       "emailAddress" -> text("changePreferences.enter-email-address.empty-error")
-        .verifying(regexp(emailAddressRegexString, "contactPreference.error.required"))
+        .verifying(regexp(emailAddressRegexString, "changePreferences.enter-email-address.format-error"))
     )
 }

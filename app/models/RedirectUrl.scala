@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,19 @@
  * limitations under the License.
  */
 
-package models.requests
+package models
 
-import play.api.mvc.{Request, WrappedRequest}
+import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.http.StringContextOps
 
-case class IdentifierRequest[A](request: Request[A], appaId: String, groupId: String, userId: String, credId: String)
-    extends WrappedRequest[A](request)
+import java.net.URL
+
+case class RedirectUrl(url: String) {
+
+  val getUrl: URL = url"$url"
+
+}
+
+case object RedirectUrl {
+  implicit val format: OFormat[RedirectUrl] = Json.format[RedirectUrl]
+}

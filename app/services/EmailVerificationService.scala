@@ -16,10 +16,11 @@
 
 package services
 
+import cats.data.EitherT
 import com.google.inject.Singleton
-import connectors.{EmailVerificationConnector, UserAnswersConnector}
-import models.{EmailVerificationDetails, GetVerificationStatusResponse, UserAnswers, VerificationDetails}
-import uk.gov.hmrc.http.HeaderCarrier
+import connectors.EmailVerificationConnector
+import models.{EmailVerificationDetails, ErrorModel, GetVerificationStatusResponse, UserAnswers, VerificationDetails}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -27,7 +28,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class EmailVerificationService @Inject() (
   emailVerificationConnector: EmailVerificationConnector,
-  userAnswersConnector: UserAnswersConnector
+  userAnswersService: UserAnswersService
 )(implicit ec: ExecutionContext) {
 
   def retrieveAddressStatusAndAddToCache(
@@ -36,12 +37,11 @@ class EmailVerificationService @Inject() (
     userAnswers: UserAnswers
   )(implicit
     hc: HeaderCarrier
-  ): Future[EmailVerificationDetails] =
+  ): EitherT[Future, ErrorModel, EmailVerificationDetails] =
     for {
       successResponse <- emailVerificationConnector.getEmailVerification(verificationDetails)
       _               <- addVerifiedToCache(successResponse, userAnswers)
-      emailDetails     = handleSuccess(emailAddress, successResponse)
-    } yield emailDetails
+    } yield handleSuccess(emailAddress, successResponse)
 
   private def handleSuccess(
     emailAddress: String,
@@ -60,14 +60,13 @@ class EmailVerificationService @Inject() (
   private def addVerifiedToCache(
     emailVerificationResponse: GetVerificationStatusResponse,
     userAnswers: UserAnswers
-  )(implicit hc: HeaderCarrier): Future[Unit] =
-    Future {
-      val newVerifiedEmails = userAnswers.verifiedEmailAddresses ++ emailVerificationResponse.emails
-        .filter(item => item.verified)
-        .map(_.emailAddress)
-        .toSet
-      val newUserAnswers    = userAnswers.copy(verifiedEmailAddresses = newVerifiedEmails)
-      userAnswersConnector.set(newUserAnswers)
-    }
+  )(implicit hc: HeaderCarrier): EitherT[Future, ErrorModel, HttpResponse] = {
+    val newVerifiedEmails = userAnswers.verifiedEmailAddresses ++ emailVerificationResponse.emails
+      .filter(item => item.verified)
+      .map(_.emailAddress)
+      .toSet
+    val newUserAnswers    = userAnswers.copy(verifiedEmailAddresses = newVerifiedEmails)
+    userAnswersService.set(newUserAnswers)
+  }
 
 }

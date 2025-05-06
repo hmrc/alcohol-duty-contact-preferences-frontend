@@ -59,3 +59,5 @@ changePreferences.enter-email-address.title = What is the email address we shoul
 changePreferences.enter-email-address.heading = What is the email address we should use to contact you about your Alcohol Duty?
 changePreferences.enter-email-address.empty-error = Enter an email address
 changePreferences.enter-email-address.format-error = Enter an email address in the correct format, like name@example.com
+
+emailVerificationJourney.signature = Manage your Alcohol Duty Service

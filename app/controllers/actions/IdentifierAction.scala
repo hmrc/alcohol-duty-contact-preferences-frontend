@@ -60,11 +60,13 @@ class AuthenticatedIdentifierAction @Inject() (
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     authorised(predicate).retrieve(internalId and groupIdentifier and allEnrolments and credentials) {
-      case optInternalId ~ optGroupId ~ enrolments ~ credentials =>
+      case optInternalId ~ optGroupId ~ enrolments ~ optCredId =>
         val internalId: String = getOrElseFailWithUnauthorised(optInternalId, "Unable to retrieve internalId")
         val groupId: String    = getOrElseFailWithUnauthorised(optGroupId, "Unable to retrieve groupIdentifier")
+        val credId: String     =
+          getOrElseFailWithUnauthorised[String](optCredId.map(_.providerId), "Unable to retrieve credentials")
         val appaId             = getAppaId(enrolments)
-        block(IdentifierRequest(request, appaId, groupId, internalId))
+        block(IdentifierRequest(request, appaId, groupId, internalId, credId))
     } recover {
       case e: AuthorisationException =>
         logger.debug(s"Got AuthorisationException:", e)
@@ -92,7 +94,7 @@ class AuthenticatedIdentifierAction @Inject() (
     )
     val appaIdOpt: Option[String] =
       adrEnrolments.getIdentifier(config.enrolmentIdentifierKey).map(_.value)
-    getOrElseFailWithUnauthorised(appaIdOpt, "Unable to retrieve APPAID from enrolments")
+    getOrElseFailWithUnauthorised(appaIdOpt, "Unable to retrieve AppaId from enrolments")
   }
 
   def getOrElseFailWithUnauthorised[T](o: Option[T], failureMessage: String): T =
