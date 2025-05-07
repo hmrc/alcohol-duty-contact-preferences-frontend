@@ -119,14 +119,16 @@ class Navigator @Inject() (
 
   private def handleEmailVerificationHandoff(
     request: DataRequest[_]
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext, messages: Messages) =
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext, messages: Messages): Future[Result] =
     request.userAnswers.emailAddress match {
       case Some(emailAddress: String) =>
         emailVerificationConnector
-          .startEmailVerification(startJourneyHelper.createRequest("TEST 123", emailAddress))
+          .startEmailVerification(startJourneyHelper.createRequest(request.credId, emailAddress))
           .value
           .map {
-            case Right(redirectUrl: RedirectUrl) => Redirect(redirectUrl.url)
+            case Right(redirectUri: RedirectUri) =>
+              logger.info(s"Redirecting to Email Verification Service, uri: ${redirectUri.redirectUri}")
+              Redirect(s"http://localhost:9890${redirectUri.redirectUri}")
             case Left(errorModel: ErrorModel)    =>
               logger.info(
                 s"Could not start email verification journey. message ${errorModel.message}, status: ${errorModel.status}"

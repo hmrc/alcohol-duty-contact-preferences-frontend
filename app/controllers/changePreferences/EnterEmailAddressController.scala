@@ -70,15 +70,16 @@ class EnterEmailAddressController @Inject() (
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
           value => {
-            val updatedUserAnswers = request.userAnswers.copy(emailAddress = Some(value))
+            val updatedRequest = request.copy(userAnswers = request.userAnswers.copy(emailAddress = Some(value)))
 
-            updateUserAnswersAndGetVerificationStatus(value, updatedUserAnswers, request.credId).value.flatMap {
+            updateUserAnswersAndGetVerificationStatus(value, updatedRequest.userAnswers, request.credId).value.flatMap {
               case Left(error)                  =>
                 logger.warn(
                   s"Failed to submit user's entered email address. message: ${error.message}, status: ${error.status}"
                 )
                 Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
-              case Right(addressEnteredDetails) => navigator.enterEmailAddressNavigation(addressEnteredDetails, request)
+              case Right(addressEnteredDetails) =>
+                navigator.enterEmailAddressNavigation(addressEnteredDetails, updatedRequest)
             }
           }
         )

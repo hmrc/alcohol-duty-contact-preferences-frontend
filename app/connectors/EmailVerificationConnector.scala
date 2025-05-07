@@ -18,7 +18,7 @@ package connectors
 
 import cats.data.EitherT
 import config.FrontendAppConfig
-import models.{EmailVerificationRequest, ErrorModel, GetVerificationStatusResponse, RedirectUrl, VerificationDetails}
+import models.{EmailVerificationRequest, ErrorModel, GetVerificationStatusResponse, RedirectUri, VerificationDetails}
 import play.api.Logging
 import play.api.http.Status.{CREATED, INTERNAL_SERVER_ERROR}
 import play.api.libs.json.Json
@@ -62,7 +62,7 @@ class EmailVerificationConnector @Inject() (
 
   def startEmailVerification(
     request: EmailVerificationRequest
-  )(implicit hc: HeaderCarrier): EitherT[Future, ErrorModel, RedirectUrl] = EitherT {
+  )(implicit hc: HeaderCarrier): EitherT[Future, ErrorModel, RedirectUri] = EitherT {
 
     val startEmailVerificationUrl = config.startEmailVerificationUrl
 
@@ -73,7 +73,7 @@ class EmailVerificationConnector @Inject() (
       .map { response =>
         response.status match {
           case CREATED =>
-            Try(response.json.as[RedirectUrl]) match {
+            Try(response.json.as[RedirectUri]) match {
               case Success(successResponse) =>
                 logger.info(s"Email verification url retrieved successfully")
                 Right(successResponse)

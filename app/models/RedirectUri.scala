@@ -17,16 +17,9 @@
 package models
 
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.http.StringContextOps
 
-import java.net.URL
+case class RedirectUri(redirectUri: String)
 
-case class RedirectUrl(url: String) {
-
-  val getUrl: URL = url"$url"
-
-}
-
-case object RedirectUrl {
-  implicit val format: OFormat[RedirectUrl] = Json.format[RedirectUrl]
+case object RedirectUri {
+  implicit val format: OFormat[RedirectUri] = Json.format[RedirectUri]
 }
