@@ -31,8 +31,7 @@ class StartEmailVerificationJourneyHelper @Inject() (
     messages: Messages
   ): EmailVerificationRequest = {
     val language: String                 = messages.lang.code
-    val enterEmailAddressPageUrl: String =
-      controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode).url
+    val enterEmailAddressPageUrl: String = config.startEmailVerificationBackUrl
 
     val email: EmailModel = EmailModel(
       address = enteredEmail,
@@ -52,7 +51,7 @@ class StartEmailVerificationJourneyHelper @Inject() (
     // TODO: Make continueUrl the CYA page
     EmailVerificationRequest(
       credId = credId,
-      continueUrl = routes.IndexController.onPageLoad().url,
+      continueUrl = config.startEmailVerificationContinueUrl,
       origin = messages("emailVerificationJourney.signature"),
       deskproServiceName = "alcohol-duty-returns-frontend",
       accessibilityStatementUrl = config.accessibilityStatementUrl,

@@ -16,6 +16,7 @@
 
 package navigation
 
+import config.FrontendAppConfig
 import connectors.EmailVerificationConnector
 
 import javax.inject.{Inject, Singleton}
@@ -36,7 +37,8 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class Navigator @Inject() (
   emailVerificationConnector: EmailVerificationConnector,
-  startJourneyHelper: StartEmailVerificationJourneyHelper
+  startJourneyHelper: StartEmailVerificationJourneyHelper,
+  config: FrontendAppConfig
 ) extends Logging {
 
   private val normalRoutes: Page => UserAnswers => Call = {
@@ -128,7 +130,8 @@ class Navigator @Inject() (
           .map {
             case Right(redirectUri: RedirectUri) =>
               logger.info(s"Redirecting to Email Verification Service, uri: ${redirectUri.redirectUri}")
-              Redirect(s"http://localhost:9890${redirectUri.redirectUri}")
+              val redirectTo = s"${config.emailVerificationRedirectBaseUrl}${redirectUri.redirectUri}"
+              Redirect(redirectTo)
             case Left(errorModel: ErrorModel)    =>
               logger.info(
                 s"Could not start email verification journey. message ${errorModel.message}, status: ${errorModel.status}"

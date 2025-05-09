@@ -39,33 +39,37 @@ class EmailVerificationService @Inject() (
     hc: HeaderCarrier
   ): EitherT[Future, ErrorModel, EmailVerificationDetails] =
     for {
-      successResponse <- emailVerificationConnector.getEmailVerification(verificationDetails)
-      _               <- addVerifiedToCache(successResponse, userAnswers)
-    } yield handleSuccess(emailAddress, successResponse)
+      successResponse    <- emailVerificationConnector.getEmailVerification(verificationDetails)
+      verificationDetails = handleSuccess(emailAddress, successResponse)
+      _                  <- addVerifiedToCache(verificationDetails, userAnswers)
+    } yield verificationDetails
 
   private def handleSuccess(
     emailAddress: String,
     successResponse: GetVerificationStatusResponse
-  ): EmailVerificationDetails =
-    successResponse.emails.find(_.emailAddress == emailAddress) match {
-      case Some(matchingEmail) =>
-        EmailVerificationDetails(
-          emailAddress = matchingEmail.emailAddress,
-          isVerified = matchingEmail.verified,
-          isLocked = matchingEmail.locked
-        )
-      case None                => EmailVerificationDetails(emailAddress = emailAddress, isVerified = false, isLocked = false)
-    }
+  ): EmailVerificationDetails = {
+
+    val isEmailVerified: Boolean =
+      successResponse.emails.exists(email => email.emailAddress.equalsIgnoreCase(emailAddress) && email.verified)
+    val isEmailLocked: Boolean   =
+      successResponse.emails.exists(email => email.emailAddress.equalsIgnoreCase(emailAddress) && email.locked)
+
+    EmailVerificationDetails(emailAddress = emailAddress, isVerified = isEmailVerified, isLocked = isEmailLocked)
+
+  }
 
   private def addVerifiedToCache(
-    emailVerificationResponse: GetVerificationStatusResponse,
+    verificationDetails: EmailVerificationDetails,
     userAnswers: UserAnswers
   )(implicit hc: HeaderCarrier): EitherT[Future, ErrorModel, HttpResponse] = {
-    val newVerifiedEmails = userAnswers.verifiedEmailAddresses ++ emailVerificationResponse.emails
-      .filter(item => item.verified)
-      .map(_.emailAddress)
-      .toSet
-    val newUserAnswers    = userAnswers.copy(verifiedEmailAddresses = newVerifiedEmails)
+    val newVerifiedEmails: Set[String] =
+      if (verificationDetails.isVerified) {
+        userAnswers.verifiedEmailAddresses ++ Set(verificationDetails.emailAddress)
+      } else {
+        userAnswers.verifiedEmailAddresses
+      }
+
+    val newUserAnswers = userAnswers.copy(verifiedEmailAddresses = newVerifiedEmails)
     userAnswersService.set(newUserAnswers)
   }
 

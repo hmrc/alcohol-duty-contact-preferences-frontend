@@ -64,10 +64,10 @@ class EmailVerificationConnector @Inject() (
     request: EmailVerificationRequest
   )(implicit hc: HeaderCarrier): EitherT[Future, ErrorModel, RedirectUri] = EitherT {
 
-    val startEmailVerificationUrl = config.startEmailVerificationUrl
+    val startEmailVerificationJourneyUrl = config.startEmailVerificationJourneyUrl
 
     httpClient
-      .post(url"$startEmailVerificationUrl")
+      .post(url"$startEmailVerificationJourneyUrl")
       .withBody(Json.toJson(request))
       .execute[HttpResponse]
       .map { response =>
