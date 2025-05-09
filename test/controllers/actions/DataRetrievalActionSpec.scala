@@ -49,7 +49,7 @@ class DataRetrievalActionSpec extends SpecBase {
         )
         val action               = new Harness(userAnswersConnector)
 
-        val result = action.actionRefine(IdentifierRequest(FakeRequest(), appaId, groupId, userId)).futureValue
+        val result = action.actionRefine(IdentifierRequest(FakeRequest(), appaId, groupId, userId, credId)).futureValue
 
         result.isRight mustBe true
         result.map { dataRetrievalRequest =>
@@ -67,14 +67,7 @@ class DataRetrievalActionSpec extends SpecBase {
 
         val result =
           action
-            .actionRefine(
-              IdentifierRequest(
-                FakeRequest(),
-                appaId,
-                groupId,
-                userId
-              )
-            )
+            .actionRefine(IdentifierRequest(FakeRequest(), appaId, groupId, userId, credId))
             .futureValue
 
         result.isRight mustBe true
@@ -97,7 +90,7 @@ class DataRetrievalActionSpec extends SpecBase {
         )
         val action               = new Harness(userAnswersConnector)
 
-        val result = action.actionRefine(IdentifierRequest(FakeRequest(), appaId, groupId, userId))
+        val result = action.actionRefine(IdentifierRequest(FakeRequest(), appaId, groupId, userId, credId))
 
         val redirectResult = result.map {
           case Left(res) => res

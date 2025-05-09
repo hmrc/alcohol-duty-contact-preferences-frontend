@@ -17,14 +17,20 @@
 package navigation
 
 import base.SpecBase
+import connectors.EmailVerificationConnector
 import controllers.routes
 import pages._
 import models._
 import pages.changePreferences.ContactPreferencePage
+import utils.StartEmailVerificationJourneyHelper
 
 class NavigatorSpec extends SpecBase {
 
-  val navigator = new Navigator
+  val navigator = new Navigator(
+    emailVerificationConnector = mock[EmailVerificationConnector],
+    startJourneyHelper = mock[StartEmailVerificationJourneyHelper],
+    config = appConfig
+  )
 
   "Navigator" - {
 

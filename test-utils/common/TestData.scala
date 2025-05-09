@@ -24,31 +24,35 @@ import play.api.libs.json.{JsObject, Json}
 import java.time._
 
 trait TestData extends ModelGenerators {
-  val clock           = Clock.fixed(Instant.ofEpochMilli(1718118467838L), ZoneId.of(ukTimeZoneStringId))
+  val clock: Clock    = Clock.fixed(Instant.ofEpochMilli(1718118467838L), ZoneId.of(ukTimeZoneStringId))
   val appaId: String  = appaIdGen.sample.get
   val groupId: String = "groupid"
   val userId: String  = "user-id"
+  val credId: String  = "cred-id"
 
-  val userDetails = UserDetails(appaId, userId)
+  val userDetails: UserDetails = UserDetails(appaId, userId)
 
   val emailAddress = "john.doe@example.com"
 
-  val subscriptionSummaryEmail = SubscriptionSummary(
+  val verifiedEmailAddresses: Set[String] = Set("jonbonesjones@example.com", "robsmith@example.com")
+
+  val subscriptionSummaryEmail: SubscriptionSummary = SubscriptionSummary(
     paperlessReference = true,
     emailAddress = Some(emailAddress),
     emailVerification = Some(true),
     bouncedEmail = Some(false)
   )
 
-  val subscriptionSummaryPostWithEmail = subscriptionSummaryEmail.copy(paperlessReference = false)
+  val subscriptionSummaryPostWithEmail: SubscriptionSummary = subscriptionSummaryEmail.copy(paperlessReference = false)
 
-  val subscriptionSummaryPostNoEmail = subscriptionSummaryEmail.copy(paperlessReference = false)
+  val subscriptionSummaryPostNoEmail: SubscriptionSummary = subscriptionSummaryEmail.copy(paperlessReference = false)
 
   val userAnswers: UserAnswers = UserAnswers(
     appaId = appaId,
     userId = userId,
     subscriptionSummary = subscriptionSummaryEmail,
     emailAddress = Some(emailAddress),
+    verifiedEmailAddresses = verifiedEmailAddresses,
     data = JsObject(Seq("contactPreferenceEmail" -> Json.toJson(true))),
     startedTime = Instant.now(clock),
     lastUpdated = Instant.now(clock)
@@ -59,6 +63,7 @@ trait TestData extends ModelGenerators {
     userId = userId,
     subscriptionSummary = subscriptionSummaryPostWithEmail,
     emailAddress = None,
+    verifiedEmailAddresses = verifiedEmailAddresses,
     data = JsObject(Seq("contactPreferenceEmail" -> Json.toJson(false))),
     startedTime = Instant.now(clock),
     lastUpdated = Instant.now(clock)
@@ -69,6 +74,7 @@ trait TestData extends ModelGenerators {
     userId = userId,
     subscriptionSummary = subscriptionSummaryPostNoEmail,
     emailAddress = None,
+    verifiedEmailAddresses = verifiedEmailAddresses,
     data = JsObject(Seq("contactPreferenceEmail" -> Json.toJson(false))),
     startedTime = Instant.now(clock),
     lastUpdated = Instant.now(clock)
@@ -79,6 +85,7 @@ trait TestData extends ModelGenerators {
     userId = userId,
     subscriptionSummary = subscriptionSummaryEmail,
     emailAddress = Some(emailAddress),
+    verifiedEmailAddresses = Set.empty[String],
     startedTime = Instant.now(clock),
     lastUpdated = Instant.now(clock)
   )

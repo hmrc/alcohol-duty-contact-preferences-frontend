@@ -25,24 +25,27 @@ import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchersSugar.eqTo
 import pages.changePreferences.ContactPreferencePage
+import play.api.data.Form
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HttpResponse
-import views.html.ContactPreferenceView
+import views.html.changePreferences.ContactPreferenceView
 
 import scala.concurrent.Future
 
 class ContactPreferenceControllerSpec extends SpecBase {
 
-  def onwardRoute = Call("GET", "/foo")
+  def onwardRoute: Call = Call("GET", "/foo")
 
-  lazy val contactPreferenceNormalRoute = routes.ContactPreferenceController.onPageLoad(NormalMode).url
-  lazy val contactPreferenceCheckRoute  = routes.ContactPreferenceController.onPageLoad(CheckMode).url
+  lazy val contactPreferenceNormalRoute: String =
+    controllers.changePreferences.routes.ContactPreferenceController.onPageLoad(NormalMode).url
+  lazy val contactPreferenceCheckRoute: String  =
+    controllers.changePreferences.routes.ContactPreferenceController.onPageLoad(CheckMode).url
 
-  val formProvider = new ContactPreferenceFormProvider()
-  val form         = formProvider()
+  val formProvider        = new ContactPreferenceFormProvider()
+  val form: Form[Boolean] = formProvider()
 
   "ContactPreferenceController" - {
 
