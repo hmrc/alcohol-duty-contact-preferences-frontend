@@ -32,9 +32,11 @@ trait TestData extends ModelGenerators {
 
   val userDetails: UserDetails = UserDetails(appaId, userId)
 
-  val emailAddress = "john.doe@example.com"
+  val emailAddress  = "john.doe@example.com"
+  val emailAddress2 = "jonjones@example.com"
+  val emailAddress3 = "robsmith@example.com"
 
-  val verifiedEmailAddresses: Set[String] = Set("jonbonesjones@example.com", "robsmith@example.com")
+  val verifiedEmailAddresses: Set[String] = Set(emailAddress2, emailAddress3)
 
   val subscriptionSummaryEmail: SubscriptionSummary = SubscriptionSummary(
     paperlessReference = true,
@@ -84,7 +86,7 @@ trait TestData extends ModelGenerators {
     appaId = appaId,
     userId = userId,
     subscriptionSummary = subscriptionSummaryEmail,
-    emailAddress = Some(emailAddress),
+    emailAddress = None,
     verifiedEmailAddresses = Set.empty[String],
     startedTime = Instant.now(clock),
     lastUpdated = Instant.now(clock)

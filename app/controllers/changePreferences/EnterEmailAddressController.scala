@@ -75,7 +75,7 @@ class EnterEmailAddressController @Inject() (
             updateUserAnswersAndGetVerificationStatus(value, updatedRequest.userAnswers, request.credId).value.flatMap {
               case Left(error)                  =>
                 logger.warn(
-                  s"Failed to submit user's entered email address. message: ${error.message}, status: ${error.status}"
+                  s"Failed to submit user's entered email address. status: ${error.status}"
                 )
                 Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
               case Right(addressEnteredDetails) =>
