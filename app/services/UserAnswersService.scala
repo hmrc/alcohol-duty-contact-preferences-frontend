@@ -31,7 +31,7 @@ class UserAnswersService @Inject() (userAnswersConnector: UserAnswersConnector)(
       if (response.status >= 200 && response.status < 300) {
         Right(response)
       } else {
-        Left(ErrorModel(response.status, s"Unexpected error setting user answers, status: ${response.status})"))
+        Left(ErrorModel(response.status, s"Unexpected error setting user answers, status: ${response.status}"))
       }
     }
   }
