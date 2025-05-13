@@ -18,20 +18,19 @@ package navigation
 
 import config.FrontendAppConfig
 import connectors.EmailVerificationConnector
-
-import javax.inject.{Inject, Singleton}
-import play.api.mvc.{Call, Result}
 import controllers.routes
-import pages.{changePreferences, _}
 import models._
 import models.requests.DataRequest
-import pages.changePreferences.{ContactPreferencePage, EnterEmailAddressPage}
+import pages.changePreferences.ContactPreferencePage
+import pages._
 import play.api.Logging
 import play.api.i18n.Messages
 import play.api.mvc.Results.Redirect
+import play.api.mvc.{Call, Result}
 import uk.gov.hmrc.http.HeaderCarrier
 import utils.StartEmailVerificationJourneyHelper
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -43,8 +42,6 @@ class Navigator @Inject() (
 
   private val normalRoutes: Page => UserAnswers => Call = {
     case ContactPreferencePage =>
-      userAnswers => contactPreferenceRoute(userAnswers, NormalMode)
-    case EnterEmailAddressPage =>
       userAnswers => contactPreferenceRoute(userAnswers, NormalMode)
     case _                     =>
       _ => routes.IndexController.onPageLoad()
