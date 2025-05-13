@@ -32,7 +32,7 @@ class UserAnswersSpec extends SpecBase {
 
   "UserAnswers" - {
     val json =
-      s"""{"appaId":"$appaId","userId":"$userId","subscriptionSummary":{"paperlessReference":true,"emailAddress":"john.doe@example.com","emailVerification":true,"bouncedEmail":false},"emailAddress":"john.doe@example.com","verifiedEmailAddresses":["jonbonesjones@example.com","robsmith@example.com"],"data":{"contactPreferenceEmail":true},"startedTime":{"$$date":{"$$numberLong":"1718118467838"}},"lastUpdated":{"$$date":{"$$numberLong":"1718118467838"}},"validUntil":{"$$date":{"$$numberLong":"1718118467839"}}}"""
+      s"""{"appaId":"$appaId","userId":"$userId","subscriptionSummary":{"paperlessReference":true,"emailAddress":"john.doe@example.com","emailVerification":true,"bouncedEmail":false},"emailAddress":"john.doe@example.com","verifiedEmailAddresses":["jonjones@example.com","robsmith@example.com"],"data":{"contactPreferenceEmail":true},"startedTime":{"$$date":{"$$numberLong":"1718118467838"}},"lastUpdated":{"$$date":{"$$numberLong":"1718118467838"}},"validUntil":{"$$date":{"$$numberLong":"1718118467839"}}}"""
 
     "must set a value for a given page and get the same value" in {
 
