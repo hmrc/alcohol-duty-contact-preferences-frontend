@@ -48,7 +48,14 @@ class EmailVerificationConnector @Inject() (
             case Success(successResponse) => Future.successful(Right(successResponse))
             case Failure(exception)       =>
               logger.warn(s"Invalid JSON format, failed to parse as GetVerificationStatusResponse", exception)
-              Future.successful(Left(ErrorModel(INTERNAL_SERVER_ERROR, s"Invalid JSON format $exception")))
+              Future.successful(
+                Left(
+                  ErrorModel(
+                    INTERNAL_SERVER_ERROR,
+                    "Invalid JSON format. Could not parse response as GetVerificationStatusResponse"
+                  )
+                )
+              )
           }
         case Left(errorResponse) =>
           logger.warn(
@@ -80,7 +87,7 @@ class EmailVerificationConnector @Inject() (
               case Failure(exception)       =>
                 logger.warn(s"Invalid JSON format, failed to parse response as a RedirectUrl", exception)
                 Left(
-                  ErrorModel(INTERNAL_SERVER_ERROR, s"Invalid JSON format, failed to parse response as a RedirectUrl")
+                  ErrorModel(INTERNAL_SERVER_ERROR, "Invalid JSON format, failed to parse response as a RedirectUrl")
                 )
             }
           case _       =>
