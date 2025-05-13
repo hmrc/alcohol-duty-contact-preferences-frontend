@@ -17,18 +17,29 @@
 package navigation
 
 import base.SpecBase
+import cats.data.EitherT
 import connectors.EmailVerificationConnector
 import controllers.routes
 import pages._
 import models._
+import models.requests.DataRequest
+import org.mockito.ArgumentMatchers.any
 import pages.changePreferences.ContactPreferencePage
+import play.api.http.Status.INTERNAL_SERVER_ERROR
+import play.api.i18n.Messages
+import play.api.test.Helpers.{defaultAwaitTimeout, redirectLocation, status}
 import utils.StartEmailVerificationJourneyHelper
+
+import scala.concurrent.Future
 
 class NavigatorSpec extends SpecBase {
 
+  val mockEmailVerificationConnector: EmailVerificationConnector  = mock[EmailVerificationConnector]
+  val mockStartJourneyHelper: StartEmailVerificationJourneyHelper = mock[StartEmailVerificationJourneyHelper]
+
   val navigator = new Navigator(
-    emailVerificationConnector = mock[EmailVerificationConnector],
-    startJourneyHelper = mock[StartEmailVerificationJourneyHelper],
+    emailVerificationConnector = mockEmailVerificationConnector,
+    startJourneyHelper = mockStartJourneyHelper,
     config = appConfig
   )
 
@@ -95,6 +106,98 @@ class NavigatorSpec extends SpecBase {
         case object UnknownPage extends Page
         navigator.nextPage(UnknownPage, CheckMode, userAnswers) mustBe routes.CheckYourAnswersController
           .onPageLoad()
+      }
+    }
+  }
+
+  "enterEmailAddressNavigation" - {
+    "when the email provided is already verified then redirect to the check your answers page" in {
+      /// TODO: change this to check for the CYA redirect when that page is built
+      implicit val mockMessages: Messages = mock[Messages]
+      val dataRequest: DataRequest[_]     = mock[DataRequest[_]]
+
+      val testEmailVerificationDetails = EmailVerificationDetails(emailAddress2, isVerified = true, isLocked = false)
+
+      val result = navigator.enterEmailAddressNavigation(
+        emailAddressEnteredDetails = testEmailVerificationDetails,
+        request = dataRequest
+      )
+
+      status(result) mustBe 303
+      redirectLocation(result).value mustBe routes.IndexController.onPageLoad().url
+    }
+
+    "when the email provided is not verified, but is locked, then redirect to the check your answers page" in {
+      /// TODO: change this to check for the locked page redirect when that page is built
+      implicit val mockMessages: Messages = mock[Messages]
+      val dataRequest: DataRequest[_]     = mock[DataRequest[_]]
+
+      val testEmailVerificationDetails = EmailVerificationDetails(emailAddress2, isVerified = false, isLocked = true)
+
+      val result = navigator.enterEmailAddressNavigation(
+        emailAddressEnteredDetails = testEmailVerificationDetails,
+        request = dataRequest
+      )
+
+      status(result) mustBe 303
+      redirectLocation(result).value mustBe routes.IndexController.onPageLoad().url
+    }
+
+    "when the email provided is not verified, and not locked" - {
+      "and an email verification redirect url is obtained successfully then redirect there" in {
+        implicit val mockMessages: Messages = mock[Messages]
+        val mockDataRequest: DataRequest[_] = mock[DataRequest[_]]
+        val testRedirectUri: RedirectUri    = RedirectUri(redirectUri = "/email-verification-frontend/test")
+
+        when(mockDataRequest.userAnswers).thenReturn(userAnswers)
+        when(mockEmailVerificationConnector.startEmailVerification(any())(any()))
+          .thenReturn(EitherT.rightT[Future, ErrorModel](testRedirectUri))
+
+        val testEmailVerificationDetails = EmailVerificationDetails(emailAddress2, isVerified = false, isLocked = false)
+
+        val result = navigator.enterEmailAddressNavigation(
+          emailAddressEnteredDetails = testEmailVerificationDetails,
+          request = mockDataRequest
+        )
+
+        status(result) mustBe 303
+        redirectLocation(result).value mustBe "http://localhost:9890/email-verification-frontend/test"
+      }
+
+      "and an email verification redirect url cannot be obtained then redirect to journey recovery" in {
+        implicit val mockMessages: Messages = mock[Messages]
+        val mockDataRequest: DataRequest[_] = mock[DataRequest[_]]
+
+        when(mockDataRequest.userAnswers).thenReturn(userAnswers)
+        when(mockEmailVerificationConnector.startEmailVerification(any())(any()))
+          .thenReturn(EitherT.leftT[Future, RedirectUri](ErrorModel(INTERNAL_SERVER_ERROR, "test error")))
+
+        val testEmailVerificationDetails = EmailVerificationDetails(emailAddress2, isVerified = false, isLocked = false)
+
+        val result = navigator.enterEmailAddressNavigation(
+          emailAddressEnteredDetails = testEmailVerificationDetails,
+          request = mockDataRequest
+        )
+
+        status(result) mustBe 303
+        redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
+      }
+
+      "and no email address can be found in user answers then redirect to journey recovery" in {
+        implicit val mockMessages: Messages = mock[Messages]
+        val mockDataRequest: DataRequest[_] = mock[DataRequest[_]]
+
+        when(mockDataRequest.userAnswers).thenReturn(emptyUserAnswers)
+
+        val testEmailVerificationDetails = EmailVerificationDetails(emailAddress2, isVerified = false, isLocked = false)
+
+        val result = navigator.enterEmailAddressNavigation(
+          emailAddressEnteredDetails = testEmailVerificationDetails,
+          request = mockDataRequest
+        )
+
+        status(result) mustBe 303
+        redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }
   }
