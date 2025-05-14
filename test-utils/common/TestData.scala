@@ -38,6 +38,7 @@ trait TestData extends ModelGenerators {
   val emailAddress  = "john.doe@example.com"
   val emailAddress2 = "jonjones@example.com"
   val emailAddress3 = "robsmith@example.com"
+  val emailAddress4 = "timmytimmy@example.com"
 
   val verifiedEmailAddresses: Set[String] = Set(emailAddress2, emailAddress3)
 
@@ -93,5 +94,16 @@ trait TestData extends ModelGenerators {
     verifiedEmailAddresses = Set.empty[String],
     startedTime = Instant.now(clock),
     lastUpdated = Instant.now(clock)
+  )
+
+  val testVerificationDetails1: GetVerificationStatusResponseEmailAddressDetails =
+    GetVerificationStatusResponseEmailAddressDetails(emailAddress = emailAddress, verified = false, locked = false)
+  val testVerificationDetails2: GetVerificationStatusResponseEmailAddressDetails =
+    GetVerificationStatusResponseEmailAddressDetails(emailAddress = emailAddress2, verified = true, locked = true)
+  val testVerificationDetails3: GetVerificationStatusResponseEmailAddressDetails =
+    GetVerificationStatusResponseEmailAddressDetails(emailAddress = emailAddress4, verified = true, locked = false)
+
+  val testGetVerificationStatusResponse: GetVerificationStatusResponse = GetVerificationStatusResponse(
+    List(testVerificationDetails1, testVerificationDetails2, testVerificationDetails3)
   )
 }

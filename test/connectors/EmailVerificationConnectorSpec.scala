@@ -18,7 +18,7 @@ package connectors
 
 import base.SpecBase
 import config.FrontendAppConfig
-import models.{EmailModel, EmailVerificationRequest, ErrorModel, GetVerificationStatusResponse, GetVerificationStatusResponseEmailAddressDetails, Labels, LanguageInfo, RedirectUri, VerificationDetails}
+import models.{EmailModel, EmailVerificationRequest, ErrorModel, Labels, LanguageInfo, RedirectUri, VerificationDetails}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchersSugar.eqTo
 import play.api.http.Status.{CREATED, INTERNAL_SERVER_ERROR, OK}
@@ -31,15 +31,6 @@ import scala.concurrent.Future
 class EmailVerificationConnectorSpec extends SpecBase {
 
   val testVerificationDetails: VerificationDetails = VerificationDetails(credId)
-
-  val testDetails1: GetVerificationStatusResponseEmailAddressDetails =
-    GetVerificationStatusResponseEmailAddressDetails(emailAddress = emailAddress, verified = false, locked = false)
-  val testDetails2: GetVerificationStatusResponseEmailAddressDetails =
-    GetVerificationStatusResponseEmailAddressDetails(emailAddress = emailAddress2, verified = true, locked = true)
-
-  val testGetVerificationStatusResponse: GetVerificationStatusResponse = GetVerificationStatusResponse(
-    List(testDetails1, testDetails2)
-  )
 
   val testGetResponseString: String = Json.toJson(testGetVerificationStatusResponse).toString
 
