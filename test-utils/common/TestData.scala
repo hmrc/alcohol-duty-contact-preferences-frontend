@@ -19,10 +19,7 @@ package common
 import config.Constants.ukTimeZoneStringId
 import generators.ModelGenerators
 import models._
-import models.requests.DataRequest
-import org.mockito.MockitoSugar.mock
 import play.api.libs.json.{JsObject, Json}
-import play.api.mvc.Request
 
 import java.time._
 
@@ -106,4 +103,26 @@ trait TestData extends ModelGenerators {
   val testGetVerificationStatusResponse: GetVerificationStatusResponse = GetVerificationStatusResponse(
     List(testVerificationDetails1, testVerificationDetails2, testVerificationDetails3)
   )
+
+  val testVerificationDetails: VerificationDetails = VerificationDetails(credId)
+
+  val testEmailVerificationRequest: EmailVerificationRequest = EmailVerificationRequest(
+    credId = credId,
+    continueUrl = "/test-continue-url",
+    origin = "testOrigin",
+    deskproServiceName = "test-deskpro-name",
+    accessibilityStatementUrl = "/test-accessibility-url",
+    backUrl = "/test-back-url",
+    email = EmailModel(address = emailAddress, enterUrl = "/test-enter-url"),
+    labels = Labels(LanguageInfo("testTitle", "testServiceName"), LanguageInfo("testTitle2", "testServiceName2")),
+    lang = "en"
+  )
+
+  val testJsonRedirectUriString: String =
+    """
+      {"redirectUri": "/test-uri"}
+    """
+
+  val testRedirectUri: RedirectUri = RedirectUri("/test-uri")
+
 }

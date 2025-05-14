@@ -17,8 +17,7 @@
 package utils
 
 import config.FrontendAppConfig
-import controllers.routes
-import models.{EmailModel, EmailVerificationRequest, Labels, LanguageInfo, NormalMode}
+import models.{EmailModel, EmailVerificationRequest, Labels, LanguageInfo}
 import play.api.i18n.Messages
 
 import javax.inject.Inject

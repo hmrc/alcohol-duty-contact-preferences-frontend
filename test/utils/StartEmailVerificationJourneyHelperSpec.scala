@@ -24,7 +24,7 @@ import play.api.i18n.{Lang, Messages}
 
 class StartEmailVerificationJourneyHelperSpec extends SpecBase {
 
-  val testEmailVerificationRequest: EmailVerificationRequest = EmailVerificationRequest(
+  override val testEmailVerificationRequest: EmailVerificationRequest = EmailVerificationRequest(
     credId = credId,
     continueUrl = "/test-continue",
     origin = "testOrigin",

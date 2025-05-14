@@ -29,8 +29,6 @@ import scala.concurrent.Future
 
 class EmailVerificationServiceSpec extends SpecBase {
 
-  val testVerificationDetails: VerificationDetails = VerificationDetails(credId)
-
   "retrieveAddressStatusAndAddToCache" - {
     "when the call to get a user's verification details fails, should return an error" in new Setup {
       when(mockEmailVerificationConnector.getEmailVerification(any())(any()))

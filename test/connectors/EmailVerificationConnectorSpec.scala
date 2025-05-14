@@ -18,7 +18,7 @@ package connectors
 
 import base.SpecBase
 import config.FrontendAppConfig
-import models.{EmailModel, EmailVerificationRequest, ErrorModel, Labels, LanguageInfo, RedirectUri, VerificationDetails}
+import models.{ErrorModel, RedirectUri, VerificationDetails}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchersSugar.eqTo
 import play.api.http.Status.{CREATED, INTERNAL_SERVER_ERROR, OK}
@@ -30,28 +30,7 @@ import scala.concurrent.Future
 
 class EmailVerificationConnectorSpec extends SpecBase {
 
-  val testVerificationDetails: VerificationDetails = VerificationDetails(credId)
-
   val testGetResponseString: String = Json.toJson(testGetVerificationStatusResponse).toString
-
-  val testJsonRedirectUriString: String =
-    """
-    {"redirectUri": "/test-uri"}
-  """
-
-  val testRedirectUri: RedirectUri = RedirectUri("/test-uri")
-
-  val testEmailVerificationRequest: EmailVerificationRequest = EmailVerificationRequest(
-    credId = credId,
-    continueUrl = "/test-continue-url",
-    origin = "testOrigin",
-    deskproServiceName = "test-deskpro-name",
-    accessibilityStatementUrl = "/test-accessibility-url",
-    backUrl = "/test-back-url",
-    email = EmailModel(address = emailAddress, enterUrl = "/test-enter-url"),
-    labels = Labels(LanguageInfo("testTitle", "testServiceName"), LanguageInfo("testTitle2", "testServiceName2")),
-    lang = "en"
-  )
 
   "getEmailVerification" - {
     "must successfully fetch valid verification details for a given user" in new SetUp {
