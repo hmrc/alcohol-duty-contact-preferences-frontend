@@ -32,6 +32,7 @@ class FakeDataRetrievalAction(maybeUserAnswers: Option[UserAnswers]) extends Dat
           request.appaId,
           request.groupId,
           request.userId,
+          request.credId,
           maybeUserAnswers
         )
       )

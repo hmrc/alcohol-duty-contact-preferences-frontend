@@ -28,8 +28,8 @@ import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.CredentialStrength.strong
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.{allEnrolments, groupIdentifier, internalId => retriveInternalId}
-import uk.gov.hmrc.auth.core.retrieve.~
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.{allEnrolments, credentials, groupIdentifier, internalId => retriveInternalId}
+import uk.gov.hmrc.auth.core.retrieve.{Credentials, ~}
 import uk.gov.hmrc.http.UnauthorizedException
 
 import scala.concurrent.Future
@@ -45,6 +45,7 @@ class IdentifierActionSpec extends SpecBase {
   val enrolments              = Enrolments(Set(Enrolment(enrolment, Seq(EnrolmentIdentifier(appaIdKey, appaId)), state)))
   val emptyEnrolments         = Enrolments(Set.empty)
   val enrolmentsWithoutAppaId = Enrolments(Set(Enrolment(enrolment, Seq.empty, state)))
+  val someCredId              = Some(Credentials(providerId = credId, providerType = "TEST_TYPE"))
 
   val mockAppConfig: FrontendAppConfig       = mock[FrontendAppConfig]
   val defaultBodyParser: BodyParsers.Default = app.injector.instanceOf[BodyParsers.Default]
@@ -71,11 +72,11 @@ class IdentifierActionSpec extends SpecBase {
               and ConfidenceLevel.L50
           ),
           eqTo(
-            retriveInternalId and groupIdentifier and allEnrolments
+            retriveInternalId and groupIdentifier and allEnrolments and credentials
           )
         )(any(), any())
       )
-        .thenReturn(Future(new ~(new ~(Some(userId), Some(groupId)), enrolments)))
+        .thenReturn(Future(new ~(new ~(new ~(Some(userId), Some(groupId)), enrolments), someCredId)))
 
       val result: Future[Result] = identifierAction.invokeBlock(FakeRequest(), testAction)
 
@@ -96,11 +97,11 @@ class IdentifierActionSpec extends SpecBase {
               and ConfidenceLevel.L50
           ),
           eqTo(
-            retriveInternalId and groupIdentifier and allEnrolments
+            retriveInternalId and groupIdentifier and allEnrolments and credentials
           )
         )(any(), any())
       )
-        .thenReturn(Future(new ~(new ~(None, Some(groupId)), enrolments)))
+        .thenReturn(Future(new ~(new ~(new ~(None, Some(groupId)), enrolments), someCredId)))
 
       intercept[IllegalStateException] {
         await(identifierAction.invokeBlock(FakeRequest(), testAction))
@@ -120,11 +121,11 @@ class IdentifierActionSpec extends SpecBase {
               and ConfidenceLevel.L50
           ),
           eqTo(
-            retriveInternalId and groupIdentifier and allEnrolments
+            retriveInternalId and groupIdentifier and allEnrolments and credentials
           )
         )(any(), any())
       )
-        .thenReturn(Future(new ~(new ~(Some(userId), None), enrolments)))
+        .thenReturn(Future(new ~(new ~(new ~(Some(userId), None), enrolments), someCredId)))
 
       intercept[IllegalStateException] {
         await(identifierAction.invokeBlock(FakeRequest(), testAction))
@@ -144,11 +145,11 @@ class IdentifierActionSpec extends SpecBase {
               and ConfidenceLevel.L50
           ),
           eqTo(
-            retriveInternalId and groupIdentifier and allEnrolments
+            retriveInternalId and groupIdentifier and allEnrolments and credentials
           )
         )(any(), any())
       )
-        .thenReturn(Future(new ~(new ~(Some(userId), Some(groupId)), emptyEnrolments)))
+        .thenReturn(Future(new ~(new ~(new ~(Some(userId), Some(groupId)), emptyEnrolments), someCredId)))
 
       intercept[IllegalStateException] {
         await(identifierAction.invokeBlock(FakeRequest(), testAction))
@@ -168,11 +169,35 @@ class IdentifierActionSpec extends SpecBase {
               and ConfidenceLevel.L50
           ),
           eqTo(
-            retriveInternalId and groupIdentifier and allEnrolments
+            retriveInternalId and groupIdentifier and allEnrolments and credentials
           )
         )(any(), any())
       )
-        .thenReturn(Future(new ~(new ~(Some(userId), Some(groupId)), enrolmentsWithoutAppaId)))
+        .thenReturn(Future(new ~(new ~(new ~(Some(userId), Some(groupId)), enrolmentsWithoutAppaId), someCredId)))
+
+      intercept[IllegalStateException] {
+        await(identifierAction.invokeBlock(FakeRequest(), testAction))
+      }
+    }
+
+    "execute the block and throw IllegalStateException if cannot get the credentials" in {
+      when(mockAppConfig.enrolmentServiceName).thenReturn(enrolment)
+      when(mockAppConfig.enrolmentIdentifierKey).thenReturn(appaIdKey)
+      when(
+        mockAuthConnector.authorise(
+          eqTo(
+            AuthProviders(GovernmentGateway)
+              and Enrolment(enrolment)
+              and CredentialStrength(strong)
+              and Organisation
+              and ConfidenceLevel.L50
+          ),
+          eqTo(
+            retriveInternalId and groupIdentifier and allEnrolments and credentials
+          )
+        )(any(), any())
+      )
+        .thenReturn(Future(new ~(new ~(new ~(Some(userId), Some(groupId)), enrolmentsWithoutAppaId), None)))
 
       intercept[IllegalStateException] {
         await(identifierAction.invokeBlock(FakeRequest(), testAction))

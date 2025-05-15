@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package common
+package pages.changePreferences
 
-import models.UserAnswers
-import pages.changePreferences.ContactPreferencePage
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-trait TestPages extends TestData {
-  def contactPreferencePage(userAnswers: UserAnswers, emailSelected: Boolean): UserAnswers =
-    userAnswers.set(ContactPreferencePage, emailSelected).get
+case object ContactPreferencePage extends QuestionPage[Boolean] {
+
+  override def path: JsPath = JsPath \ toString
+
+  override def toString: String = "contactPreferenceEmail"
 }
