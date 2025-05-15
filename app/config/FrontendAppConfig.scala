@@ -32,10 +32,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   private val contactFormServiceIdentifier        = "alcohol-duty-contact-preferences-frontend"
   private lazy val contactPreferencesHost: String = servicesConfig.baseUrl("alcohol-duty-contact-preferences")
 
-  private val startVerificationProtocol = configuration.get[String]("microservice.services.email-verification.protocol")
-  private val startVerificationHost     = configuration.get[String]("microservice.services.email-verification.host")
-  private val startVerificationPort     = configuration.get[String]("microservice.services.email-verification.port")
-
   def feedbackUrl(implicit request: RequestHeader): String =
     s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=${host + request.uri}"
 
