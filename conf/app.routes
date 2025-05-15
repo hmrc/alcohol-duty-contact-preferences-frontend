@@ -22,8 +22,7 @@ POST        /change-what-email-address                   controllers.changePrefe
 
 GET         /check-your-answers                          controllers.CheckYourAnswersController.onPageLoad()
 
-GET         /account/sign-out-survey                     controllers.auth.AuthController.signOut()
-GET         /account/signed-out                          controllers.auth.SignedOutController.onPageLoad()
+GET         /account/sign-out-survey                     controllers.auth.SignOutController.signOut()
 
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad()
 

@@ -39,9 +39,11 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   def feedbackUrl(implicit request: RequestHeader): String =
     s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=${host + request.uri}"
 
-  val loginUrl: String         = configuration.get[String]("urls.login")
-  val loginContinueUrl: String = configuration.get[String]("urls.loginContinue")
-  val signOutUrl: String       = configuration.get[String]("urls.signOut")
+  val loginUrl: String                  = configuration.get[String]("urls.login")
+  val loginContinueUrl: String          = configuration.get[String]("urls.loginContinue")
+  val signOutUrl: String                = configuration.get[String]("urls.signOut")
+  val businessTaxAccountUrl: String     = configuration.get[String]("urls.businessTaxAccount")
+  val accessibilityStatementUrl: String = configuration.get[String]("urls.accessibility-statement")
 
   private val exitSurveyBaseUrl: String = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
   val exitSurveyUrl: String             = s"$exitSurveyBaseUrl/feedback/alcohol-duty-contact-preferences-frontend"
@@ -61,6 +63,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
 
   def ecpUserAnswersGetUrl(appaId: String): String =
     s"$contactPreferencesHost/alcohol-duty-contact-preferences/user-answers/$appaId"
+
+  def ecpUserAnswersUrl(): String =
+    s"$contactPreferencesHost/alcohol-duty-contact-preferences/user-answers"
 
   def ecpGetEmailVerificationUrl(credId: String): String =
     s"$contactPreferencesHost/alcohol-duty-contact-preferences/get-email-verification/$credId"
@@ -84,10 +89,5 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
     s"$startEmailVerificationJourneyBaseUrl$startEmailVerificationJourneyUrlSuffix"
 
   val emailVerificationRedirectBaseUrl: String = servicesConfig.baseUrl("email-verification-frontend")
-
-  def ecpUserAnswersUrl(): String =
-    s"$contactPreferencesHost/alcohol-duty-contact-preferences/user-answers"
-
-  val accessibilityStatementUrl: String = configuration.get[String]("urls.accessibility-statement")
 
 }
