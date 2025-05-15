@@ -63,10 +63,6 @@ class Navigator @Inject() (
 
     (selectedEmail, paperlessReference, currentEmail) match {
       case (Some(true), false, None)    =>
-        // TODO: next page is /what-email-address
-        logger.info(
-          "User selected email and is currently on post with no email in ETMP. Should redirect to /what-email-address"
-        )
         controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(mode)
       case (Some(true), false, Some(_)) =>
         // TODO: next page is /existing-email
@@ -106,11 +102,8 @@ class Navigator @Inject() (
         logger.info("User has a verified email address. Should redirect to /check-answers")
         Future.successful(Redirect(routes.IndexController.onPageLoad()))
       case (false, true)  =>
-        // TODO: next page is /confirmation-code-limit
-        logger.info(
-          "User has been locked out for the entered email address. Should redirect to /confirmation-code-limit"
-        )
-        Future.successful(Redirect(routes.IndexController.onPageLoad()))
+        logger.info("User has been locked out for the entered email address.")
+        Future.successful(Redirect(controllers.changePreferences.routes.EmailLockedController.onPageLoad()))
       case (false, false) =>
         handleEmailVerificationHandoff(request)
     }
