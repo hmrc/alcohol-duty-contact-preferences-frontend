@@ -77,16 +77,23 @@ class ContactPreferenceController @Inject() (
         .bindFromRequest()
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-          value =>
+          value => {
+            val maybeAnswerChanged = hasAnswerChanged(mode, request.userAnswers, value)
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(ContactPreferencePage, value))
               _              <- userAnswersConnector.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(ContactPreferencePage, mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(ContactPreferencePage, mode, updatedAnswers, maybeAnswerChanged))
+          }
         )
   }
 
   private def getPreparedForm(ua: UserAnswers): Form[Boolean] = ua.get(ContactPreferencePage) match {
     case None        => form
     case Some(value) => form.fill(value)
+  }
+
+  private def hasAnswerChanged(mode: Mode, ua: UserAnswers, submittedValue: Boolean): Option[Boolean] = mode match {
+    case NormalMode => None
+    case CheckMode  => ua.get(ContactPreferencePage).map(_ != submittedValue)
   }
 }

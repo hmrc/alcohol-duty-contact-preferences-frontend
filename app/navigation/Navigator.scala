@@ -42,28 +42,35 @@ class Navigator @Inject() (
 
   private val normalRoutes: Page => UserAnswers => Call = {
     case ContactPreferencePage =>
-      userAnswers => contactPreferenceRoute(userAnswers, NormalMode)
+      userAnswers => contactPreferenceRoute(userAnswers)
     case _                     =>
       _ => routes.IndexController.onPageLoad()
   }
 
-  private val checkRouteMap: Page => UserAnswers => Call = _ => _ => routes.CheckYourAnswersController.onPageLoad()
+  private val checkRouteMap: Page => UserAnswers => Boolean => Call = {
+    case ContactPreferencePage =>
+      userAnswers =>
+        hasChanged =>
+          if (hasChanged) contactPreferenceRoute(userAnswers)
+          else routes.CheckYourAnswersController.onPageLoad()
+    case _                     => _ => _ => routes.CheckYourAnswersController.onPageLoad()
+  }
 
-  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers): Call = mode match {
+  def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, hasAnswerChanged: Option[Boolean]): Call = mode match {
     case NormalMode =>
       normalRoutes(page)(userAnswers)
     case CheckMode  =>
-      checkRouteMap(page)(userAnswers)
+      checkRouteMap(page)(userAnswers)(hasAnswerChanged.getOrElse(false))
   }
 
-  private def contactPreferenceRoute(userAnswers: UserAnswers, mode: Mode): Call = {
+  private def contactPreferenceRoute(userAnswers: UserAnswers): Call = {
     val selectedEmail      = userAnswers.get(changePreferences.ContactPreferencePage)
     val paperlessReference = userAnswers.subscriptionSummary.paperlessReference
     val currentEmail       = userAnswers.subscriptionSummary.emailAddress
 
     (selectedEmail, paperlessReference, currentEmail) match {
       case (Some(true), false, None)    =>
-        controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(mode)
+        controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode)
       case (Some(true), false, Some(_)) =>
         // TODO: next page is /existing-email
         logger.info(
@@ -77,7 +84,7 @@ class Navigator @Inject() (
       case (Some(false), true, Some(_)) =>
         // TODO: next page is /check-answers
         logger.info("User selected post and is currently on email. Should redirect to /check-answers")
-        routes.IndexController.onPageLoad()
+        routes.CheckYourAnswersController.onPageLoad()
       case (Some(false), false, _)      =>
         // TODO: next page is /enrolled-letters
         logger.info("User selected post and is currently on post. Should redirect to /enrolled-letters")

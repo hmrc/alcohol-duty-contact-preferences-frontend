@@ -43,13 +43,12 @@ class NavigatorSpec extends SpecBase {
     config = appConfig
   )
 
-  "Navigator" - {
+  "Navigator .nextPage" - {
 
     "in Normal mode" - {
-
       "must go from a page that doesn't exist in the route map to Index" in {
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, NormalMode, userAnswers) mustBe routes.IndexController.onPageLoad()
+        navigator.nextPage(UnknownPage, NormalMode, userAnswers, None) mustBe routes.IndexController.onPageLoad()
       }
 
       "from the Contact Preference page" - {
@@ -57,7 +56,8 @@ class NavigatorSpec extends SpecBase {
           navigator.nextPage(
             ContactPreferencePage,
             NormalMode,
-            userAnswersPostNoEmail.set(ContactPreferencePage, true).success.value
+            userAnswersPostNoEmail.set(ContactPreferencePage, true).success.value,
+            None
           ) mustBe controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode)
         }
 
@@ -65,7 +65,8 @@ class NavigatorSpec extends SpecBase {
           navigator.nextPage(
             ContactPreferencePage,
             NormalMode,
-            userAnswersPostWithEmail.set(ContactPreferencePage, true).success.value
+            userAnswersPostWithEmail.set(ContactPreferencePage, true).success.value,
+            None
           ) mustBe routes.IndexController.onPageLoad()
           // TODO: change to correct route when page is created
         }
@@ -74,25 +75,27 @@ class NavigatorSpec extends SpecBase {
           navigator.nextPage(
             ContactPreferencePage,
             NormalMode,
-            userAnswers.set(ContactPreferencePage, true).success.value
+            userAnswers.set(ContactPreferencePage, true).success.value,
+            None
           ) mustBe routes.IndexController.onPageLoad()
           // TODO: change to correct route when page is created
         }
 
-        "must go to the Check Answers page if the user is currently on email and has selected post" in {
+        "must go to the Check Your Answers page if the user is currently on email and has selected post" in {
           navigator.nextPage(
             ContactPreferencePage,
             NormalMode,
-            userAnswers.set(ContactPreferencePage, false).success.value
-          ) mustBe routes.IndexController.onPageLoad()
-          // TODO: change to correct route when page is created
+            userAnswers.set(ContactPreferencePage, false).success.value,
+            None
+          ) mustBe routes.CheckYourAnswersController.onPageLoad()
         }
 
         "must go to the Enrolled Letters page if the user is currently on post and has selected post" in {
           navigator.nextPage(
             ContactPreferencePage,
             NormalMode,
-            userAnswersPostNoEmail.set(ContactPreferencePage, false).success.value
+            userAnswersPostNoEmail.set(ContactPreferencePage, false).success.value,
+            None
           ) mustBe routes.IndexController.onPageLoad()
           // TODO: change to correct route when page is created
         }
@@ -100,10 +103,58 @@ class NavigatorSpec extends SpecBase {
     }
 
     "in Check mode" - {
+      "must go from the Contact Preference page to the next page in normal mode if the answer has changed" in {
+        navigator.nextPage(
+          ContactPreferencePage,
+          CheckMode,
+          userAnswersPostNoEmail.set(ContactPreferencePage, true).success.value,
+          Some(true)
+        ) mustBe controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode)
+
+        navigator.nextPage(
+          ContactPreferencePage,
+          CheckMode,
+          userAnswersPostWithEmail.set(ContactPreferencePage, true).success.value,
+          Some(true)
+        ) mustBe routes.IndexController.onPageLoad()
+        // TODO: change to correct route when Existing Email page is created
+
+        navigator.nextPage(
+          ContactPreferencePage,
+          CheckMode,
+          userAnswers.set(ContactPreferencePage, true).success.value,
+          Some(true)
+        ) mustBe routes.IndexController.onPageLoad()
+        // TODO: change to correct route when Enrolled Emails page is created
+
+        navigator.nextPage(
+          ContactPreferencePage,
+          CheckMode,
+          userAnswers.set(ContactPreferencePage, false).success.value,
+          Some(true)
+        ) mustBe routes.CheckYourAnswersController.onPageLoad()
+
+        navigator.nextPage(
+          ContactPreferencePage,
+          CheckMode,
+          userAnswersPostNoEmail.set(ContactPreferencePage, false).success.value,
+          Some(true)
+        ) mustBe routes.IndexController.onPageLoad()
+        // TODO: change to correct route when Enrolled Letters page is created
+      }
+
+      "must go from the Contact Preference page to the Check Your Answers page if the answer has not changed" in {
+        navigator.nextPage(
+          ContactPreferencePage,
+          CheckMode,
+          userAnswers.set(ContactPreferencePage, true).success.value,
+          Some(false)
+        ) mustBe routes.CheckYourAnswersController.onPageLoad()
+      }
 
       "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, CheckMode, userAnswers) mustBe routes.CheckYourAnswersController
+        navigator.nextPage(UnknownPage, CheckMode, userAnswers, Some(false)) mustBe routes.CheckYourAnswersController
           .onPageLoad()
       }
     }
