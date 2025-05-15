@@ -18,7 +18,7 @@ package connectors
 
 import base.SpecBase
 import config.FrontendAppConfig
-import models.{ErrorModel, RedirectUri, VerificationDetails}
+import models.ErrorModel
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchersSugar.eqTo
 import play.api.http.Status.{CREATED, INTERNAL_SERVER_ERROR, OK}

@@ -18,17 +18,11 @@ package controllers.auth
 
 import base.SpecBase
 import config.FrontendAppConfig
-import connectors.UserAnswersConnector
 import controllers.actions.{FakeAppaId, FakeSignOutAction, SignOutAction}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchersSugar.eqTo
-import play.api.http.Status.OK
 import play.api.inject._
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.HttpResponse
 
 import java.net.URLEncoder
-import scala.concurrent.Future
 
 class SignOutControllerSpec extends SpecBase {
 

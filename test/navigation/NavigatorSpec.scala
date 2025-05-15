@@ -25,7 +25,7 @@ import models._
 import models.requests.DataRequest
 import org.mockito.ArgumentMatchers.any
 import pages.changePreferences.ContactPreferencePage
-import play.api.http.Status.INTERNAL_SERVER_ERROR
+import play.api.http.Status.{INTERNAL_SERVER_ERROR, SEE_OTHER}
 import play.api.i18n.Messages
 import play.api.test.Helpers.{defaultAwaitTimeout, redirectLocation, status}
 import utils.StartEmailVerificationJourneyHelper
@@ -58,8 +58,7 @@ class NavigatorSpec extends SpecBase {
             ContactPreferencePage,
             NormalMode,
             userAnswersPostNoEmail.set(ContactPreferencePage, true).success.value
-          ) mustBe routes.IndexController.onPageLoad()
-          // TODO: change to correct route when page is created
+          ) mustBe controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode)
         }
 
         "must go to the Existing Email page if the user is currently on post, has selected email and has an email in ETMP" in {
@@ -123,12 +122,11 @@ class NavigatorSpec extends SpecBase {
         request = dataRequest
       )
 
-      status(result) mustBe 303
+      status(result) mustBe SEE_OTHER
       redirectLocation(result).value mustBe routes.IndexController.onPageLoad().url
     }
 
     "when the email provided is not verified, but is locked, then redirect to the check your answers page" in {
-      /// TODO: change this to check for the locked page redirect when that page is built
       implicit val mockMessages: Messages = mock[Messages]
       val dataRequest: DataRequest[_]     = mock[DataRequest[_]]
 
@@ -139,8 +137,8 @@ class NavigatorSpec extends SpecBase {
         request = dataRequest
       )
 
-      status(result) mustBe 303
-      redirectLocation(result).value mustBe routes.IndexController.onPageLoad().url
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result).value mustBe controllers.changePreferences.routes.EmailLockedController.onPageLoad().url
     }
 
     "when the email provided is not verified, and not locked" - {
@@ -160,7 +158,7 @@ class NavigatorSpec extends SpecBase {
           request = mockDataRequest
         )
 
-        status(result) mustBe 303
+        status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe "http://localhost:9890/email-verification-frontend/test"
       }
 
@@ -179,7 +177,7 @@ class NavigatorSpec extends SpecBase {
           request = mockDataRequest
         )
 
-        status(result) mustBe 303
+        status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
 
@@ -196,7 +194,7 @@ class NavigatorSpec extends SpecBase {
           request = mockDataRequest
         )
 
-        status(result) mustBe 303
+        status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }

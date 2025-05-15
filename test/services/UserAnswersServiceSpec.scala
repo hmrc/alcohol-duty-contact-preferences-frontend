@@ -17,7 +17,6 @@
 package services
 
 import base.SpecBase
-import cats.data.EitherT
 import connectors.UserAnswersConnector
 import models.ErrorModel
 import org.mockito.ArgumentMatchers.any
