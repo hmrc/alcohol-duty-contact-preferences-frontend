@@ -162,7 +162,6 @@ class NavigatorSpec extends SpecBase {
 
   "enterEmailAddressNavigation" - {
     "when the email provided is already verified then redirect to the check your answers page" in {
-      /// TODO: change this to check for the CYA redirect when that page is built
       implicit val mockMessages: Messages = mock[Messages]
       val dataRequest: DataRequest[_]     = mock[DataRequest[_]]
 
@@ -174,7 +173,7 @@ class NavigatorSpec extends SpecBase {
       )
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result).value mustBe routes.IndexController.onPageLoad().url
+      redirectLocation(result).value mustBe routes.CheckYourAnswersController.onPageLoad().url
     }
 
     "when the email provided is not verified, but is locked, then redirect to the check your answers page" in {

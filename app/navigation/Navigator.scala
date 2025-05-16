@@ -70,6 +70,9 @@ class Navigator @Inject() (
 
     (selectedEmail, paperlessReference, currentEmail) match {
       case (Some(true), false, None)    =>
+        logger.info(
+          "User selected email and is currently on post with no email in ETMP. Redirecting to /what-email-address"
+        )
         controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode)
       case (Some(true), false, Some(_)) =>
         // TODO: next page is /existing-email
@@ -82,8 +85,7 @@ class Navigator @Inject() (
         logger.info("User selected email and is currently on email. Should redirect to /enrolled-emails")
         routes.IndexController.onPageLoad()
       case (Some(false), true, Some(_)) =>
-        // TODO: next page is /check-answers
-        logger.info("User selected post and is currently on email. Should redirect to /check-answers")
+        logger.info("User selected post and is currently on email. Redirecting to Check Your Answers")
         routes.CheckYourAnswersController.onPageLoad()
       case (Some(false), false, _)      =>
         // TODO: next page is /enrolled-letters
@@ -105,9 +107,8 @@ class Navigator @Inject() (
 
     (isVerified, isLocked) match {
       case (true, _)      =>
-        // TODO: next page is /check-answers
-        logger.info("User has a verified email address. Should redirect to /check-answers")
-        Future.successful(Redirect(routes.IndexController.onPageLoad()))
+        logger.info("User has a verified email address. Redirecting to Check Your Answers")
+        Future.successful(Redirect(routes.CheckYourAnswersController.onPageLoad()))
       case (false, true)  =>
         logger.info("User has been locked out for the entered email address.")
         Future.successful(Redirect(controllers.changePreferences.routes.EmailLockedController.onPageLoad()))
