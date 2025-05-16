@@ -54,7 +54,7 @@ trait SpecBase
 
   def getMessages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 
-  val fakeIdentifierUserDetails: FakeIdentifierUserDetails = FakeIdentifierUserDetails(appaId, groupId, userId)
+  val fakeIdentifierUserDetails: FakeIdentifierUserDetails = FakeIdentifierUserDetails(appaId, groupId, userId, credId)
 
   def messages(app: Application): Messages = app.injector.instanceOf[MessagesApi].preferred(FakeRequest())
 

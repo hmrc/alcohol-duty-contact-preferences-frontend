@@ -60,7 +60,7 @@ trait ISpecBase
     with ModelGenerators
     with TestData {
 
-  val fakeIdentifierUserDetails: FakeIdentifierUserDetails = FakeIdentifierUserDetails(appaId, groupId, userId)
+  val fakeIdentifierUserDetails: FakeIdentifierUserDetails = FakeIdentifierUserDetails(appaId, groupId, userId, credId)
 
   protected def applicationBuilder(userAnswers: Option[UserAnswers] = None): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()

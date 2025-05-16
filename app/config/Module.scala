@@ -19,7 +19,7 @@ package config
 import com.google.inject.AbstractModule
 import controllers.actions._
 
-import java.time.{Clock, ZoneOffset}
+import java.time.{Clock, ZoneId}
 
 class Module extends AbstractModule {
 
@@ -27,6 +27,7 @@ class Module extends AbstractModule {
     bind(classOf[DataRetrievalAction]).to(classOf[DataRetrievalActionImpl]).asEagerSingleton()
     bind(classOf[DataRequiredAction]).to(classOf[DataRequiredActionImpl]).asEagerSingleton()
     bind(classOf[IdentifierAction]).to(classOf[AuthenticatedIdentifierAction]).asEagerSingleton()
-    bind(classOf[Clock]).toInstance(Clock.systemDefaultZone.withZone(ZoneOffset.UTC))
+    bind(classOf[SignOutAction]).to(classOf[SignOutActionImpl]).asEagerSingleton()
+    bind(classOf[Clock]).toInstance(Clock.system(ZoneId.of(Constants.ukTimeZoneStringId)))
   }
 }

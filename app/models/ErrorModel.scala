@@ -14,12 +14,6 @@
  * limitations under the License.
  */
 
-package common
+package models
 
-import models.UserAnswers
-import pages.changePreferences.ContactPreferencePage
-
-trait TestPages extends TestData {
-  def contactPreferencePage(userAnswers: UserAnswers, emailSelected: Boolean): UserAnswers =
-    userAnswers.set(ContactPreferencePage, emailSelected).get
-}
+case class ErrorModel(status: Int, message: String)

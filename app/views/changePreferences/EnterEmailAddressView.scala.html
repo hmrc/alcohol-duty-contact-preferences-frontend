@@ -14,42 +14,30 @@
  * limitations under the License.
  *@
 
-@import viewmodels.LegendSize
+@import viewmodels.LabelSize
 
 @this(
         layout: templates.Layout,
         formHelper: FormWithCSRF,
         govukErrorSummary: GovukErrorSummary,
-        govukRadios: GovukRadios,
+        govukInput: GovukInput,
         govukButton: GovukButton
 )
 
 @(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("contactPreference.title"))) {
+@layout(pageTitle = title(form, messages("changePreferences.enter-email-address.title"))) {
 
-    @formHelper(action = routes.ContactPreferenceController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.changePreferences.routes.EnterEmailAddressController.onSubmit(mode), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
         }
 
-        @govukRadios(
-            RadiosViewModel(
-                field = form("contactPreferenceEmail"),
-                legend = LegendViewModel(messages("contactPreference.heading")).withSize(LegendSize.Large),
-                items = Seq(
-                    RadioItem(
-                        id = Some("contactPreferenceEmail"),
-                        value = Some("true"),
-                        content = Text(messages("contactPreference.email"))
-                    ),
-                    RadioItem(
-                        id = Some(s"contactPreferencePost"),
-                        value = Some("false"),
-                        content = Text(messages("contactPreference.post"))
-                    )
-                )
+        @govukInput(
+            InputViewModel(
+                field = form("emailAddress"),
+                label = LabelViewModel(messages("changePreferences.enter-email-address.title")).asPageHeading(size = LabelSize.Large),
             )
         )
 

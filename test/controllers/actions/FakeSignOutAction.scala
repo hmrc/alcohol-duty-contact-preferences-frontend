@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,28 +16,22 @@
 
 package controllers.actions
 
-import models.UserAnswers
-import models.requests.{IdentifierRequest, OptionalDataRequest}
-import play.api.mvc.Result
+import models.requests.RequestWithOptAppaId
+import play.api.mvc._
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class FakeDataRetrievalAction(maybeUserAnswers: Option[UserAnswers]) extends DataRetrievalAction {
+case class FakeAppaId(appaId: Option[String])
 
-  override protected def refine[A](request: IdentifierRequest[A]): Future[Either[Result, OptionalDataRequest[A]]] =
-    Future(
-      Right(
-        OptionalDataRequest(
-          request.request,
-          request.appaId,
-          request.groupId,
-          request.userId,
-          request.credId,
-          maybeUserAnswers
-        )
-      )
-    )
+class FakeSignOutAction @Inject() (bodyParsers: PlayBodyParsers, fakeAppaId: FakeAppaId) extends SignOutAction {
 
-  override protected implicit val executionContext: ExecutionContext =
+  override def invokeBlock[A](request: Request[A], block: RequestWithOptAppaId[A] => Future[Result]): Future[Result] =
+    block(RequestWithOptAppaId(request, fakeAppaId.appaId))
+
+  override def parser: BodyParser[AnyContent] =
+    bodyParsers.default
+
+  override protected def executionContext: ExecutionContext =
     scala.concurrent.ExecutionContext.Implicits.global
 }
