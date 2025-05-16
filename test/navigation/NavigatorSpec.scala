@@ -25,7 +25,7 @@ import models._
 import models.requests.DataRequest
 import org.mockito.ArgumentMatchers.any
 import pages.changePreferences.ContactPreferencePage
-import play.api.http.Status.INTERNAL_SERVER_ERROR
+import play.api.http.Status.{INTERNAL_SERVER_ERROR, SEE_OTHER}
 import play.api.i18n.Messages
 import play.api.test.Helpers.{defaultAwaitTimeout, redirectLocation, status}
 import utils.StartEmailVerificationJourneyHelper
@@ -43,13 +43,12 @@ class NavigatorSpec extends SpecBase {
     config = appConfig
   )
 
-  "Navigator" - {
+  "Navigator .nextPage" - {
 
     "in Normal mode" - {
-
       "must go from a page that doesn't exist in the route map to Index" in {
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, NormalMode, userAnswers) mustBe routes.IndexController.onPageLoad()
+        navigator.nextPage(UnknownPage, NormalMode, userAnswers, None) mustBe routes.IndexController.onPageLoad()
       }
 
       "from the Contact Preference page" - {
@@ -57,16 +56,17 @@ class NavigatorSpec extends SpecBase {
           navigator.nextPage(
             ContactPreferencePage,
             NormalMode,
-            userAnswersPostNoEmail.set(ContactPreferencePage, true).success.value
-          ) mustBe routes.IndexController.onPageLoad()
-          // TODO: change to correct route when page is created
+            userAnswersPostNoEmail.set(ContactPreferencePage, true).success.value,
+            None
+          ) mustBe controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode)
         }
 
         "must go to the Existing Email page if the user is currently on post, has selected email and has an email in ETMP" in {
           navigator.nextPage(
             ContactPreferencePage,
             NormalMode,
-            userAnswersPostWithEmail.set(ContactPreferencePage, true).success.value
+            userAnswersPostWithEmail.set(ContactPreferencePage, true).success.value,
+            None
           ) mustBe routes.IndexController.onPageLoad()
           // TODO: change to correct route when page is created
         }
@@ -75,25 +75,27 @@ class NavigatorSpec extends SpecBase {
           navigator.nextPage(
             ContactPreferencePage,
             NormalMode,
-            userAnswers.set(ContactPreferencePage, true).success.value
+            userAnswers.set(ContactPreferencePage, true).success.value,
+            None
           ) mustBe routes.IndexController.onPageLoad()
           // TODO: change to correct route when page is created
         }
 
-        "must go to the Check Answers page if the user is currently on email and has selected post" in {
+        "must go to the Check Your Answers page if the user is currently on email and has selected post" in {
           navigator.nextPage(
             ContactPreferencePage,
             NormalMode,
-            userAnswers.set(ContactPreferencePage, false).success.value
-          ) mustBe routes.IndexController.onPageLoad()
-          // TODO: change to correct route when page is created
+            userAnswers.set(ContactPreferencePage, false).success.value,
+            None
+          ) mustBe routes.CheckYourAnswersController.onPageLoad()
         }
 
         "must go to the Enrolled Letters page if the user is currently on post and has selected post" in {
           navigator.nextPage(
             ContactPreferencePage,
             NormalMode,
-            userAnswersPostNoEmail.set(ContactPreferencePage, false).success.value
+            userAnswersPostNoEmail.set(ContactPreferencePage, false).success.value,
+            None
           ) mustBe routes.IndexController.onPageLoad()
           // TODO: change to correct route when page is created
         }
@@ -101,10 +103,58 @@ class NavigatorSpec extends SpecBase {
     }
 
     "in Check mode" - {
+      "must go from the Contact Preference page to the next page in normal mode if the answer has changed" in {
+        navigator.nextPage(
+          ContactPreferencePage,
+          CheckMode,
+          userAnswersPostNoEmail.set(ContactPreferencePage, true).success.value,
+          Some(true)
+        ) mustBe controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode)
+
+        navigator.nextPage(
+          ContactPreferencePage,
+          CheckMode,
+          userAnswersPostWithEmail.set(ContactPreferencePage, true).success.value,
+          Some(true)
+        ) mustBe routes.IndexController.onPageLoad()
+        // TODO: change to correct route when Existing Email page is created
+
+        navigator.nextPage(
+          ContactPreferencePage,
+          CheckMode,
+          userAnswers.set(ContactPreferencePage, true).success.value,
+          Some(true)
+        ) mustBe routes.IndexController.onPageLoad()
+        // TODO: change to correct route when Enrolled Emails page is created
+
+        navigator.nextPage(
+          ContactPreferencePage,
+          CheckMode,
+          userAnswers.set(ContactPreferencePage, false).success.value,
+          Some(true)
+        ) mustBe routes.CheckYourAnswersController.onPageLoad()
+
+        navigator.nextPage(
+          ContactPreferencePage,
+          CheckMode,
+          userAnswersPostNoEmail.set(ContactPreferencePage, false).success.value,
+          Some(true)
+        ) mustBe routes.IndexController.onPageLoad()
+        // TODO: change to correct route when Enrolled Letters page is created
+      }
+
+      "must go from the Contact Preference page to the Check Your Answers page if the answer has not changed" in {
+        navigator.nextPage(
+          ContactPreferencePage,
+          CheckMode,
+          userAnswers.set(ContactPreferencePage, true).success.value,
+          Some(false)
+        ) mustBe routes.CheckYourAnswersController.onPageLoad()
+      }
 
       "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, CheckMode, userAnswers) mustBe routes.CheckYourAnswersController
+        navigator.nextPage(UnknownPage, CheckMode, userAnswers, Some(false)) mustBe routes.CheckYourAnswersController
           .onPageLoad()
       }
     }
@@ -112,7 +162,6 @@ class NavigatorSpec extends SpecBase {
 
   "enterEmailAddressNavigation" - {
     "when the email provided is already verified then redirect to the check your answers page" in {
-      /// TODO: change this to check for the CYA redirect when that page is built
       implicit val mockMessages: Messages = mock[Messages]
       val dataRequest: DataRequest[_]     = mock[DataRequest[_]]
 
@@ -123,12 +172,11 @@ class NavigatorSpec extends SpecBase {
         request = dataRequest
       )
 
-      status(result) mustBe 303
-      redirectLocation(result).value mustBe routes.IndexController.onPageLoad().url
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result).value mustBe routes.CheckYourAnswersController.onPageLoad().url
     }
 
     "when the email provided is not verified, but is locked, then redirect to the check your answers page" in {
-      /// TODO: change this to check for the locked page redirect when that page is built
       implicit val mockMessages: Messages = mock[Messages]
       val dataRequest: DataRequest[_]     = mock[DataRequest[_]]
 
@@ -139,8 +187,8 @@ class NavigatorSpec extends SpecBase {
         request = dataRequest
       )
 
-      status(result) mustBe 303
-      redirectLocation(result).value mustBe routes.IndexController.onPageLoad().url
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result).value mustBe controllers.changePreferences.routes.EmailLockedController.onPageLoad().url
     }
 
     "when the email provided is not verified, and not locked" - {
@@ -160,7 +208,7 @@ class NavigatorSpec extends SpecBase {
           request = mockDataRequest
         )
 
-        status(result) mustBe 303
+        status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe "http://localhost:9890/email-verification-frontend/test"
       }
 
@@ -179,7 +227,7 @@ class NavigatorSpec extends SpecBase {
           request = mockDataRequest
         )
 
-        status(result) mustBe 303
+        status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
 
@@ -196,7 +244,7 @@ class NavigatorSpec extends SpecBase {
           request = mockDataRequest
         )
 
-        status(result) mustBe 303
+        status(result) mustBe SEE_OTHER
         redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }

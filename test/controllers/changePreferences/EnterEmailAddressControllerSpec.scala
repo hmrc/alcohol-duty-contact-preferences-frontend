@@ -30,7 +30,6 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.{EmailVerificationService, UserAnswersService}
 import uk.gov.hmrc.http.HttpResponse
-import views.html.IndexView
 import views.html.changePreferences.EnterEmailAddressView
 
 import scala.concurrent.Future

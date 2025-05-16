@@ -48,7 +48,12 @@ trait TestData extends ModelGenerators {
 
   val subscriptionSummaryPostWithEmail: SubscriptionSummary = subscriptionSummaryEmail.copy(paperlessReference = false)
 
-  val subscriptionSummaryPostNoEmail: SubscriptionSummary = subscriptionSummaryEmail.copy(paperlessReference = false)
+  val subscriptionSummaryPostNoEmail: SubscriptionSummary = SubscriptionSummary(
+    paperlessReference = false,
+    emailAddress = None,
+    emailVerification = None,
+    bouncedEmail = None
+  )
 
   val userAnswers: UserAnswers = UserAnswers(
     appaId = appaId,

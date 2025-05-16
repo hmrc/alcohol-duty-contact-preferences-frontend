@@ -32,16 +32,14 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   private val contactFormServiceIdentifier        = "alcohol-duty-contact-preferences-frontend"
   private lazy val contactPreferencesHost: String = servicesConfig.baseUrl("alcohol-duty-contact-preferences")
 
-  private val startVerificationProtocol = configuration.get[String]("microservice.services.email-verification.protocol")
-  private val startVerificationHost     = configuration.get[String]("microservice.services.email-verification.host")
-  private val startVerificationPort     = configuration.get[String]("microservice.services.email-verification.port")
-
   def feedbackUrl(implicit request: RequestHeader): String =
     s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=${host + request.uri}"
 
-  val loginUrl: String         = configuration.get[String]("urls.login")
-  val loginContinueUrl: String = configuration.get[String]("urls.loginContinue")
-  val signOutUrl: String       = configuration.get[String]("urls.signOut")
+  val loginUrl: String                  = configuration.get[String]("urls.login")
+  val loginContinueUrl: String          = configuration.get[String]("urls.loginContinue")
+  val signOutUrl: String                = configuration.get[String]("urls.signOut")
+  val businessTaxAccountUrl: String     = configuration.get[String]("urls.businessTaxAccount")
+  val accessibilityStatementUrl: String = configuration.get[String]("urls.accessibility-statement")
 
   private val exitSurveyBaseUrl: String = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
   val exitSurveyUrl: String             = s"$exitSurveyBaseUrl/feedback/alcohol-duty-contact-preferences-frontend"
@@ -62,10 +60,14 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   def ecpUserAnswersGetUrl(appaId: String): String =
     s"$contactPreferencesHost/alcohol-duty-contact-preferences/user-answers/$appaId"
 
+  def ecpUserAnswersUrl(): String =
+    s"$contactPreferencesHost/alcohol-duty-contact-preferences/user-answers"
+
   def ecpGetEmailVerificationUrl(credId: String): String =
     s"$contactPreferencesHost/alcohol-duty-contact-preferences/get-email-verification/$credId"
 
-  private val startEmailVerificationContinueBaseUrl: String   = configuration.get[String]("contact-preferences-frontend")
+  private val startEmailVerificationContinueBaseUrl: String   =
+    configuration.get[String]("microservice.services.contact-preferences-frontend.prefix")
   private val startEmailVerificationContinueUrlSuffix: String =
     configuration.get[String]("microservice.services.contact-preferences-frontend.url.checkYourAnswersPage")
   private val startEmailVerificationBackUrlSuffix: String     =
@@ -83,11 +85,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   val startEmailVerificationJourneyUrl: String =
     s"$startEmailVerificationJourneyBaseUrl$startEmailVerificationJourneyUrlSuffix"
 
-  val emailVerificationRedirectBaseUrl: String = configuration.get[String]("email-verification-frontend")
-
-  def ecpUserAnswersUrl(): String =
-    s"$contactPreferencesHost/alcohol-duty-contact-preferences/user-answers"
-
-  val accessibilityStatementUrl: String = configuration.get[String]("urls.accessibility-statement")
+  val emailVerificationRedirectBaseUrl: String =
+    configuration.get[String]("microservice.services.email-verification-frontend.prefix")
 
 }

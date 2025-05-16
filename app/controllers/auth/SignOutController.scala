@@ -17,7 +17,7 @@
 package controllers.auth
 
 import config.FrontendAppConfig
-import controllers.actions.IdentifierAction
+import controllers.actions.SignOutAction
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -26,16 +26,21 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class AuthController @Inject() (
+class SignOutController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   config: FrontendAppConfig,
-  identify: IdentifierAction
+  signOutAction: SignOutAction
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
     with Logging
     with I18nSupport {
 
-  def signOut(): Action[AnyContent] = identify { implicit request =>
-    Redirect(config.signOutUrl, Map("continue" -> Seq(config.exitSurveyUrl)))
+  def signOut(): Action[AnyContent] = signOutAction { implicit request =>
+    request.appaId match {
+      case Some(_) => Redirect(config.signOutUrl, Map("continue" -> Seq(config.exitSurveyUrl)))
+      case None    =>
+        logger.info("User not authenticated when signing out.")
+        Redirect(config.signOutUrl, Map("continue" -> Seq(config.exitSurveyUrl)))
+    }
   }
 }

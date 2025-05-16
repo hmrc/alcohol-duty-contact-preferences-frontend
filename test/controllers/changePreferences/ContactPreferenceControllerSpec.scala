@@ -143,12 +143,12 @@ class ContactPreferenceControllerSpec extends SpecBase {
     }
 
     "onSubmit" - {
-      "must redirect to the next page when valid data is submitted" in {
+      "must redirect to the next page when valid data is submitted in normal mode" in {
         val mockUserAnswersConnector = mock[UserAnswersConnector]
         val mockNavigator            = mock[Navigator]
 
         when(mockUserAnswersConnector.set(any())(any())) thenReturn Future.successful(mock[HttpResponse])
-        when(mockNavigator.nextPage(eqTo(ContactPreferencePage), any(), any())) thenReturn onwardRoute
+        when(mockNavigator.nextPage(eqTo(ContactPreferencePage), any(), any(), any())) thenReturn onwardRoute
 
         val application = applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(
@@ -168,7 +168,67 @@ class ContactPreferenceControllerSpec extends SpecBase {
           redirectLocation(result).value mustEqual onwardRoute.url
 
           verify(mockUserAnswersConnector, times(1)).set(any())(any())
-          verify(mockNavigator, times(1)).nextPage(eqTo(ContactPreferencePage), eqTo(NormalMode), any())
+          verify(mockNavigator, times(1)).nextPage(eqTo(ContactPreferencePage), eqTo(NormalMode), any(), eqTo(None))
+        }
+      }
+
+      "must redirect to the next page when valid data is submitted in check mode and the answer has not changed" in {
+        val mockUserAnswersConnector = mock[UserAnswersConnector]
+        val mockNavigator            = mock[Navigator]
+
+        when(mockUserAnswersConnector.set(any())(any())) thenReturn Future.successful(mock[HttpResponse])
+        when(mockNavigator.nextPage(eqTo(ContactPreferencePage), any(), any(), any())) thenReturn onwardRoute
+
+        val application = applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[Navigator].toInstance(mockNavigator),
+            bind[UserAnswersConnector].toInstance(mockUserAnswersConnector)
+          )
+          .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, contactPreferenceCheckRoute)
+              .withFormUrlEncodedBody(("contactPreferenceEmail", "true"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual onwardRoute.url
+
+          verify(mockUserAnswersConnector, times(1)).set(any())(any())
+          verify(mockNavigator, times(1))
+            .nextPage(eqTo(ContactPreferencePage), eqTo(CheckMode), any(), eqTo(Some(false)))
+        }
+      }
+
+      "must redirect to the next page when valid data is submitted in check mode and the answer has changed" in {
+        val mockUserAnswersConnector = mock[UserAnswersConnector]
+        val mockNavigator            = mock[Navigator]
+
+        when(mockUserAnswersConnector.set(any())(any())) thenReturn Future.successful(mock[HttpResponse])
+        when(mockNavigator.nextPage(eqTo(ContactPreferencePage), any(), any(), any())) thenReturn onwardRoute
+
+        val application = applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(
+            bind[Navigator].toInstance(mockNavigator),
+            bind[UserAnswersConnector].toInstance(mockUserAnswersConnector)
+          )
+          .build()
+
+        running(application) {
+          val request =
+            FakeRequest(POST, contactPreferenceCheckRoute)
+              .withFormUrlEncodedBody(("contactPreferenceEmail", "false"))
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual onwardRoute.url
+
+          verify(mockUserAnswersConnector, times(1)).set(any())(any())
+          verify(mockNavigator, times(1))
+            .nextPage(eqTo(ContactPreferencePage), eqTo(CheckMode), any(), eqTo(Some(true)))
         }
       }
 
