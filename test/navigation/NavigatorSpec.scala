@@ -99,6 +99,15 @@ class NavigatorSpec extends SpecBase {
           ) mustBe routes.IndexController.onPageLoad()
           // TODO: change to correct route when page is created
         }
+
+        "must redirect to journey recovery if the answer is missing" in {
+          navigator.nextPage(
+            ContactPreferencePage,
+            NormalMode,
+            emptyUserAnswers,
+            None
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
       }
 
       "from the Existing Email page" - {
@@ -106,7 +115,7 @@ class NavigatorSpec extends SpecBase {
           navigator.nextPage(
             ExistingEmailPage,
             NormalMode,
-            userAnswersPostNoEmail.set(ExistingEmailPage, true).success.value,
+            userAnswersPostWithEmail.set(ExistingEmailPage, true).success.value,
             None
           ) mustBe routes.CheckYourAnswersController.onPageLoad()
         }
@@ -115,9 +124,18 @@ class NavigatorSpec extends SpecBase {
           navigator.nextPage(
             ExistingEmailPage,
             NormalMode,
-            userAnswersPostNoEmail.set(ExistingEmailPage, false).success.value,
+            userAnswersPostWithEmail.set(ExistingEmailPage, false).success.value,
             None
           ) mustBe controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode)
+        }
+
+        "must redirect to journey recovery if the answer is missing" in {
+          navigator.nextPage(
+            ExistingEmailPage,
+            NormalMode,
+            userAnswersPostWithEmail,
+            None
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
         }
       }
     }

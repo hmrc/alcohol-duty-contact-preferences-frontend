@@ -72,7 +72,7 @@ trait TestData extends ModelGenerators {
     subscriptionSummary = subscriptionSummaryPostWithEmail,
     emailAddress = None,
     verifiedEmailAddresses = verifiedEmailAddresses,
-    data = JsObject(Seq("contactPreferenceEmail" -> Json.toJson(false))),
+    data = JsObject(Seq("contactPreferenceEmail" -> Json.toJson(true))),
     startedTime = Instant.now(clock),
     lastUpdated = Instant.now(clock)
   )
