@@ -24,7 +24,7 @@ import pages._
 import models._
 import models.requests.DataRequest
 import org.mockito.ArgumentMatchers.any
-import pages.changePreferences.ContactPreferencePage
+import pages.changePreferences.{ContactPreferencePage, ExistingEmailPage}
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, SEE_OTHER}
 import play.api.i18n.Messages
 import play.api.test.Helpers.{defaultAwaitTimeout, redirectLocation, status}
@@ -46,9 +46,10 @@ class NavigatorSpec extends SpecBase {
   "Navigator .nextPage" - {
 
     "in Normal mode" - {
-      "must go from a page that doesn't exist in the route map to Index" in {
+      "must go from a page that doesn't exist in the route map to journey recovery" in {
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, NormalMode, userAnswers, None) mustBe routes.IndexController.onPageLoad()
+        navigator.nextPage(UnknownPage, NormalMode, userAnswers, None) mustBe routes.JourneyRecoveryController
+          .onPageLoad()
       }
 
       "from the Contact Preference page" - {
@@ -67,8 +68,7 @@ class NavigatorSpec extends SpecBase {
             NormalMode,
             userAnswersPostWithEmail.set(ContactPreferencePage, true).success.value,
             None
-          ) mustBe routes.IndexController.onPageLoad()
-          // TODO: change to correct route when page is created
+          ) mustBe controllers.changePreferences.routes.ExistingEmailController.onPageLoad()
         }
 
         "must go to the Enrolled Emails page if the user is currently on email and has selected email" in {
@@ -100,6 +100,26 @@ class NavigatorSpec extends SpecBase {
           // TODO: change to correct route when page is created
         }
       }
+
+      "from the Existing Email page" - {
+        "must go to the Check Your Answers page if the user selects Yes" in {
+          navigator.nextPage(
+            ExistingEmailPage,
+            NormalMode,
+            userAnswersPostNoEmail.set(ExistingEmailPage, true).success.value,
+            None
+          ) mustBe routes.CheckYourAnswersController.onPageLoad()
+        }
+
+        "must go to the What Email Address page if the user selects No" in {
+          navigator.nextPage(
+            ExistingEmailPage,
+            NormalMode,
+            userAnswersPostNoEmail.set(ExistingEmailPage, false).success.value,
+            None
+          ) mustBe controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode)
+        }
+      }
     }
 
     "in Check mode" - {
@@ -116,8 +136,7 @@ class NavigatorSpec extends SpecBase {
           CheckMode,
           userAnswersPostWithEmail.set(ContactPreferencePage, true).success.value,
           Some(true)
-        ) mustBe routes.IndexController.onPageLoad()
-        // TODO: change to correct route when Existing Email page is created
+        ) mustBe controllers.changePreferences.routes.ExistingEmailController.onPageLoad()
 
         navigator.nextPage(
           ContactPreferencePage,

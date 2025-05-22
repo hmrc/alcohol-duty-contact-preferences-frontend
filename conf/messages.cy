@@ -56,7 +56,7 @@ contactPreference.email = NOT_FOUND
 contactPreference.post = NOT_FOUND
 contactPreference.error.required = NOT_FOUND
 
-existingEmail.title = NOT_FOUND
+existingEmail.title = Ai hwn yw eich e-bost?
 existingEmail.heading = Ai {0} yw’ch cyfeiriad e-bost chi?
 existingEmail.hint = Byddwn ni’n anfon e-bost atoch pan fo neges newydd yn eich cyfrif.
 existingEmail.no = Na, hoffwn ddefnyddio cyfeiriad e-bost gwahanol
