@@ -60,7 +60,7 @@ existingEmail.title = Is this your email?
 existingEmail.heading = Is {0} your email?
 existingEmail.hint = We will email you when you have a new message in your account.
 existingEmail.no = No, I want to use a different email
-existingEmail.error.required = Select 'Yes' if {0} is your email
+existingEmail.error.required = Select ‘Yes’ if {0} is your email
 
 changePreferences.enter-email-address.title = What is the email address we should use to contact you about your Alcohol Duty?
 changePreferences.enter-email-address.heading = What is the email address we should use to contact you about your Alcohol Duty?
