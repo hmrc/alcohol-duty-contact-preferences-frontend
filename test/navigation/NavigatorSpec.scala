@@ -62,7 +62,16 @@ class NavigatorSpec extends SpecBase {
           ) mustBe controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode)
         }
 
-        "must go to the Existing Email page if the user is currently on post, has selected email and has an email in ETMP" in {
+        "must go to the What Email Address page if the user is currently on post, has selected email and has an unverified email in ETMP" in {
+          navigator.nextPage(
+            ContactPreferencePage,
+            NormalMode,
+            userAnswersPostWithUnverifiedEmail.set(ContactPreferencePage, true).success.value,
+            None
+          ) mustBe controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode)
+        }
+
+        "must go to the Existing Email page if the user is currently on post, has selected email and has a verified email in ETMP" in {
           navigator.nextPage(
             ContactPreferencePage,
             NormalMode,
@@ -147,6 +156,13 @@ class NavigatorSpec extends SpecBase {
           CheckMode,
           userAnswersPostNoEmail.set(ContactPreferencePage, true).success.value,
           Some(true)
+        ) mustBe controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode)
+
+        navigator.nextPage(
+          ContactPreferencePage,
+          NormalMode,
+          userAnswersPostWithUnverifiedEmail.set(ContactPreferencePage, true).success.value,
+          None
         ) mustBe controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode)
 
         navigator.nextPage(

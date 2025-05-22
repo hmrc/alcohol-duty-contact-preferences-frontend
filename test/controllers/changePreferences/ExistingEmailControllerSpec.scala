@@ -110,6 +110,19 @@ class ExistingEmailControllerSpec extends SpecBase {
         }
       }
 
+      "must redirect to Journey Recovery for a GET if the email in the subscription summary is not verified" in {
+        val application = applicationBuilder(userAnswers = Some(userAnswersPostWithUnverifiedEmail)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, existingEmailRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
       "must redirect to Journey Recovery for a GET if the user has not selected email on the contact preference question" in {
         val userAnswers = userAnswersPostWithEmail.set(ContactPreferencePage, false).success.value
 
@@ -192,6 +205,19 @@ class ExistingEmailControllerSpec extends SpecBase {
 
       "must redirect to Journey Recovery for a POST if the subscription summary has no email address" in {
         val application = applicationBuilder(userAnswers = Some(userAnswersPostNoEmail)).build()
+
+        running(application) {
+          val request = FakeRequest(POST, existingEmailRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to Journey Recovery for a POST if the email in the subscription summary is not verified" in {
+        val application = applicationBuilder(userAnswers = Some(userAnswersPostWithUnverifiedEmail)).build()
 
         running(application) {
           val request = FakeRequest(POST, existingEmailRoute)

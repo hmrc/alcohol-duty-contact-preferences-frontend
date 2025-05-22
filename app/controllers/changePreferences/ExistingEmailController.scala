@@ -47,34 +47,39 @@ class ExistingEmailController @Inject() (
     with Logging {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    (request.userAnswers.subscriptionSummary.emailAddress, request.userAnswers.get(ContactPreferencePage)) match {
-      case (None, _)                                =>
-        logger.warn(s"User has no existing email in subscription summary, unable to access existing email page.")
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      case (Some(_), None) | (Some(_), Some(false)) =>
-        logger.warn(s"User has not selected email, unable to access existing email page.")
-        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      case (Some(email), Some(true))                =>
+    (
+      request.userAnswers.subscriptionSummary.emailAddress,
+      request.userAnswers.subscriptionSummary.emailVerification,
+      request.userAnswers.get(ContactPreferencePage)
+    ) match {
+      case (Some(email), Some(true), Some(true)) =>
         val form         = formProvider(email)
         val preparedForm = request.userAnswers.get(ExistingEmailPage) match {
           case None        => form
           case Some(value) => form.fill(value)
         }
         Ok(view(preparedForm, email))
+      case (None, _, _)                          =>
+        logger.warn(s"User has no existing email in subscription summary, unable to access existing email page.")
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      case (Some(_), Some(false) | None, _)      =>
+        logger.warn(
+          s"User's existing email in subscription summary is not verified, unable to access existing email page."
+        )
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      case (Some(_), Some(true), _)              =>
+        logger.warn(s"User has not selected email, unable to access existing email page.")
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    (request.userAnswers.subscriptionSummary.emailAddress, request.userAnswers.get(ContactPreferencePage)) match {
-      case (None, _)                                =>
-        logger.warn(
-          s"User has no existing email in subscription summary, unable to submit answer for existing email page."
-        )
-        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-      case (Some(_), None) | (Some(_), Some(false)) =>
-        logger.warn(s"User has not selected email, unable to submit answer for existing email page.")
-        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-      case (Some(email), Some(true))                =>
+    (
+      request.userAnswers.subscriptionSummary.emailAddress,
+      request.userAnswers.subscriptionSummary.emailVerification,
+      request.userAnswers.get(ContactPreferencePage)
+    ) match {
+      case (Some(email), Some(true), Some(true)) =>
         val form = formProvider(email)
         form
           .bindFromRequest()
@@ -86,6 +91,19 @@ class ExistingEmailController @Inject() (
                 _              <- userAnswersConnector.set(updatedAnswers)
               } yield Redirect(navigator.nextPage(ExistingEmailPage, NormalMode, updatedAnswers, None))
           )
+      case (None, _, _)                          =>
+        logger.warn(
+          s"User has no existing email in subscription summary, unable to submit answer for existing email page."
+        )
+        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      case (Some(_), Some(false) | None, _)      =>
+        logger.warn(
+          s"User's existing email in subscription summary is not verified, unable to submit answer for existing email page."
+        )
+        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      case (Some(_), Some(true), _)              =>
+        logger.warn(s"User has not selected email, unable to submit answer for existing email page.")
+        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
   }
 }

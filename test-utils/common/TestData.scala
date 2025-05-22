@@ -77,6 +77,10 @@ trait TestData extends ModelGenerators {
     lastUpdated = Instant.now(clock)
   )
 
+  val userAnswersPostWithUnverifiedEmail: UserAnswers = userAnswersPostWithEmail.copy(
+    subscriptionSummary = subscriptionSummaryPostWithEmail.copy(emailVerification = Some(false))
+  )
+
   val userAnswersPostNoEmail: UserAnswers = UserAnswers(
     appaId = appaId,
     userId = userId,
