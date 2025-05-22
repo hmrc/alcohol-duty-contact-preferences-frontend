@@ -21,7 +21,7 @@ import connectors.EmailVerificationConnector
 import controllers.routes
 import models._
 import models.requests.DataRequest
-import pages.changePreferences.ContactPreferencePage
+import pages.changePreferences.{ContactPreferencePage, ExistingEmailPage}
 import pages._
 import play.api.Logging
 import play.api.i18n.Messages
@@ -43,8 +43,15 @@ class Navigator @Inject() (
   private val normalRoutes: Page => UserAnswers => Call = {
     case ContactPreferencePage =>
       userAnswers => contactPreferenceRoute(userAnswers)
+    case ExistingEmailPage     =>
+      userAnswers =>
+        userAnswers.get(ExistingEmailPage) match {
+          case Some(true)  => routes.CheckYourAnswersController.onPageLoad()
+          case Some(false) => controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode)
+          case None        => routes.JourneyRecoveryController.onPageLoad()
+        }
     case _                     =>
-      _ => routes.IndexController.onPageLoad()
+      _ => routes.JourneyRecoveryController.onPageLoad()
   }
 
   private val checkRouteMap: Page => UserAnswers => Boolean => Call = {
@@ -64,7 +71,7 @@ class Navigator @Inject() (
   }
 
   private def contactPreferenceRoute(userAnswers: UserAnswers): Call = {
-    val selectedEmail      = userAnswers.get(changePreferences.ContactPreferencePage)
+    val selectedEmail      = userAnswers.get(ContactPreferencePage)
     val paperlessReference = userAnswers.subscriptionSummary.paperlessReference
     val currentEmail       = userAnswers.subscriptionSummary.emailAddress
 
@@ -75,11 +82,10 @@ class Navigator @Inject() (
         )
         controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode)
       case (Some(true), false, Some(_)) =>
-        // TODO: next page is /existing-email
         logger.info(
-          "User selected email and is currently on post but has an email in ETMP. Should redirect to /existing-email"
+          "User selected email and is currently on post but has an email in ETMP. Redirecting to /existing-email"
         )
-        routes.IndexController.onPageLoad()
+        controllers.changePreferences.routes.ExistingEmailController.onPageLoad()
       case (Some(true), true, Some(_))  =>
         // TODO: next page is /enrolled-emails
         logger.info("User selected email and is currently on email. Should redirect to /enrolled-emails")

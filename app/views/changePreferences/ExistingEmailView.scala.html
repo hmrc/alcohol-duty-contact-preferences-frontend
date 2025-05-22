@@ -24,11 +24,11 @@
         govukButton: GovukButton
 )
 
-@(form: Form[_], mode: Mode)(implicit request: Request[_], messages: Messages)
+@(form: Form[_], emailAddress: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = title(form, messages("contactPreference.title"))) {
+@layout(pageTitle = title(form, messages("existingEmail.title"))) {
 
-    @formHelper(action = controllers.changePreferences.routes.ContactPreferenceController.onSubmit(mode), Symbol("autoComplete") -> "off") {
+    @formHelper(action = controllers.changePreferences.routes.ExistingEmailController.onSubmit(), Symbol("autoComplete") -> "off") {
 
         @if(form.errors.nonEmpty) {
             @govukErrorSummary(ErrorSummaryViewModel(form))
@@ -36,21 +36,21 @@
 
         @govukRadios(
             RadiosViewModel(
-                field = form("contactPreferenceEmail"),
-                legend = LegendViewModel(messages("contactPreference.heading")).withSize(LegendSize.Large),
+                field = form("useExistingEmail"),
+                legend = LegendViewModel(messages("existingEmail.heading", emailAddress)).withSize(LegendSize.Large),
                 items = Seq(
                     RadioItem(
-                        id = Some("contactPreferenceEmail"),
+                        id = Some("useExistingEmail"),
                         value = Some("true"),
-                        content = Text(messages("contactPreference.email"))
+                        content = Text(messages("site.yes"))
                     ),
                     RadioItem(
-                        id = Some("contactPreferencePost"),
+                        id = Some(s"useExistingEmail-no"),
                         value = Some("false"),
-                        content = Text(messages("contactPreference.post"))
+                        content = Text(messages("existingEmail.no"))
                     )
                 )
-            )
+            ).withHint(HintViewModel(messages("existingEmail.hint")))
         )
 
         @govukButton(
