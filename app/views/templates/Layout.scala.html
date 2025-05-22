@@ -65,12 +65,16 @@
     }
 }
 
+@additionalScripts = {
+    <script src='@controllers.routes.Assets.versioned("javascripts/application.min.js")'></script>
+}
+
 @beforeContent = {
 
     <div class="@Css.gridRowCssClass">
         <div class="@Css.gridColumnTwoThirds">
         @if(showBackLink) {
-            @govukBackLink(BackLinkViewModel(href = "#").withCssClass("js-visible"))
+            @govukBackLink(BackLink.mimicsBrowserBackButtonViaJavaScript)
         }
         </div>
 
@@ -104,5 +108,8 @@
     )),
     beforeContentBlock = Some(beforeContent),
     footerBlock = Some(hmrcStandardFooter()),
+    scriptsBlock       = Some(hmrcScripts(
+        scriptsBlock = Some(additionalScripts)
+    )),
     mainContentLayout = if(fullWidth) Some(fullWidthPageLayout(_)) else Some(defaultMainContentLayout(_))
 )(content)
