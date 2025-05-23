@@ -24,14 +24,12 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
 
 class SignOutController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   config: FrontendAppConfig,
   signOutAction: SignOutAction
-)(implicit ec: ExecutionContext)
-    extends FrontendBaseController
+) extends FrontendBaseController
     with Logging
     with I18nSupport {
 

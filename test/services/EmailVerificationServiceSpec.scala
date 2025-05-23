@@ -30,7 +30,7 @@ import scala.concurrent.Future
 class EmailVerificationServiceSpec extends SpecBase {
 
   "retrieveAddressStatusAndAddToCache" - {
-    "when the call to get a user's verification details fails, should return an error" in new Setup {
+    "when the call to get a user's verification details fails, must return an error" in new Setup {
       when(mockEmailVerificationConnector.getEmailVerification(any())(any()))
         .thenReturn(
           EitherT.leftT[Future, GetVerificationStatusResponse](ErrorModel(INTERNAL_SERVER_ERROR, "test error"))
@@ -43,7 +43,7 @@ class EmailVerificationServiceSpec extends SpecBase {
       }
     }
 
-    "when the call to set user answers fails, should return an error" in new Setup {
+    "when the call to set user answers fails, must return an error" in new Setup {
       when(mockEmailVerificationConnector.getEmailVerification(any())(any()))
         .thenReturn(EitherT.rightT[Future, ErrorModel](testGetVerificationStatusResponse))
 
@@ -60,7 +60,7 @@ class EmailVerificationServiceSpec extends SpecBase {
     }
 
     "when get verification details and user answers set are successful" - {
-      "and the new email address is verified and not in the cache, should add the new email to the cache and return it" in new Setup {
+      "and the new email address is verified and not in the cache, must add the new email to the cache and return it" in new Setup {
         val updatedUserAnswers: UserAnswers =
           userAnswers.copy(verifiedEmailAddresses = userAnswers.verifiedEmailAddresses ++ Set(emailAddress4))
 
@@ -83,7 +83,7 @@ class EmailVerificationServiceSpec extends SpecBase {
         verify(mockUserAnswersService, times(1)).set(eqTo(updatedUserAnswers))(any())
       }
 
-      "and the new email address is verified but is in the cache, should return the email details" in new Setup {
+      "and the new email address is verified but is in the cache, must return the email details" in new Setup {
         when(mockEmailVerificationConnector.getEmailVerification(any())(any()))
           .thenReturn(
             EitherT.rightT[Future, ErrorModel](testGetVerificationStatusResponse)

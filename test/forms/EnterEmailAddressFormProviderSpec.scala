@@ -18,7 +18,6 @@ package forms
 
 import base.SpecBase
 import forms.behaviours.StringFieldBehaviours
-import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import play.api.data.FormError
 
 import scala.collection.immutable.ArraySeq
@@ -33,7 +32,7 @@ class EnterEmailAddressFormProviderSpec extends StringFieldBehaviours with SpecB
 
   ".emailAddress" - {
 
-    "should bind like a mandatory field" - {
+    "must bind like a mandatory field" - {
       val fieldName = "emailAddress"
 
       behave like mandatoryField(
@@ -43,26 +42,26 @@ class EnterEmailAddressFormProviderSpec extends StringFieldBehaviours with SpecB
       )
     }
 
-    "should bind valid email addresses" in {
+    "must bind valid email addresses" in {
       val data = Map("emailAddress" -> emailAddress)
 
-      form.bind(data).value.value shouldBe emailAddress
+      form.bind(data).value.value mustBe emailAddress
     }
 
-    "should bind valid email addresses without a top level domain" in {
+    "must bind valid email addresses without a top level domain" in {
       val data = Map("emailAddress" -> "name@example")
 
-      form.bind(data).value.value shouldBe "name@example"
+      form.bind(data).value.value mustBe "name@example"
     }
 
-    "should unbind valid email addresses" in {
+    "must unbind valid email addresses" in {
       val data = emailAddress
       form.fill(data).data must contain theSameElementsAs Map(
         "emailAddress" -> emailAddress
       )
     }
 
-    "should fail to bind empty answers" in {
+    "must fail to bind empty answers" in {
       val data = Map("emailAddress" -> "")
 
       form.bind(data).errors must contain allElementsOf Seq(

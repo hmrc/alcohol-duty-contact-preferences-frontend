@@ -28,7 +28,7 @@ import scala.concurrent.Future
 class UserAnswersServiceSpec extends SpecBase {
 
   "set" - {
-    "should return a success if the operation was successful" in new Setup {
+    "must return a success if the operation was successful" in new Setup {
       when(mockUserAnswersConnector.set(any())(any()))
         .thenReturn(Future.successful(HttpResponse(status = OK, body = "success response")))
 
@@ -36,7 +36,7 @@ class UserAnswersServiceSpec extends SpecBase {
         _.toString mustBe Right(HttpResponse(status = OK, body = "success response")).toString
       }
     }
-    "should return an error if the operation was unsuccessful" in new Setup {
+    "must return an error if the operation was unsuccessful" in new Setup {
       when(mockUserAnswersConnector.set(any())(any()))
         .thenReturn(Future.successful(HttpResponse(status = INTERNAL_SERVER_ERROR, body = "error response")))
 

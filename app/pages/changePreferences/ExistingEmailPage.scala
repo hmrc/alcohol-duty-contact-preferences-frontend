@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package controllers
+package pages.changePreferences
 
-import controllers.actions.IdentifierAction
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import pages.QuestionPage
+import play.api.libs.json.JsPath
 
-import javax.inject.Inject
+case object ExistingEmailPage extends QuestionPage[Boolean] {
 
-class KeepAliveController @Inject() (
-  val controllerComponents: MessagesControllerComponents,
-  identify: IdentifierAction
-) extends FrontendBaseController {
+  override def path: JsPath = JsPath \ toString
 
-  def keepAlive(): Action[AnyContent] = identify { _ =>
-    Ok
-  }
+  override def toString: String = "useExistingEmail"
 }

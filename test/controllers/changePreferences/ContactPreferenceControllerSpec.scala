@@ -50,7 +50,7 @@ class ContactPreferenceControllerSpec extends SpecBase {
   "ContactPreferenceController" - {
 
     "onPageLoad in normal mode" - {
-      "must create user answers, then return OK and the correct view for a GET if user answers do not exist" - {
+      "must create user answers, then return OK and the correct view for a GET if user answers do not exist" in {
         val mockUserAnswersConnector = mock[UserAnswersConnector]
 
         when(mockUserAnswersConnector.createUserAnswers(any())(any())) thenReturn Future.successful(
@@ -115,7 +115,7 @@ class ContactPreferenceControllerSpec extends SpecBase {
         }
       }
 
-      "must redirect to Journey Recovery for a GET if no existing data is found" in {
+      "must redirect to Journey Recovery for a GET if user answers do not exist" in {
         val application = applicationBuilder(userAnswers = None).build()
 
         running(application) {
@@ -251,7 +251,7 @@ class ContactPreferenceControllerSpec extends SpecBase {
         }
       }
 
-      "must redirect to Journey Recovery for a POST if no existing data is found" in {
+      "must redirect to Journey Recovery for a POST if user answers do not exist" in {
         val application = applicationBuilder(userAnswers = None).build()
 
         running(application) {
