@@ -40,7 +40,7 @@ class StartEmailVerificationJourneyHelperSpec extends SpecBase {
   )
 
   "StartEmailVerificationJourneyHelper.createRequest" - {
-    "should make a request when given a credId and the email a user has entered" in new SetUp {
+    "must make a request when given a credId and the email a user has entered" in new SetUp {
       implicit val mockMessages: Messages = mock[Messages]
 
       when(mockConfig.startEmailVerificationContinueUrl).thenReturn("/test-continue")

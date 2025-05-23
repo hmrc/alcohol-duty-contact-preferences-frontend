@@ -88,7 +88,7 @@ class EnterEmailAddressControllerSpec extends SpecBase {
         }
       }
 
-      "must redirect to Journey Recovery for a GET if no existing data is found" in {
+      "must redirect to Journey Recovery for a GET if user answers do not exist" in {
         val application = applicationBuilder(userAnswers = None).build()
 
         running(application) {
@@ -155,14 +155,12 @@ class EnterEmailAddressControllerSpec extends SpecBase {
                 .withFormUrlEncodedBody(("emailAddress", emailAddress2))
             val result  = route(application, request).value
 
-            status(result) mustEqual 303
+            status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
             verify(mockUserAnswersService, times(1)).set(any())(any())
           }
         }
         "must go to Check Your Answers when the user answers set operation is successful" in {
-          // TODO: Update the location to the CYA page when that is built
-
           val mockUserAnswersService = mock[UserAnswersService]
           val mockNavigator          = mock[Navigator]
 
@@ -170,7 +168,7 @@ class EnterEmailAddressControllerSpec extends SpecBase {
             HttpResponse(OK, "Test success")
           )
           when(mockNavigator.enterEmailAddressNavigation(any(), any())(any(), any(), any())) thenReturn Future
-            .successful(Redirect(routes.IndexController.onPageLoad().url))
+            .successful(Redirect(routes.CheckYourAnswersController.onPageLoad().url))
 
           val application =
             applicationBuilder(userAnswers = Some(emptyUserAnswers.copy(verifiedEmailAddresses = Set(emailAddress2))))
@@ -186,8 +184,8 @@ class EnterEmailAddressControllerSpec extends SpecBase {
                 .withFormUrlEncodedBody(("emailAddress", emailAddress2))
             val result  = route(application, request).value
 
-            status(result) mustEqual 303
-            redirectLocation(result).value mustEqual routes.IndexController.onPageLoad().url
+            status(result) mustEqual SEE_OTHER
+            redirectLocation(result).value mustEqual routes.CheckYourAnswersController.onPageLoad().url
             verify(mockUserAnswersService, times(1)).set(any())(any())
             verify(mockNavigator, times(1)).enterEmailAddressNavigation(any(), any())(any(), any(), any())
           }
@@ -217,7 +215,7 @@ class EnterEmailAddressControllerSpec extends SpecBase {
                 .withFormUrlEncodedBody(("emailAddress", "TestEmail@email.com"))
             val result  = route(application, request).value
 
-            status(result) mustEqual 303
+            status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
             verify(mockEmailVerificationService, times(1)).retrieveAddressStatusAndAddToCache(any(), any(), any())(
               any()
@@ -251,7 +249,7 @@ class EnterEmailAddressControllerSpec extends SpecBase {
                 .withFormUrlEncodedBody(("emailAddress", "TestEmail@email.com"))
             val result  = route(application, request).value
 
-            status(result) mustEqual 303
+            status(result) mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual "/email-verification-frontend"
             verify(mockEmailVerificationService, times(1)).retrieveAddressStatusAndAddToCache(any(), any(), any())(
               any()

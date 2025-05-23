@@ -20,17 +20,18 @@ import base.SpecBase
 import connectors.UserAnswersConnector
 import controllers.routes
 import forms.ExistingEmailFormProvider
-import models.NormalMode
+import models.{ErrorModel, NormalMode}
 import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchersSugar.eqTo
-import pages.changePreferences.{ContactPreferencePage, ExistingEmailPage}
+import pages.changePreferences.ExistingEmailPage
 import play.api.data.Form
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HttpResponse
+import utils.ExistingEmailPageCheckHelper
 import views.html.changePreferences.ExistingEmailView
 
 import scala.concurrent.Future
@@ -47,7 +48,13 @@ class ExistingEmailControllerSpec extends SpecBase {
 
     "onPageLoad" - {
       "must return OK and the correct view for a GET" in {
-        val application = applicationBuilder(userAnswers = Some(userAnswersPostWithEmail)).build()
+        val mockHelper = mock[ExistingEmailPageCheckHelper]
+
+        when(mockHelper.checkDetailsForExistingEmailPage(any())) thenReturn Right(emailAddress)
+
+        val application = applicationBuilder(userAnswers = Some(userAnswersPostWithEmail))
+          .overrides(bind[ExistingEmailPageCheckHelper].toInstance(mockHelper))
+          .build()
 
         running(application) {
           val request = FakeRequest(GET, existingEmailRoute)
@@ -61,13 +68,21 @@ class ExistingEmailControllerSpec extends SpecBase {
             request,
             getMessages(application)
           ).toString
+
+          verify(mockHelper, times(1)).checkDetailsForExistingEmailPage(eqTo(userAnswersPostWithEmail))
         }
       }
 
       "must populate the view correctly on a GET if user answers already exist" in {
+        val mockHelper = mock[ExistingEmailPageCheckHelper]
+
+        when(mockHelper.checkDetailsForExistingEmailPage(any())) thenReturn Right(emailAddress)
+
         val userAnswers = userAnswersPostWithEmail.set(ExistingEmailPage, false).success.value
 
-        val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+        val application = applicationBuilder(userAnswers = Some(userAnswers))
+          .overrides(bind[ExistingEmailPageCheckHelper].toInstance(mockHelper))
+          .build()
 
         running(application) {
           val request = FakeRequest(GET, existingEmailRoute)
@@ -81,11 +96,21 @@ class ExistingEmailControllerSpec extends SpecBase {
             request,
             getMessages(application)
           ).toString
+
+          verify(mockHelper, times(1)).checkDetailsForExistingEmailPage(eqTo(userAnswers))
         }
       }
 
-      "must redirect to Journey Recovery for a GET if no existing data is found" in {
-        val application = applicationBuilder(userAnswers = None).build()
+      "must redirect to Journey Recovery for a GET if user answers do not exist" in {
+        val mockHelper = mock[ExistingEmailPageCheckHelper]
+
+        when(mockHelper.checkDetailsForExistingEmailPage(any())) thenReturn Left(
+          ErrorModel(BAD_REQUEST, "Error from helper")
+        )
+
+        val application = applicationBuilder(userAnswers = None)
+          .overrides(bind[ExistingEmailPageCheckHelper].toInstance(mockHelper))
+          .build()
 
         running(application) {
           val request = FakeRequest(GET, existingEmailRoute)
@@ -94,11 +119,21 @@ class ExistingEmailControllerSpec extends SpecBase {
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+
+          verify(mockHelper, times(0)).checkDetailsForExistingEmailPage(any())
         }
       }
 
-      "must redirect to Journey Recovery for a GET if the subscription summary has no email address" in {
-        val application = applicationBuilder(userAnswers = Some(userAnswersPostNoEmail)).build()
+      "must redirect to Journey Recovery for a GET if the helper returns an error when checking the user's details" in {
+        val mockHelper = mock[ExistingEmailPageCheckHelper]
+
+        when(mockHelper.checkDetailsForExistingEmailPage(any())) thenReturn Left(
+          ErrorModel(BAD_REQUEST, "Error from helper")
+        )
+
+        val application = applicationBuilder(userAnswers = Some(userAnswersPostNoEmail))
+          .overrides(bind[ExistingEmailPageCheckHelper].toInstance(mockHelper))
+          .build()
 
         running(application) {
           val request = FakeRequest(GET, existingEmailRoute)
@@ -107,75 +142,65 @@ class ExistingEmailControllerSpec extends SpecBase {
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-        }
-      }
 
-      "must redirect to Journey Recovery for a GET if the email in the subscription summary is not verified" in {
-        val application = applicationBuilder(userAnswers = Some(userAnswersPostWithUnverifiedEmail)).build()
-
-        running(application) {
-          val request = FakeRequest(GET, existingEmailRoute)
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-        }
-      }
-
-      "must redirect to Journey Recovery for a GET if the user has not selected email on the contact preference question" in {
-        val userAnswers = userAnswersPostWithEmail.set(ContactPreferencePage, false).success.value
-
-        val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-
-        running(application) {
-          val request = FakeRequest(GET, existingEmailRoute)
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+          verify(mockHelper, times(1)).checkDetailsForExistingEmailPage(eqTo(userAnswersPostNoEmail))
         }
       }
     }
 
     "onSubmit" - {
       "must redirect to the next page when valid data is submitted" in {
+        val mockHelper               = mock[ExistingEmailPageCheckHelper]
         val mockUserAnswersConnector = mock[UserAnswersConnector]
         val mockNavigator            = mock[Navigator]
 
+        when(mockHelper.checkDetailsForExistingEmailPage(any())) thenReturn Right(emailAddress)
         when(mockUserAnswersConnector.set(any())(any())) thenReturn Future.successful(mock[HttpResponse])
         when(mockNavigator.nextPage(eqTo(ExistingEmailPage), any(), any(), any())) thenReturn onwardRoute
 
         val application = applicationBuilder(userAnswers = Some(userAnswersPostWithEmail))
           .overrides(
+            bind[ExistingEmailPageCheckHelper].toInstance(mockHelper),
             bind[Navigator].toInstance(mockNavigator),
             bind[UserAnswersConnector].toInstance(mockUserAnswersConnector)
           )
           .build()
 
         running(application) {
-          val request =
-            FakeRequest(POST, existingEmailRoute)
-              .withFormUrlEncodedBody(("useExistingEmail", "true"))
+          val request = FakeRequest(POST, existingEmailRoute)
+            .withFormUrlEncodedBody(("useExistingEmail", "true"))
 
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual onwardRoute.url
 
+          verify(mockHelper, times(1)).checkDetailsForExistingEmailPage(eqTo(userAnswersPostWithEmail))
           verify(mockUserAnswersConnector, times(1)).set(any())(any())
           verify(mockNavigator, times(1)).nextPage(eqTo(ExistingEmailPage), eqTo(NormalMode), any(), eqTo(None))
         }
       }
 
       "must return a Bad Request and errors when invalid data is submitted" in {
-        val application = applicationBuilder(userAnswers = Some(userAnswersPostWithEmail)).build()
+        val mockHelper               = mock[ExistingEmailPageCheckHelper]
+        val mockUserAnswersConnector = mock[UserAnswersConnector]
+        val mockNavigator            = mock[Navigator]
+
+        when(mockHelper.checkDetailsForExistingEmailPage(any())) thenReturn Right(emailAddress)
+        when(mockUserAnswersConnector.set(any())(any())) thenReturn Future.successful(mock[HttpResponse])
+        when(mockNavigator.nextPage(eqTo(ExistingEmailPage), any(), any(), any())) thenReturn onwardRoute
+
+        val application = applicationBuilder(userAnswers = Some(userAnswersPostWithEmail))
+          .overrides(
+            bind[ExistingEmailPageCheckHelper].toInstance(mockHelper),
+            bind[Navigator].toInstance(mockNavigator),
+            bind[UserAnswersConnector].toInstance(mockUserAnswersConnector)
+          )
+          .build()
 
         running(application) {
-          val request =
-            FakeRequest(POST, existingEmailRoute)
-              .withFormUrlEncodedBody(("useExistingEmail", ""))
+          val request = FakeRequest(POST, existingEmailRoute)
+            .withFormUrlEncodedBody(("useExistingEmail", ""))
 
           val boundForm = form.bind(Map("useExistingEmail" -> ""))
 
@@ -185,26 +210,65 @@ class ExistingEmailControllerSpec extends SpecBase {
 
           status(result) mustEqual BAD_REQUEST
           contentAsString(result) mustEqual view(boundForm, emailAddress)(request, getMessages(application)).toString
+
+          verify(mockHelper, times(1)).checkDetailsForExistingEmailPage(eqTo(userAnswersPostWithEmail))
+          verify(mockUserAnswersConnector, times(0)).set(any())(any())
+          verify(mockNavigator, times(0)).nextPage(any(), any(), any(), any())
         }
       }
 
-      "must redirect to Journey Recovery for a POST if no existing data is found" in {
-        val application = applicationBuilder(userAnswers = None).build()
+      "must redirect to Journey Recovery for a POST if user answers do not exist" in {
+        val mockHelper               = mock[ExistingEmailPageCheckHelper]
+        val mockUserAnswersConnector = mock[UserAnswersConnector]
+        val mockNavigator            = mock[Navigator]
+
+        when(mockHelper.checkDetailsForExistingEmailPage(any())) thenReturn Left(
+          ErrorModel(BAD_REQUEST, "Error from helper")
+        )
+        when(mockUserAnswersConnector.set(any())(any())) thenReturn Future.successful(mock[HttpResponse])
+        when(mockNavigator.nextPage(eqTo(ExistingEmailPage), any(), any(), any())) thenReturn onwardRoute
+
+        val application = applicationBuilder(userAnswers = None)
+          .overrides(
+            bind[ExistingEmailPageCheckHelper].toInstance(mockHelper),
+            bind[Navigator].toInstance(mockNavigator),
+            bind[UserAnswersConnector].toInstance(mockUserAnswersConnector)
+          )
+          .build()
 
         running(application) {
-          val request =
-            FakeRequest(POST, existingEmailRoute)
-              .withFormUrlEncodedBody(("useExistingEmail", "true"))
+          val request = FakeRequest(POST, existingEmailRoute)
+            .withFormUrlEncodedBody(("useExistingEmail", "true"))
 
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+
+          verify(mockHelper, times(0)).checkDetailsForExistingEmailPage(any())
+          verify(mockUserAnswersConnector, times(0)).set(any())(any())
+          verify(mockNavigator, times(0)).nextPage(any(), any(), any(), any())
         }
       }
 
       "must redirect to Journey Recovery for a POST if the subscription summary has no email address" in {
-        val application = applicationBuilder(userAnswers = Some(userAnswersPostNoEmail)).build()
+        val mockHelper               = mock[ExistingEmailPageCheckHelper]
+        val mockUserAnswersConnector = mock[UserAnswersConnector]
+        val mockNavigator            = mock[Navigator]
+
+        when(mockHelper.checkDetailsForExistingEmailPage(any())) thenReturn Left(
+          ErrorModel(BAD_REQUEST, "Error from helper")
+        )
+        when(mockUserAnswersConnector.set(any())(any())) thenReturn Future.successful(mock[HttpResponse])
+        when(mockNavigator.nextPage(eqTo(ExistingEmailPage), any(), any(), any())) thenReturn onwardRoute
+
+        val application = applicationBuilder(userAnswers = Some(userAnswersPostNoEmail))
+          .overrides(
+            bind[ExistingEmailPageCheckHelper].toInstance(mockHelper),
+            bind[Navigator].toInstance(mockNavigator),
+            bind[UserAnswersConnector].toInstance(mockUserAnswersConnector)
+          )
+          .build()
 
         running(application) {
           val request = FakeRequest(POST, existingEmailRoute)
@@ -213,34 +277,10 @@ class ExistingEmailControllerSpec extends SpecBase {
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-        }
-      }
 
-      "must redirect to Journey Recovery for a POST if the email in the subscription summary is not verified" in {
-        val application = applicationBuilder(userAnswers = Some(userAnswersPostWithUnverifiedEmail)).build()
-
-        running(application) {
-          val request = FakeRequest(POST, existingEmailRoute)
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-        }
-      }
-
-      "must redirect to Journey Recovery for a POST if the user has not selected email on the contact preference question" in {
-        val userAnswers = userAnswersPostWithEmail.remove(ContactPreferencePage).success.value
-
-        val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
-
-        running(application) {
-          val request = FakeRequest(POST, existingEmailRoute)
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+          verify(mockHelper, times(1)).checkDetailsForExistingEmailPage(eqTo(userAnswersPostNoEmail))
+          verify(mockUserAnswersConnector, times(0)).set(any())(any())
+          verify(mockNavigator, times(0)).nextPage(any(), any(), any(), any())
         }
       }
     }

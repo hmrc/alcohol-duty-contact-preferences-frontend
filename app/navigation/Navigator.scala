@@ -51,6 +51,9 @@ class Navigator @Inject() (
           case None        => routes.JourneyRecoveryController.onPageLoad()
         }
     case _                     =>
+      logger.warn(
+        "Navigation attempted from a page that doesn't exist in the route map in normal mode. Redirecting to journey recovery."
+      )
       _ => routes.JourneyRecoveryController.onPageLoad()
   }
 
@@ -60,7 +63,13 @@ class Navigator @Inject() (
         hasChanged =>
           if (hasChanged) contactPreferenceRoute(userAnswers)
           else routes.CheckYourAnswersController.onPageLoad()
-    case _                     => _ => _ => routes.CheckYourAnswersController.onPageLoad()
+    case _                     =>
+      _ =>
+        _ =>
+          logger.warn(
+            "Navigation attempted from a page that doesn't exist in the route map in check mode. Redirecting to Check Your Answers."
+          )
+          routes.CheckYourAnswersController.onPageLoad()
   }
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, hasAnswerChanged: Option[Boolean]): Call = mode match {
