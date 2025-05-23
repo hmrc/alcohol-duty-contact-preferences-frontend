@@ -10,6 +10,7 @@ site.start = Start now
 site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
+site.returnToBusinessAccount = Go back to your business tax account
 
 date.day = Day
 date.month = Month
@@ -54,3 +55,15 @@ contactPreference.heading = How would you like to be contacted?
 contactPreference.email = Email me when I have a message in my account
 contactPreference.post = Send me letters by post
 contactPreference.error.required = Select how you would like to be contacted
+
+changePreferences.enter-email-address.title = What is the email address we should use to contact you about your Alcohol Duty?
+changePreferences.enter-email-address.heading = What is the email address we should use to contact you about your Alcohol Duty?
+changePreferences.enter-email-address.empty-error = Enter an email address
+changePreferences.enter-email-address.format-error = Enter an email address in the correct format, like name@example.com
+
+emailLocked.title = You cannot request another confirmation code
+emailLocked.heading = You cannot request another confirmation code
+emailLocked.guidance1 = To keep your account secure, we limit how many times you can request an email confirmation code.
+emailLocked.guidance2 = You can try again in 24 hours.
+
+emailVerificationJourney.signature = Manage your Alcohol Duty Service

@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package pages
+package models
 
-import play.api.libs.json.JsPath
+import play.api.libs.json.{Json, OFormat}
 
-case object ContactPreferencePage extends QuestionPage[Boolean] {
+case class EmailVerificationDetails(emailAddress: String, isVerified: Boolean, isLocked: Boolean)
 
-  override def path: JsPath = JsPath \ toString
-
-  override def toString: String = "contactPreferenceEmail"
+case object EmailVerificationDetails {
+  implicit val format: OFormat[EmailVerificationDetails] = Json.format[EmailVerificationDetails]
 }

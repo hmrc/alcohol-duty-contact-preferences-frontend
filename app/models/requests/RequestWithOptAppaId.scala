@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,8 @@
  * limitations under the License.
  */
 
-package common
+package models.requests
 
-import models.UserAnswers
-import pages.changePreferences.ContactPreferencePage
+import play.api.mvc.{Request, WrappedRequest}
 
-trait TestPages extends TestData {
-  def contactPreferencePage(userAnswers: UserAnswers, emailSelected: Boolean): UserAnswers =
-    userAnswers.set(ContactPreferencePage, emailSelected).get
-}
+case class RequestWithOptAppaId[A](request: Request[A], appaId: Option[String]) extends WrappedRequest[A](request)

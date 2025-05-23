@@ -24,31 +24,43 @@ import play.api.libs.json.{JsObject, Json}
 import java.time._
 
 trait TestData extends ModelGenerators {
-  val clock           = Clock.fixed(Instant.ofEpochMilli(1718118467838L), ZoneId.of(ukTimeZoneStringId))
+  val clock: Clock    = Clock.fixed(Instant.ofEpochMilli(1718118467838L), ZoneId.of(ukTimeZoneStringId))
   val appaId: String  = appaIdGen.sample.get
   val groupId: String = "groupid"
   val userId: String  = "user-id"
+  val credId: String  = "cred-id"
 
-  val userDetails = UserDetails(appaId, userId)
+  val userDetails: UserDetails = UserDetails(appaId, userId)
 
-  val emailAddress = "john.doe@example.com"
+  val emailAddress  = "john.doe@example.com"
+  val emailAddress2 = "jonjones@example.com"
+  val emailAddress3 = "robsmith@example.com"
+  val emailAddress4 = "timmytimmy@example.com"
 
-  val subscriptionSummaryEmail = SubscriptionSummary(
+  val verifiedEmailAddresses: Set[String] = Set(emailAddress2, emailAddress3)
+
+  val subscriptionSummaryEmail: SubscriptionSummary = SubscriptionSummary(
     paperlessReference = true,
     emailAddress = Some(emailAddress),
     emailVerification = Some(true),
     bouncedEmail = Some(false)
   )
 
-  val subscriptionSummaryPostWithEmail = subscriptionSummaryEmail.copy(paperlessReference = false)
+  val subscriptionSummaryPostWithEmail: SubscriptionSummary = subscriptionSummaryEmail.copy(paperlessReference = false)
 
-  val subscriptionSummaryPostNoEmail = subscriptionSummaryEmail.copy(paperlessReference = false)
+  val subscriptionSummaryPostNoEmail: SubscriptionSummary = SubscriptionSummary(
+    paperlessReference = false,
+    emailAddress = None,
+    emailVerification = None,
+    bouncedEmail = None
+  )
 
   val userAnswers: UserAnswers = UserAnswers(
     appaId = appaId,
     userId = userId,
     subscriptionSummary = subscriptionSummaryEmail,
     emailAddress = Some(emailAddress),
+    verifiedEmailAddresses = verifiedEmailAddresses,
     data = JsObject(Seq("contactPreferenceEmail" -> Json.toJson(true))),
     startedTime = Instant.now(clock),
     lastUpdated = Instant.now(clock)
@@ -59,6 +71,7 @@ trait TestData extends ModelGenerators {
     userId = userId,
     subscriptionSummary = subscriptionSummaryPostWithEmail,
     emailAddress = None,
+    verifiedEmailAddresses = verifiedEmailAddresses,
     data = JsObject(Seq("contactPreferenceEmail" -> Json.toJson(false))),
     startedTime = Instant.now(clock),
     lastUpdated = Instant.now(clock)
@@ -69,6 +82,7 @@ trait TestData extends ModelGenerators {
     userId = userId,
     subscriptionSummary = subscriptionSummaryPostNoEmail,
     emailAddress = None,
+    verifiedEmailAddresses = verifiedEmailAddresses,
     data = JsObject(Seq("contactPreferenceEmail" -> Json.toJson(false))),
     startedTime = Instant.now(clock),
     lastUpdated = Instant.now(clock)
@@ -78,8 +92,42 @@ trait TestData extends ModelGenerators {
     appaId = appaId,
     userId = userId,
     subscriptionSummary = subscriptionSummaryEmail,
-    emailAddress = Some(emailAddress),
+    emailAddress = None,
+    verifiedEmailAddresses = Set.empty[String],
     startedTime = Instant.now(clock),
     lastUpdated = Instant.now(clock)
   )
+
+  val testVerificationDetails1: GetVerificationStatusResponseEmailAddressDetails =
+    GetVerificationStatusResponseEmailAddressDetails(emailAddress = emailAddress, verified = false, locked = false)
+  val testVerificationDetails2: GetVerificationStatusResponseEmailAddressDetails =
+    GetVerificationStatusResponseEmailAddressDetails(emailAddress = emailAddress2, verified = true, locked = true)
+  val testVerificationDetails3: GetVerificationStatusResponseEmailAddressDetails =
+    GetVerificationStatusResponseEmailAddressDetails(emailAddress = emailAddress4, verified = true, locked = false)
+
+  val testGetVerificationStatusResponse: GetVerificationStatusResponse = GetVerificationStatusResponse(
+    List(testVerificationDetails1, testVerificationDetails2, testVerificationDetails3)
+  )
+
+  val testVerificationDetails: VerificationDetails = VerificationDetails(credId)
+
+  val testEmailVerificationRequest: EmailVerificationRequest = EmailVerificationRequest(
+    credId = credId,
+    continueUrl = "/test-continue-url",
+    origin = "testOrigin",
+    deskproServiceName = "test-deskpro-name",
+    accessibilityStatementUrl = "/test-accessibility-url",
+    backUrl = "/test-back-url",
+    email = EmailModel(address = emailAddress, enterUrl = "/test-enter-url"),
+    labels = Labels(LanguageInfo("testTitle", "testServiceName"), LanguageInfo("testTitle2", "testServiceName2")),
+    lang = "en"
+  )
+
+  val testJsonRedirectUriString: String =
+    """
+      {"redirectUri": "/test-uri"}
+    """
+
+  val testRedirectUri: RedirectUri = RedirectUri("/test-uri")
+
 }

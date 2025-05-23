@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package common
+package models
 
-import models.UserAnswers
-import pages.changePreferences.ContactPreferencePage
+import play.api.libs.json.{Json, OFormat}
 
-trait TestPages extends TestData {
-  def contactPreferencePage(userAnswers: UserAnswers, emailSelected: Boolean): UserAnswers =
-    userAnswers.set(ContactPreferencePage, emailSelected).get
+case class RedirectUri(redirectUri: String)
+
+case object RedirectUri {
+  implicit val format: OFormat[RedirectUri] = Json.format[RedirectUri]
 }

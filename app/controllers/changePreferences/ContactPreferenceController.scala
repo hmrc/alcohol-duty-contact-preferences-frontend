@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.changePreferences
 
 import connectors.UserAnswersConnector
 import controllers.actions._
+import controllers.routes
 import forms.ContactPreferenceFormProvider
 import models.{CheckMode, Mode, NormalMode, UserAnswers, UserDetails}
 import navigation.Navigator
-import pages.ContactPreferencePage
+import pages.changePreferences.ContactPreferencePage
 import play.api.Logging
 import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.ContactPreferenceView
+import views.html.changePreferences.ContactPreferenceView
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -76,16 +77,23 @@ class ContactPreferenceController @Inject() (
         .bindFromRequest()
         .fold(
           formWithErrors => Future.successful(BadRequest(view(formWithErrors, mode))),
-          value =>
+          value => {
+            val maybeAnswerChanged = hasAnswerChanged(mode, request.userAnswers, value)
             for {
               updatedAnswers <- Future.fromTry(request.userAnswers.set(ContactPreferencePage, value))
               _              <- userAnswersConnector.set(updatedAnswers)
-            } yield Redirect(navigator.nextPage(ContactPreferencePage, mode, updatedAnswers))
+            } yield Redirect(navigator.nextPage(ContactPreferencePage, mode, updatedAnswers, maybeAnswerChanged))
+          }
         )
   }
 
   private def getPreparedForm(ua: UserAnswers): Form[Boolean] = ua.get(ContactPreferencePage) match {
     case None        => form
     case Some(value) => form.fill(value)
+  }
+
+  private def hasAnswerChanged(mode: Mode, ua: UserAnswers, submittedValue: Boolean): Option[Boolean] = mode match {
+    case NormalMode => None
+    case CheckMode  => ua.get(ContactPreferencePage).map(_ != submittedValue)
   }
 }

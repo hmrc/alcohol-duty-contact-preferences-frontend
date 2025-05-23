@@ -29,6 +29,7 @@ final case class UserAnswers(
   userId: String,
   subscriptionSummary: SubscriptionSummary,
   emailAddress: Option[String],
+  verifiedEmailAddresses: Set[String],
   data: JsObject = Json.obj(),
   startedTime: Instant,
   lastUpdated: Instant,
@@ -76,6 +77,7 @@ object UserAnswers {
       (__ \ "userId").format[String] and
       (__ \ "subscriptionSummary").format[SubscriptionSummary] and
       (__ \ "emailAddress").formatNullable[String] and
+      (__ \ "verifiedEmailAddresses").format[Set[String]] and
       (__ \ "data").formatWithDefault[JsObject](Json.obj()) and
       (__ \ "startedTime").format(MongoJavatimeFormats.instantFormat) and
       (__ \ "lastUpdated").format(MongoJavatimeFormats.instantFormat) and

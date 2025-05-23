@@ -33,7 +33,7 @@ class DataRequiredActionSpec extends SpecBase {
   }
 
   val identifierRequest: IdentifierRequest[AnyContentAsEmpty.type] =
-    IdentifierRequest(FakeRequest(), appaId, groupId, userId)
+    IdentifierRequest(FakeRequest(), appaId, groupId, userId, credId)
 
   "Data Required Action" - {
     "must redirect to the Journey Recovery when User Answers is None" in {
@@ -42,7 +42,7 @@ class DataRequiredActionSpec extends SpecBase {
 
       val result =
         harness
-          .actionRefine(OptionalDataRequest(identifierRequest, appaId, groupId, userId, None))
+          .actionRefine(OptionalDataRequest(identifierRequest, appaId, groupId, userId, credId, None))
           .futureValue
           .left
           .getOrElse(
@@ -59,7 +59,7 @@ class DataRequiredActionSpec extends SpecBase {
       val harness = new Harness
 
       val optionalDataRequest =
-        OptionalDataRequest(identifierRequest, appaId, groupId, userId, Some(userAnswers))
+        OptionalDataRequest(identifierRequest, appaId, groupId, userId, credId, Some(userAnswers))
 
       val result =
         harness

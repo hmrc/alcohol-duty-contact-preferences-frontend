@@ -10,16 +10,21 @@ GET         /refresh-session                             controllers.KeepAliveCo
 
 GET         /there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
 
-GET         /method                                      controllers.ContactPreferenceController.onPageLoad(mode: Mode = NormalMode)
-POST        /method                                      controllers.ContactPreferenceController.onSubmit(mode: Mode = NormalMode)
-# CheckMode routes needed to prevent compilation error on line 31 of ContactPreferenceView
-GET         /change-method                               controllers.ContactPreferenceController.onPageLoad(mode: Mode = CheckMode)
-POST        /change-method                               controllers.ContactPreferenceController.onSubmit(mode: Mode = CheckMode)
+GET         /method                                      controllers.changePreferences.ContactPreferenceController.onPageLoad(mode: Mode = NormalMode)
+POST        /method                                      controllers.changePreferences.ContactPreferenceController.onSubmit(mode: Mode = NormalMode)
+GET         /change-method                               controllers.changePreferences.ContactPreferenceController.onPageLoad(mode: Mode = CheckMode)
+POST        /change-method                               controllers.changePreferences.ContactPreferenceController.onSubmit(mode: Mode = CheckMode)
+
+GET         /what-email-address                          controllers.changePreferences.EnterEmailAddressController.onPageLoad(mode: Mode = NormalMode)
+POST        /what-email-address                          controllers.changePreferences.EnterEmailAddressController.onSubmit(mode: Mode = NormalMode)
+GET         /change-what-email-address                   controllers.changePreferences.EnterEmailAddressController.onPageLoad(mode: Mode = CheckMode)
+POST        /change-what-email-address                   controllers.changePreferences.EnterEmailAddressController.onSubmit(mode: Mode = CheckMode)
+
+GET         /confirmation-code-limit                     controllers.changePreferences.EmailLockedController.onPageLoad()
 
 GET         /check-your-answers                          controllers.CheckYourAnswersController.onPageLoad()
 
-GET         /account/sign-out-survey                     controllers.auth.AuthController.signOut()
-GET         /account/signed-out                          controllers.auth.SignedOutController.onPageLoad()
+GET         /account/sign-out-survey                     controllers.auth.SignOutController.signOut()
 
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad()
 
