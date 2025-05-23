@@ -37,7 +37,7 @@
         @govukRadios(
             RadiosViewModel(
                 field = form("useExistingEmail"),
-                legend = LegendViewModel(messages("existingEmail.heading", emailAddress)).withSize(LegendSize.Large),
+                legend = LegendViewModel(messages("existingEmail.heading", emailAddress)).asPageHeading(size = LegendSize.Large),
                 items = Seq(
                     RadioItem(
                         id = Some("useExistingEmail"),

@@ -37,7 +37,7 @@
         @govukRadios(
             RadiosViewModel(
                 field = form("contactPreferenceEmail"),
-                legend = LegendViewModel(messages("contactPreference.heading")).withSize(LegendSize.Large),
+                legend = LegendViewModel(messages("contactPreference.heading")).asPageHeading(size = LegendSize.Large),
                 items = Seq(
                     RadioItem(
                         id = Some("contactPreferenceEmail"),
