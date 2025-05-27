@@ -71,11 +71,20 @@ class ExistingEmailController @Inject() (
           .bindFromRequest()
           .fold(
             formWithErrors => Future.successful(BadRequest(view(formWithErrors, email))),
-            value =>
+            value => {
+              val userAnswers = if (value) {
+                request.userAnswers.copy(
+                  emailAddress = Some(email),
+                  verifiedEmailAddresses = request.userAnswers.verifiedEmailAddresses + email
+                )
+              } else {
+                request.userAnswers
+              }
               for {
-                updatedAnswers <- Future.fromTry(request.userAnswers.set(ExistingEmailPage, value))
+                updatedAnswers <- Future.fromTry(userAnswers.set(ExistingEmailPage, value))
                 _              <- userAnswersConnector.set(updatedAnswers)
               } yield Redirect(navigator.nextPage(ExistingEmailPage, NormalMode, updatedAnswers, None))
+            }
           )
       case Left(error)  =>
         logger.warn(error.message)
