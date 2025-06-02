@@ -15,6 +15,9 @@ POST        /method                                      controllers.changePrefe
 GET         /change-method                               controllers.changePreferences.ContactPreferenceController.onPageLoad(mode: Mode = CheckMode)
 POST        /change-method                               controllers.changePreferences.ContactPreferenceController.onSubmit(mode: Mode = CheckMode)
 
+GET         /existing-email                              controllers.changePreferences.ExistingEmailController.onPageLoad()
+POST        /existing-email                              controllers.changePreferences.ExistingEmailController.onSubmit()
+
 GET         /what-email-address                          controllers.changePreferences.EnterEmailAddressController.onPageLoad(mode: Mode = NormalMode)
 POST        /what-email-address                          controllers.changePreferences.EnterEmailAddressController.onSubmit(mode: Mode = NormalMode)
 GET         /change-what-email-address                   controllers.changePreferences.EnterEmailAddressController.onPageLoad(mode: Mode = CheckMode)
@@ -22,7 +25,7 @@ POST        /change-what-email-address                   controllers.changePrefe
 
 GET         /confirmation-code-limit                     controllers.changePreferences.EmailLockedController.onPageLoad()
 
-GET         /check-your-answers                          controllers.CheckYourAnswersController.onPageLoad()
+GET         /check-answers                               controllers.CheckYourAnswersController.onPageLoad()
 
 GET         /account/sign-out-survey                     controllers.auth.SignOutController.signOut()
 

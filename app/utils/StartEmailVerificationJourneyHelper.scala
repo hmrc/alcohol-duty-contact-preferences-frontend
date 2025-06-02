@@ -47,7 +47,6 @@ class StartEmailVerificationJourneyHelper @Inject() (
       en = languageInfo
     )
 
-    // TODO: Make continueUrl the CYA page
     EmailVerificationRequest(
       credId = credId,
       continueUrl = config.startEmailVerificationContinueUrl,

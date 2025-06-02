@@ -3,8 +3,8 @@ service.name = Rheoli’ch Toll Alcohol
 site.back = Yn ôl
 site.remove = NOT_FOUND
 site.change = NOT_FOUND
-site.no = NOT_FOUND
-site.yes = NOT_FOUND
+site.no = Na
+site.yes = Iawn
 site.continue = Parhau
 site.start = NOT_FOUND
 site.startAgain = NOT_FOUND
@@ -55,6 +55,12 @@ contactPreference.heading = NOT_FOUND
 contactPreference.email = NOT_FOUND
 contactPreference.post = NOT_FOUND
 contactPreference.error.required = NOT_FOUND
+
+existingEmail.title = Ai hwn yw eich e-bost?
+existingEmail.heading = Ai {0} yw’ch cyfeiriad e-bost chi?
+existingEmail.hint = Byddwn ni’n anfon e-bost atoch pan fo neges newydd yn eich cyfrif.
+existingEmail.no = Na, hoffwn ddefnyddio cyfeiriad e-bost gwahanol
+existingEmail.error.required = Dewiswch ‘Iawn’ os {0} yw’ch e-bost
 
 changePreferences.enter-email-address.title = Pa gyfeiriad e-bost y dylem ei ddefnyddio i gysylltu â chi ynglŷn â’ch Toll Alcohol?
 changePreferences.enter-email-address.heading = Pa gyfeiriad e-bost y dylem ei ddefnyddio i gysylltu â chi ynglŷn â’ch Toll Alcohol?

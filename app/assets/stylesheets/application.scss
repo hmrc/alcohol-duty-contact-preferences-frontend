@@ -4,3 +4,26 @@
 .js-enabled .js-visible {
   display: inline-block !important;
 }
+
+.govuk-grid-column-two-thirds {
+  min-height: 1px;
+}
+
+.text-align-right {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.text-align-right-wrap {
+  text-align: right;
+  word-wrap: break-word;
+  white-space: normal;
+}
+
+.govuk-grid-column-full {
+  overflow: auto;
+}
+
+.no-wrap {
+  white-space: nowrap;
+}
