@@ -1,4 +1,4 @@
 # Add all the application routes to the app.routes file
-
-
-GET     /create-and-show-user-answers   testOnly.controllers.TestUserAnswersController.onPageLoad()
+GET     /clear-all                          testOnly.controllers.TestOnlyController.clearAllData()
+GET     /create-and-show-user-answers       testOnly.controllers.TestOnlyController.createAndShowUserAnswers()
+GET     /create-and-fill-user-answers       testOnly.controllers.TestOnlyController.createAndFillUserAnswers(verified: Boolean ?= true, locked: Boolean ?= false)
