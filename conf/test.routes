@@ -1,4 +1,6 @@
 # Add all the application routes to the app.routes file
-GET     /clear-all                          testOnly.controllers.TestOnlyController.clearAllData()
-GET     /create-and-show-user-answers       testOnly.controllers.TestOnlyController.createAndShowUserAnswers()
-GET     /create-and-fill-user-answers       testOnly.controllers.TestOnlyController.createAndFillUserAnswers(verified: Boolean ?= true, locked: Boolean ?= false)
+GET     /clear-all                                            testOnly.controllers.TestOnlyController.clearAllData()
+GET     /create-and-show-user-answers                         testOnly.controllers.TestOnlyController.createAndShowUserAnswers()
+
+GET     /landing-page                                         testOnly.controllers.TestOnlyController.testOnlyLandingPage()
+GET     /create-and-fill-user-answers/:verified/:locked       testOnly.controllers.TestOnlyController.createAndFillUserAnswers(verified: Boolean, locked: Boolean)

@@ -21,9 +21,10 @@ import connectors.UserAnswersConnector
 import controllers.actions.IdentifierAction
 import models.UserDetails
 import play.api.Logging
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import testOnly.connectors.TestOnlyUserAnswersConnector
-import testOnly.views.html.CreateAndFillUserAnswersView
+import testOnly.views.html.{CreateAndFillUserAnswersView, LandingPageView}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,9 +34,11 @@ class TestOnlyController @Inject() (
   identify: IdentifierAction,
   userAnswersConnector: UserAnswersConnector,
   testOnlyUserAnswersConnector: TestOnlyUserAnswersConnector,
+  landingPageView: LandingPageView,
   createAndFillUserAnswersView: CreateAndFillUserAnswersView
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
+    with I18nSupport
     with Logging {
 
   def clearAllData(): Action[AnyContent] = Action.async { implicit request =>
@@ -49,10 +52,18 @@ class TestOnlyController @Inject() (
     } yield Ok(s"test successful, user answers: $ua")
   }
 
+  def testOnlyLandingPage(): Action[AnyContent] = identify { implicit request =>
+    if (request.credId.takeRight(1) != "0") {
+      BadRequest("credId must end in 0 for test-only route")
+    } else {
+      Ok(landingPageView(request.appaId, request.credId))
+    }
+  }
+
   def createAndFillUserAnswers(verified: Boolean, locked: Boolean): Action[AnyContent] = identify.async {
     implicit request =>
       if (request.credId.takeRight(1) != "0") {
-        Future.successful(BadRequest("credId must end in 0"))
+        Future.successful(BadRequest("credId must end in 0 for test-only route"))
       } else if (!verified && !locked) {
         Future.successful(
           BadRequest("At least one of verified and locked must be true when redirected back from email verification")

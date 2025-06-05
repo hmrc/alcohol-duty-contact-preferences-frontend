@@ -14,19 +14,39 @@
  * limitations under the License.
  *@
 
-@this(
+@import components.{Link, PageHeading, Paragraph, SectionBreak}
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 
+@this(
+        layout: templates.Layout,
+        pageHeading: PageHeading,
+        paragraph: Paragraph,
+        link: Link,
+        sectionBreak: SectionBreak
 )
 
-@(credId: String, verified: Boolean, locked: Boolean, userAnswers: UserAnswers)
-    <p>Created user answers for
-        <br> APPA ID: @userAnswers.appaId
-        <br> CredID: @credId
-    </p>
-    <p>User has submitted email address: @userAnswers.emailAddress.getOrElse("")</p>
-    <p>Email verification status is:
-        <br> Verified: @verified
-        <br> Locked: @locked
-    </p>
+@(credId: String, verified: Boolean, locked: Boolean, userAnswers: UserAnswers)(implicit request: Request[_], messages: Messages)
+@layout(pageTitle = "Test-only route: Created user answers", showBackLink = false) {
 
-    <a href="@routes.CheckYourAnswersController.onPageLoad()">Continue to Check Your Answers page</a>
+    @pageHeading("Test-only route: Created user answers")
+
+    @paragraph(HtmlContent(
+        "Created user answers for APPA ID: " + userAnswers.appaId + ", CredId: " + credId
+    ))
+
+    @paragraph(HtmlContent(
+        "User has submitted email address: " + userAnswers.emailAddress.getOrElse("")
+    ))
+
+    @paragraph(HtmlContent(
+        "Email verification status is: <br> Verified: " + verified + "<br> Locked: " + locked
+    ))
+
+    @paragraph(HtmlContent(
+        link(
+            id = "continue-link",
+            text = "Continue to Check Your Answers page",
+            href = routes.CheckYourAnswersController.onPageLoad().url
+        )
+    ))
+}

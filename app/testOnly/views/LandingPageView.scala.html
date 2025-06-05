@@ -1,0 +1,63 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import components.{Link, PageHeading, Paragraph, SectionBreak}
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+
+@this(
+        layout: templates.Layout,
+        pageHeading: PageHeading,
+        paragraph: Paragraph,
+        link: Link,
+        sectionBreak: SectionBreak
+)
+
+@(appaId: String, credId: String)(implicit request: Request[_], messages: Messages)
+
+@layout(pageTitle = "Test-only landing page", showBackLink = false) {
+
+    @pageHeading("Test-only landing page")
+
+    @paragraph(HtmlContent(
+        "Logged in with APPA ID: " + appaId + ", CredId: " + credId
+    ))
+
+    @paragraph("Click on a link to create user answers for the following statuses when redirected back from email-verification:")
+
+    @paragraph(HtmlContent(
+        link(
+            id = "verified-notLocked",
+            text = "Verified and not locked",
+            href = testOnly.controllers.routes.TestOnlyController.createAndFillUserAnswers(verified = true, locked = false).url
+        )
+    ))
+
+    @paragraph(HtmlContent(
+        link(
+            id = "verified-locked",
+            text = "Verified and locked",
+            href = testOnly.controllers.routes.TestOnlyController.createAndFillUserAnswers(verified = true, locked = true).url
+        )
+    ))
+
+    @paragraph(HtmlContent(
+        link(
+            id = "notVerified-Locked",
+            text = "Not verified and locked",
+            href = testOnly.controllers.routes.TestOnlyController.createAndFillUserAnswers(verified = false, locked = true).url
+        )
+    ))
+}
