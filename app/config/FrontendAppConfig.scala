@@ -66,9 +66,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   def ecpUserAnswersClearAllUrl(): String =
     s"$contactPreferencesHost/alcohol-duty-contact-preferences/test-only/user-answers/clear-all"
 
-  def ecpUserAnswersTestOnlyCreateUrl(verified: Boolean, locked: Boolean): String =
-    s"$contactPreferencesHost/alcohol-duty-contact-preferences/test-only/create-and-fill-user-answers/$verified/$locked"
-
   def ecpGetEmailVerificationUrl(credId: String): String =
     s"$contactPreferencesHost/alcohol-duty-contact-preferences/get-email-verification/$credId"
 

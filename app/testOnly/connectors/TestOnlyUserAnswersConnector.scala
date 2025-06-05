@@ -17,11 +17,9 @@
 package testOnly.connectors
 
 import config.FrontendAppConfig
-import models.{UserAnswers, UserDetails}
-import play.api.libs.json.Json
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps}
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,16 +31,5 @@ class TestOnlyUserAnswersConnector @Inject() (
 
   def clearAllData()(implicit hc: HeaderCarrier): Future[HttpResponse] =
     httpClient.delete(url"${appConfig.ecpUserAnswersClearAllUrl()}").execute[HttpResponse]
-
-  def createAndFillUserAnswers(
-    userDetails: UserDetails,
-    verified: Boolean,
-    locked: Boolean
-  )(implicit hc: HeaderCarrier): Future[Either[UpstreamErrorResponse, UserAnswers]] =
-    httpClient
-      .post(url"${appConfig.ecpUserAnswersTestOnlyCreateUrl(verified, locked)}")
-      .withBody(Json.toJson(userDetails))
-      .setHeader("Csrf-Token" -> "nocheck")
-      .execute[Either[UpstreamErrorResponse, UserAnswers]]
 
 }
