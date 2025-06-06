@@ -20,26 +20,32 @@ import com.google.inject.Inject
 import connectors.UserAnswersConnector
 import controllers.actions.IdentifierAction
 import models.UserDetails
-import play.api.i18n.{I18nSupport, MessagesApi}
+import play.api.Logging
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import testOnly.connectors.TestOnlyUserAnswersConnector
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import scala.concurrent.ExecutionContext
 
-class TestUserAnswersController @Inject() (
-  override val messagesApi: MessagesApi,
+class TestOnlyController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
-  userAnswersConnector: UserAnswersConnector
+  userAnswersConnector: UserAnswersConnector,
+  testOnlyUserAnswersConnector: TestOnlyUserAnswersConnector
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
-  def onPageLoad(): Action[AnyContent] = identify.async { implicit request =>
+  def clearAllData(): Action[AnyContent] = Action.async { implicit request =>
+    testOnlyUserAnswersConnector.clearAllData().map(httpResponse => Ok(httpResponse.body))
+  }
+
+  def createAndShowUserAnswers(): Action[AnyContent] = identify.async { implicit request =>
     for {
       _  <- userAnswersConnector.createUserAnswers(UserDetails(request.appaId, request.userId))
       ua <- userAnswersConnector.get(request.appaId)
     } yield Ok(s"test successful, user answers: $ua")
   }
-
 }

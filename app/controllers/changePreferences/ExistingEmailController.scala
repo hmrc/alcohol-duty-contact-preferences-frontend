@@ -72,14 +72,7 @@ class ExistingEmailController @Inject() (
           .fold(
             formWithErrors => Future.successful(BadRequest(view(formWithErrors, email))),
             value => {
-              val userAnswers = if (value) {
-                request.userAnswers.copy(
-                  emailAddress = Some(email),
-                  verifiedEmailAddresses = request.userAnswers.verifiedEmailAddresses + email
-                )
-              } else {
-                request.userAnswers
-              }
+              val userAnswers = if (value) request.userAnswers.copy(emailAddress = Some(email)) else request.userAnswers
               for {
                 updatedAnswers <- Future.fromTry(userAnswers.set(ExistingEmailPage, value))
                 _              <- userAnswersConnector.set(updatedAnswers)
