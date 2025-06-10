@@ -50,11 +50,11 @@ unauthorised.title = NOT_FOUND
 unauthorised.heading = NOT_FOUND
 unauthorised.guidance = NOT_FOUND
 
-contactPreference.title = NOT_FOUND
-contactPreference.heading = NOT_FOUND
-contactPreference.email = NOT_FOUND
-contactPreference.post = NOT_FOUND
-contactPreference.error.required = NOT_FOUND
+contactPreference.title = Sut yr hoffech i ni gysylltu â chi?
+contactPreference.heading = Sut yr hoffech i ni gysylltu â chi?
+contactPreference.email = E-bostiwch fi pan fo neges yn fy nghyfrif
+contactPreference.post = Anfonwch lythyrau ataf drwy’r post
+contactPreference.error.required = Dewiswch sut yr hoffech i ni gysylltu â chi
 
 existingEmail.title = Ai hwn yw eich e-bost?
 existingEmail.heading = Ai {0} yw’ch cyfeiriad e-bost chi?
