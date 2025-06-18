@@ -15,6 +15,8 @@ POST        /method                                      controllers.changePrefe
 GET         /change-method                               controllers.changePreferences.ContactPreferenceController.onPageLoad(mode: Mode = CheckMode)
 POST        /change-method                               controllers.changePreferences.ContactPreferenceController.onSubmit(mode: Mode = CheckMode)
 
+GET         /enrolled-emails                             controllers.changePreferences.EnrolledEmailsController.onPageLoad()
+
 GET         /existing-email                              controllers.changePreferences.ExistingEmailController.onPageLoad()
 POST        /existing-email                              controllers.changePreferences.ExistingEmailController.onSubmit()
 

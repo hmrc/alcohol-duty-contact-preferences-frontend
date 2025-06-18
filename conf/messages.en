@@ -56,6 +56,10 @@ contactPreference.email = Email me when I have a message in my account
 contactPreference.post = Send me letters by post
 contactPreference.error.required = Select how you would like to be contacted
 
+enrolledEmails.title = We will email you when you have a digital message
+enrolledEmails.heading = We will email you at {0} when you have a digital message
+enrolledEmails.updateEmailLink = If this is not the correct address, you can update it
+
 existingEmail.title = Is this your email?
 existingEmail.heading = Is {0} your email?
 existingEmail.hint = We will email you when you have a new message in your account.

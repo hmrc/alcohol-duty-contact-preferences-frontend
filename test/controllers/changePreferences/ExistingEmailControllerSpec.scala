@@ -31,7 +31,7 @@ import play.api.mvc.Call
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HttpResponse
-import utils.ExistingEmailPageCheckHelper
+import utils.PageCheckHelper
 import views.html.changePreferences.ExistingEmailView
 
 import scala.concurrent.Future
@@ -48,12 +48,12 @@ class ExistingEmailControllerSpec extends SpecBase {
 
     "onPageLoad" - {
       "must return OK and the correct view for a GET" in {
-        val mockHelper = mock[ExistingEmailPageCheckHelper]
+        val mockHelper = mock[PageCheckHelper]
 
         when(mockHelper.checkDetailsForExistingEmailPage(any())) thenReturn Right(emailAddress)
 
         val application = applicationBuilder(userAnswers = Some(userAnswersPostWithEmail))
-          .overrides(bind[ExistingEmailPageCheckHelper].toInstance(mockHelper))
+          .overrides(bind[PageCheckHelper].toInstance(mockHelper))
           .build()
 
         running(application) {
@@ -74,14 +74,14 @@ class ExistingEmailControllerSpec extends SpecBase {
       }
 
       "must populate the view correctly on a GET if user answers already exist" in {
-        val mockHelper = mock[ExistingEmailPageCheckHelper]
+        val mockHelper = mock[PageCheckHelper]
 
         when(mockHelper.checkDetailsForExistingEmailPage(any())) thenReturn Right(emailAddress)
 
         val userAnswers = userAnswersPostWithEmail.set(ExistingEmailPage, false).success.value
 
         val application = applicationBuilder(userAnswers = Some(userAnswers))
-          .overrides(bind[ExistingEmailPageCheckHelper].toInstance(mockHelper))
+          .overrides(bind[PageCheckHelper].toInstance(mockHelper))
           .build()
 
         running(application) {
@@ -102,14 +102,14 @@ class ExistingEmailControllerSpec extends SpecBase {
       }
 
       "must redirect to Journey Recovery for a GET if user answers do not exist" in {
-        val mockHelper = mock[ExistingEmailPageCheckHelper]
+        val mockHelper = mock[PageCheckHelper]
 
         when(mockHelper.checkDetailsForExistingEmailPage(any())) thenReturn Left(
           ErrorModel(BAD_REQUEST, "Error from helper")
         )
 
         val application = applicationBuilder(userAnswers = None)
-          .overrides(bind[ExistingEmailPageCheckHelper].toInstance(mockHelper))
+          .overrides(bind[PageCheckHelper].toInstance(mockHelper))
           .build()
 
         running(application) {
@@ -125,14 +125,14 @@ class ExistingEmailControllerSpec extends SpecBase {
       }
 
       "must redirect to Journey Recovery for a GET if the helper returns an error when checking the user's details" in {
-        val mockHelper = mock[ExistingEmailPageCheckHelper]
+        val mockHelper = mock[PageCheckHelper]
 
         when(mockHelper.checkDetailsForExistingEmailPage(any())) thenReturn Left(
           ErrorModel(BAD_REQUEST, "Error from helper")
         )
 
         val application = applicationBuilder(userAnswers = Some(userAnswersPostNoEmail))
-          .overrides(bind[ExistingEmailPageCheckHelper].toInstance(mockHelper))
+          .overrides(bind[PageCheckHelper].toInstance(mockHelper))
           .build()
 
         running(application) {
@@ -150,7 +150,7 @@ class ExistingEmailControllerSpec extends SpecBase {
 
     "onSubmit" - {
       "must redirect to the next page when valid data is submitted" in {
-        val mockHelper               = mock[ExistingEmailPageCheckHelper]
+        val mockHelper               = mock[PageCheckHelper]
         val mockUserAnswersConnector = mock[UserAnswersConnector]
         val mockNavigator            = mock[Navigator]
 
@@ -160,7 +160,7 @@ class ExistingEmailControllerSpec extends SpecBase {
 
         val application = applicationBuilder(userAnswers = Some(userAnswersPostWithEmail))
           .overrides(
-            bind[ExistingEmailPageCheckHelper].toInstance(mockHelper),
+            bind[PageCheckHelper].toInstance(mockHelper),
             bind[Navigator].toInstance(mockNavigator),
             bind[UserAnswersConnector].toInstance(mockUserAnswersConnector)
           )
@@ -182,7 +182,7 @@ class ExistingEmailControllerSpec extends SpecBase {
       }
 
       "must return a Bad Request and errors when invalid data is submitted" in {
-        val mockHelper               = mock[ExistingEmailPageCheckHelper]
+        val mockHelper               = mock[PageCheckHelper]
         val mockUserAnswersConnector = mock[UserAnswersConnector]
         val mockNavigator            = mock[Navigator]
 
@@ -192,7 +192,7 @@ class ExistingEmailControllerSpec extends SpecBase {
 
         val application = applicationBuilder(userAnswers = Some(userAnswersPostWithEmail))
           .overrides(
-            bind[ExistingEmailPageCheckHelper].toInstance(mockHelper),
+            bind[PageCheckHelper].toInstance(mockHelper),
             bind[Navigator].toInstance(mockNavigator),
             bind[UserAnswersConnector].toInstance(mockUserAnswersConnector)
           )
@@ -218,7 +218,7 @@ class ExistingEmailControllerSpec extends SpecBase {
       }
 
       "must redirect to Journey Recovery for a POST if user answers do not exist" in {
-        val mockHelper               = mock[ExistingEmailPageCheckHelper]
+        val mockHelper               = mock[PageCheckHelper]
         val mockUserAnswersConnector = mock[UserAnswersConnector]
         val mockNavigator            = mock[Navigator]
 
@@ -230,7 +230,7 @@ class ExistingEmailControllerSpec extends SpecBase {
 
         val application = applicationBuilder(userAnswers = None)
           .overrides(
-            bind[ExistingEmailPageCheckHelper].toInstance(mockHelper),
+            bind[PageCheckHelper].toInstance(mockHelper),
             bind[Navigator].toInstance(mockNavigator),
             bind[UserAnswersConnector].toInstance(mockUserAnswersConnector)
           )
@@ -252,7 +252,7 @@ class ExistingEmailControllerSpec extends SpecBase {
       }
 
       "must redirect to Journey Recovery for a POST if the subscription summary has no email address" in {
-        val mockHelper               = mock[ExistingEmailPageCheckHelper]
+        val mockHelper               = mock[PageCheckHelper]
         val mockUserAnswersConnector = mock[UserAnswersConnector]
         val mockNavigator            = mock[Navigator]
 
@@ -264,7 +264,7 @@ class ExistingEmailControllerSpec extends SpecBase {
 
         val application = applicationBuilder(userAnswers = Some(userAnswersPostNoEmail))
           .overrides(
-            bind[ExistingEmailPageCheckHelper].toInstance(mockHelper),
+            bind[PageCheckHelper].toInstance(mockHelper),
             bind[Navigator].toInstance(mockNavigator),
             bind[UserAnswersConnector].toInstance(mockUserAnswersConnector)
           )

@@ -24,15 +24,20 @@
         sectionBreak: SectionBreak
 )
 
-@(businessTaxAccountUrl: String)(implicit request: Request[_], messages: Messages)
+@(currentEmail: String, businessTaxAccountUrl: String)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("emailLocked.title")), showBackLink = false) {
+@layout(pageTitle = titleNoForm(messages("enrolledEmails.title"))) {
 
-    @pageHeading(messages("emailLocked.heading"))
+    @pageHeading(messages("enrolledEmails.heading", currentEmail))
 
-    @paragraph(messages("emailLocked.guidance1"))
-
-    @paragraph(messages("emailLocked.guidance2"))
+    @paragraph(content =
+        HtmlContent(
+            link(
+                id = "update-email-address-link",
+                text = messages("enrolledEmails.updateEmailLink"),
+                href = controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode).url
+            ) + "."
+        ))
 
     @paragraph(content =
         HtmlContent(

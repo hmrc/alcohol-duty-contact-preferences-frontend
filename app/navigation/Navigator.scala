@@ -98,9 +98,8 @@ class Navigator @Inject() (
         )
         controllers.changePreferences.routes.ExistingEmailController.onPageLoad()
       case (Some(true), true, _)      =>
-        // TODO: next page is /enrolled-emails
-        logger.info("User selected email and is currently on email. Should redirect to /enrolled-emails")
-        routes.IndexController.onPageLoad()
+        logger.info("User selected email and is currently on email. Redirecting to /enrolled-emails")
+        controllers.changePreferences.routes.EnrolledEmailsController.onPageLoad()
       case (Some(false), true, _)     =>
         logger.info("User selected post and is currently on email. Redirecting to Check Your Answers")
         routes.CheckYourAnswersController.onPageLoad()

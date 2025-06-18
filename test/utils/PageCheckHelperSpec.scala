@@ -19,13 +19,48 @@ package utils
 import base.SpecBase
 import models.ErrorModel
 import pages.changePreferences.ContactPreferencePage
-import play.api.http.Status.BAD_REQUEST
+import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR}
 
-class ExistingEmailPageCheckHelperSpec extends SpecBase {
+class PageCheckHelperSpec extends SpecBase {
 
-  val testHelper = new ExistingEmailPageCheckHelper()
+  val testHelper = new PageCheckHelper()
 
-  "ExistingEmailPageCheckHelper .checkDetailsForExistingEmailPage" - {
+  "checkDetailsForEnrolledEmailsPage" - {
+    "must return a Right containing the email address if the user is currently on email and has selected email" in {
+      val result = testHelper.checkDetailsForEnrolledEmailsPage(userAnswers)
+
+      result mustBe Right(emailAddress)
+    }
+
+    "must return a Left containing an ErrorModel if the user is currently on post" in {
+      val result = testHelper.checkDetailsForEnrolledEmailsPage(userAnswersPostWithEmail)
+
+      result mustBe Left(ErrorModel(BAD_REQUEST, "Error on enrolled emails page: User is currently on post."))
+    }
+
+    "must return a Left containing an ErrorModel if the user has not selected email on the contact preference page" in {
+      val result = testHelper.checkDetailsForEnrolledEmailsPage(
+        userAnswers.set(ContactPreferencePage, false).success.value
+      )
+
+      result mustBe Left(ErrorModel(BAD_REQUEST, "Error on enrolled emails page: User has not selected email."))
+    }
+
+    "must return a Left containing an ErrorModel if the user has no email in the subscription summary" in {
+      val result = testHelper.checkDetailsForEnrolledEmailsPage(
+        userAnswers.copy(subscriptionSummary = subscriptionSummaryEmail.copy(emailAddress = None))
+      )
+
+      result mustBe Left(
+        ErrorModel(
+          INTERNAL_SERVER_ERROR,
+          "Error on enrolled emails page: User is currently on email but has no email in subscription summary."
+        )
+      )
+    }
+  }
+
+  "checkDetailsForExistingEmailPage" - {
     "must return a Right containing the email address if the user has an existing verified email" in {
       val result = testHelper.checkDetailsForExistingEmailPage(userAnswersPostWithEmail)
 
