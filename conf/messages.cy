@@ -56,7 +56,7 @@ contactPreference.email = E-bostiwch fi pan fo neges yn fy nghyfrif
 contactPreference.post = Anfonwch lythyrau ataf drwy’r post
 contactPreference.error.required = Dewiswch sut yr hoffech i ni gysylltu â chi
 
-enrolledEmails.title = We will email you when you have a digital message
+enrolledEmails.title = Byddwn ni’n anfon e-bost atoch pan fo gennych neges ddigidol
 enrolledEmails.heading = Byddwn ni’n anfon e-bost atoch yn {0} pan fo gennych neges ddigidol
 enrolledEmails.updateEmailLink = Os nad dyma’r cyfeiriad cywir, gallwch ei ddiweddaru
 

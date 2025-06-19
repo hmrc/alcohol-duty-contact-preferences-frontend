@@ -86,8 +86,7 @@ class NavigatorSpec extends SpecBase {
             NormalMode,
             userAnswers.set(ContactPreferencePage, true).success.value,
             None
-          ) mustBe routes.IndexController.onPageLoad()
-          // TODO: change to correct route when page is created
+          ) mustBe controllers.changePreferences.routes.EnrolledEmailsController.onPageLoad()
         }
 
         "must go to the Check Your Answers page if the user is currently on email and has selected post" in {
@@ -177,8 +176,7 @@ class NavigatorSpec extends SpecBase {
           CheckMode,
           userAnswers.set(ContactPreferencePage, true).success.value,
           Some(true)
-        ) mustBe routes.IndexController.onPageLoad()
-        // TODO: change to correct route when Enrolled Emails page is created
+        ) mustBe controllers.changePreferences.routes.EnrolledEmailsController.onPageLoad()
 
         navigator.nextPage(
           ContactPreferencePage,
