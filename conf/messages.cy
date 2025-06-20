@@ -60,6 +60,10 @@ enrolledEmails.title = Byddwn ni’n anfon e-bost atoch pan fo gennych neges ddi
 enrolledEmails.heading = Byddwn ni’n anfon e-bost atoch yn {0} pan fo gennych neges ddigidol
 enrolledEmails.updateEmailLink = Os nad dyma’r cyfeiriad cywir, gallwch ei ddiweddaru
 
+enrolledLetters.title = Byddwn ni’n parhau i anfon llythyrau atoch drwy’r post
+enrolledLetters.heading = Byddwn ni’n parhau i anfon llythyrau atoch drwy’r post
+enrolledLetters.guidance = Byddwn ni’n anfon negeseuon ynghylch eich Datganiad Toll Alcohol at eich cyfeiriad gohebu.
+
 existingEmail.title = Ai hwn yw eich e-bost?
 existingEmail.heading = Ai {0} yw’ch cyfeiriad e-bost chi?
 existingEmail.hint = Byddwn ni’n anfon e-bost atoch pan fo neges newydd yn eich cyfrif.

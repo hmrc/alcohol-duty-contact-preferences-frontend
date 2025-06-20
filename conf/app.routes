@@ -17,6 +17,8 @@ POST        /change-method                               controllers.changePrefe
 
 GET         /enrolled-emails                             controllers.changePreferences.EnrolledEmailsController.onPageLoad()
 
+GET         /enrolled-letters                            controllers.changePreferences.EnrolledLettersController.onPageLoad()
+
 GET         /existing-email                              controllers.changePreferences.ExistingEmailController.onPageLoad()
 POST        /existing-email                              controllers.changePreferences.ExistingEmailController.onSubmit()
 
