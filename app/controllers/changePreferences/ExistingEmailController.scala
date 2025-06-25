@@ -26,7 +26,7 @@ import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.ExistingEmailPageCheckHelper
+import utils.PageCheckHelper
 import views.html.changePreferences.ExistingEmailView
 
 import javax.inject.Inject
@@ -40,7 +40,7 @@ class ExistingEmailController @Inject() (
   requireData: DataRequiredAction,
   formProvider: ExistingEmailFormProvider,
   userAnswersConnector: UserAnswersConnector,
-  helper: ExistingEmailPageCheckHelper,
+  helper: PageCheckHelper,
   val controllerComponents: MessagesControllerComponents,
   view: ExistingEmailView
 )(implicit ec: ExecutionContext)

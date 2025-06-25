@@ -18,11 +18,34 @@ package utils
 
 import models.{ErrorModel, UserAnswers}
 import pages.changePreferences.ContactPreferencePage
-import play.api.http.Status.BAD_REQUEST
+import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR}
 
 import javax.inject.Inject
 
-class ExistingEmailPageCheckHelper @Inject() {
+class PageCheckHelper @Inject() {
+
+  def checkDetailsForEnrolledEmailsPage(userAnswers: UserAnswers): Either[ErrorModel, String] = {
+    val isOnEmail                 = userAnswers.subscriptionSummary.paperlessReference
+    val isEmailPreferenceSelected = userAnswers.get(ContactPreferencePage).contains(true)
+    val existingEmail             = userAnswers.subscriptionSummary.emailAddress
+
+    if (!isOnEmail) {
+      Left(ErrorModel(BAD_REQUEST, "Error on enrolled emails page: User is currently on post."))
+    } else if (!isEmailPreferenceSelected) {
+      Left(ErrorModel(BAD_REQUEST, "Error on enrolled emails page: User has not selected email."))
+    } else {
+      existingEmail match {
+        case None        =>
+          Left(
+            ErrorModel(
+              INTERNAL_SERVER_ERROR,
+              "Error on enrolled emails page: User is currently on email but has no email in subscription summary."
+            )
+          )
+        case Some(email) => Right(email)
+      }
+    }
+  }
 
   def checkDetailsForExistingEmailPage(userAnswers: UserAnswers): Either[ErrorModel, String] = {
     val existingEmail             = userAnswers.subscriptionSummary.emailAddress
