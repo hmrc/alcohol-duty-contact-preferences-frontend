@@ -52,7 +52,7 @@ unauthorised.guidance = NOT_FOUND
 
 contactPreference.title = Sut yr hoffech i ni gysylltu â chi?
 contactPreference.heading = Sut yr hoffech i ni gysylltu â chi?
-contactPreference.email = E-bostiwch fi pan fo neges yn fy nghyfrif
+contactPreference.email = E-bostiwch fi pan fo gennyf neges digidol
 contactPreference.post = Anfonwch lythyrau ataf drwy’r post
 contactPreference.error.required = Dewiswch sut yr hoffech i ni gysylltu â chi
 
