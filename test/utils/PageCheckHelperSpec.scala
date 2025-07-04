@@ -60,6 +60,28 @@ class PageCheckHelperSpec extends SpecBase {
     }
   }
 
+  "checkDetailsForEnrolledLettersPage" - {
+    "must return a Right containing Unit if the user is currently on post and has selected post" in {
+      val result = testHelper.checkDetailsForEnrolledLettersPage(userAnswersPostNoEmail)
+
+      result mustBe Right(())
+    }
+
+    "must return a Left containing an ErrorModel if the user is currently on email" in {
+      val result = testHelper.checkDetailsForEnrolledLettersPage(userAnswers)
+
+      result mustBe Left(ErrorModel(BAD_REQUEST, "Error on enrolled letters page: User is currently on email."))
+    }
+
+    "must return a Left containing an ErrorModel if the user has not selected email on the contact preference page" in {
+      val result = testHelper.checkDetailsForEnrolledLettersPage(
+        userAnswersPostNoEmail.set(ContactPreferencePage, true).success.value
+      )
+
+      result mustBe Left(ErrorModel(BAD_REQUEST, "Error on enrolled letters page: User has not selected post."))
+    }
+  }
+
   "checkDetailsForExistingEmailPage" - {
     "must return a Right containing the email address if the user has an existing verified email" in {
       val result = testHelper.checkDetailsForExistingEmailPage(userAnswersPostWithEmail)

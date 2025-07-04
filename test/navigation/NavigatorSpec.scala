@@ -104,8 +104,7 @@ class NavigatorSpec extends SpecBase {
             NormalMode,
             userAnswersPostNoEmail.set(ContactPreferencePage, false).success.value,
             None
-          ) mustBe routes.IndexController.onPageLoad()
-          // TODO: change to correct route when page is created
+          ) mustBe controllers.changePreferences.routes.EnrolledLettersController.onPageLoad()
         }
 
         "must redirect to journey recovery if the answer is missing" in {
@@ -190,8 +189,7 @@ class NavigatorSpec extends SpecBase {
           CheckMode,
           userAnswersPostNoEmail.set(ContactPreferencePage, false).success.value,
           Some(true)
-        ) mustBe routes.IndexController.onPageLoad()
-        // TODO: change to correct route when Enrolled Letters page is created
+        ) mustBe controllers.changePreferences.routes.EnrolledLettersController.onPageLoad()
       }
 
       "must go from the Contact Preference page to the Check Your Answers page if the answer has not changed" in {

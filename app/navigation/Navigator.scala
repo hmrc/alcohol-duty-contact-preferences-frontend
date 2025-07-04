@@ -104,9 +104,8 @@ class Navigator @Inject() (
         logger.info("User selected post and is currently on email. Redirecting to Check Your Answers")
         routes.CheckYourAnswersController.onPageLoad()
       case (Some(false), false, _)    =>
-        // TODO: next page is /enrolled-letters
-        logger.info("User selected post and is currently on post. Should redirect to /enrolled-letters")
-        routes.IndexController.onPageLoad()
+        logger.info("User selected post and is currently on post. Redirecting to /enrolled-letters")
+        controllers.changePreferences.routes.EnrolledLettersController.onPageLoad()
       case _                          =>
         routes.JourneyRecoveryController.onPageLoad()
     }

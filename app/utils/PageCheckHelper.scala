@@ -47,6 +47,19 @@ class PageCheckHelper @Inject() {
     }
   }
 
+  def checkDetailsForEnrolledLettersPage(userAnswers: UserAnswers): Either[ErrorModel, Unit] = {
+    val isOnEmail                = userAnswers.subscriptionSummary.paperlessReference
+    val isPostPreferenceSelected = userAnswers.get(ContactPreferencePage).contains(false)
+
+    if (isOnEmail) {
+      Left(ErrorModel(BAD_REQUEST, "Error on enrolled letters page: User is currently on email."))
+    } else if (!isPostPreferenceSelected) {
+      Left(ErrorModel(BAD_REQUEST, "Error on enrolled letters page: User has not selected post."))
+    } else {
+      Right((): Unit)
+    }
+  }
+
   def checkDetailsForExistingEmailPage(userAnswers: UserAnswers): Either[ErrorModel, String] = {
     val existingEmail             = userAnswers.subscriptionSummary.emailAddress
     val isExistingEmailVerified   = userAnswers.subscriptionSummary.emailVerification.contains(true)

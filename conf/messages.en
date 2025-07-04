@@ -60,6 +60,10 @@ enrolledEmails.title = We will email you when you have a digital message
 enrolledEmails.heading = We will email you at {0} when you have a digital message
 enrolledEmails.updateEmailLink = If this is not the correct address, you can update it
 
+enrolledLetters.title = We will continue to send you letters by post
+enrolledLetters.heading = We will continue to send you letters by post
+enrolledLetters.guidance = We will send messages about your Alcohol Duty return to your correspondence address.
+
 existingEmail.title = Is this your email?
 existingEmail.heading = Is {0} your email?
 existingEmail.hint = We will email you when you have a new message in your account.
