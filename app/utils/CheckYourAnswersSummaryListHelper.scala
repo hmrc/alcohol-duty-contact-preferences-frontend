@@ -82,8 +82,7 @@ class CheckYourAnswersSummaryListHelper @Inject() {
       actions = Seq(
         ActionItemViewModel(
           HtmlContent(messages("site.change")),
-          controllers.changePreferences.routes.ContactPreferenceController.onPageLoad(CheckMode).url
-          // TODO: Use correspondence address page
+          controllers.changePreferences.routes.CorrespondenceAddressController.onPageLoad().url
         ).withVisuallyHiddenText(messages("checkYourAnswers.correspondenceAddress.change.hidden"))
       )
     )
