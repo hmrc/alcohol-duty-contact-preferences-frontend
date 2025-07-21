@@ -16,7 +16,7 @@
 
 package utils
 
-import models.{ErrorModel, UserAnswers}
+import models.{ErrorModel, PaperlessPreferenceSubmission, UserAnswers}
 import pages.changePreferences.ContactPreferencePage
 import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR}
 
@@ -94,6 +94,36 @@ class PageCheckHelper @Inject() {
         if (userAnswers.verifiedEmailAddresses.contains(email)) Right(false) else Right(true)
       case _                         =>
         Left(ErrorModel(BAD_REQUEST, "Error on Check Your Answers: User answers do not contain the required data."))
+    }
+  }
+
+  def createSubmissionForCheckYourAnswers(
+    userAnswers: UserAnswers
+  ): Either[ErrorModel, PaperlessPreferenceSubmission] = {
+    val contactPreferenceOption = userAnswers.get(ContactPreferencePage)
+    val enteredEmailAddress     = userAnswers.emailAddress
+
+    (contactPreferenceOption, enteredEmailAddress) match {
+      case (Some(false), _)          =>
+        Right(
+          PaperlessPreferenceSubmission(
+            paperlessPreference = false,
+            emailAddress = None,
+            emailVerification = None,
+            bouncedEmail = None
+          )
+        )
+      case (Some(true), Some(email)) =>
+        Right(
+          PaperlessPreferenceSubmission(
+            paperlessPreference = true,
+            emailAddress = Some(email),
+            emailVerification = Some(true),
+            bouncedEmail = Some(false)
+          )
+        )
+      case _                         =>
+        Left(ErrorModel(BAD_REQUEST, "Error creating submission: User answers do not contain the required data."))
     }
   }
 }

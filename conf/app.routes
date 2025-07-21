@@ -32,6 +32,9 @@ GET         /correspondence-address                      controllers.changePrefe
 GET         /confirmation-code-limit                     controllers.changePreferences.EmailLockedController.onPageLoad()
 
 GET         /check-answers                               controllers.changePreferences.CheckYourAnswersController.onPageLoad()
+POST        /check-answers                               controllers.changePreferences.CheckYourAnswersController.onSubmit()
+
+GET         /confirmation                                controllers.changePreferences.PreferenceUpdatedController.onPageLoad()
 
 GET         /account/sign-out-survey                     controllers.auth.SignOutController.signOut()
 

@@ -30,13 +30,16 @@
 
 @layout(pageTitle = titleNoForm(messages("checkYourAnswers.title")), showBackLink = false) {
 
-    @pageHeading(messages("checkYourAnswers.heading"))
+    @formHelper(action = controllers.changePreferences.routes.CheckYourAnswersController.onSubmit(), Symbol("autoComplete") -> "off") {
 
-    @subHeading(messages("checkYourAnswers.h2"), classes = Css.headingMCssClass)
+        @pageHeading(messages("checkYourAnswers.heading"))
 
-    @govukSummaryList(list)
+        @subHeading(messages("checkYourAnswers.h2"), classes = Css.headingMCssClass)
 
-    @govukButton(
-        ButtonViewModel("submitButton", messages("site.submit"))
-    )
+        @govukSummaryList(list)
+
+        @govukButton(
+            ButtonViewModel("submitButton", messages("site.submit"))
+        )
+    }
 }
