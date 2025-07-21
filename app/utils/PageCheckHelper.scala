@@ -84,4 +84,16 @@ class PageCheckHelper @Inject() {
     }
   }
 
+  def checkDetailsForCheckYourAnswers(userAnswers: UserAnswers): Either[ErrorModel, Boolean] = {
+    val contactPreferenceOption = userAnswers.get(ContactPreferencePage)
+    val enteredEmailAddress     = userAnswers.emailAddress
+
+    (contactPreferenceOption, enteredEmailAddress) match {
+      case (Some(false), _)          => Right(false)
+      case (Some(true), Some(email)) =>
+        if (userAnswers.verifiedEmailAddresses.contains(email)) Right(false) else Right(true)
+      case _                         =>
+        Left(ErrorModel(BAD_REQUEST, "Error on Check Your Answers: User answers do not contain the required data."))
+    }
+  }
 }

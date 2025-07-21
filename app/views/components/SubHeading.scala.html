@@ -14,16 +14,10 @@
  * limitations under the License.
  *@
 
-@this(
-    layout: templates.Layout,
-    govukSummaryList: GovukSummaryList
-)
+@import config.Constants.Css
 
-@(list: SummaryList)(implicit request: Request[_], messages: Messages)
+@this()
 
-@layout(pageTitle = titleNoForm(messages("checkYourAnswers.title"))) {
+@(text: String, classes: String = Css.headingLCssClass)
 
-    <h1 class="govuk-heading-xl">@messages("checkYourAnswers.heading")</h1>
-
-    @govukSummaryList(list)
-}
+<h2 class="@classes">@text</h2>

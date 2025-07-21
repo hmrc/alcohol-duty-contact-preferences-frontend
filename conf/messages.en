@@ -6,6 +6,7 @@ site.change = Change
 site.no = No
 site.yes = Yes
 site.continue = Continue
+site.submit = Submit
 site.start = Start now
 site.startAgain = Start again
 site.signIn = Sign in
@@ -31,9 +32,6 @@ error.summary.title = There is a problem
 index.title = alcohol-duty-contact-preferences-frontend
 index.heading = alcohol-duty-contact-preferences-frontend
 index.guidance = Welcome to your new frontend. Please see the README file for a guide to getting started.
-
-checkYourAnswers.title = Check your answers
-checkYourAnswers.heading = Check your answers
 
 journeyRecovery.continue.title = Sorry, there is a problem with the service
 journeyRecovery.continue.heading = Sorry, there is a problem with the service
@@ -79,5 +77,17 @@ emailLocked.title = You cannot request another confirmation code
 emailLocked.heading = You cannot request another confirmation code
 emailLocked.guidance1 = To keep your account secure, we limit how many times you can request an email confirmation code.
 emailLocked.guidance2 = You can try again in 24 hours.
+
+checkYourAnswers.title = Check your answers
+checkYourAnswers.heading = Check your answers
+checkYourAnswers.h2 = Contact preference
+checkYourAnswers.contactPreference.key = How would you like to be contacted?
+checkYourAnswers.contactPreference.email = Email me when I have a message in my account
+checkYourAnswers.contactPreference.post = Send me letters by post
+checkYourAnswers.contactPreference.change.hidden = how you would like to be contacted
+checkYourAnswers.emailAddress.key = Email address
+checkYourAnswers.emailAddress.change.hidden = email address
+checkYourAnswers.correspondenceAddress.key = Address
+checkYourAnswers.correspondenceAddress.change.hidden = address
 
 emailVerificationJourney.signature = Manage your Alcohol Duty Service

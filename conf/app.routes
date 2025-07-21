@@ -29,7 +29,7 @@ POST        /change-what-email-address                   controllers.changePrefe
 
 GET         /confirmation-code-limit                     controllers.changePreferences.EmailLockedController.onPageLoad()
 
-GET         /check-answers                               controllers.CheckYourAnswersController.onPageLoad()
+GET         /check-answers                               controllers.changePreferences.CheckYourAnswersController.onPageLoad()
 
 GET         /account/sign-out-survey                     controllers.auth.SignOutController.signOut()
 
