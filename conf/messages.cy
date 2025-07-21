@@ -82,12 +82,12 @@ checkYourAnswers.title = Gwiriwch eich atebion
 checkYourAnswers.heading = Gwiriwch eich atebion
 checkYourAnswers.h2 = Dewis o ran cysylltu
 checkYourAnswers.contactPreference.key = Sut yr hoffech i ni gysylltu â chi?
-checkYourAnswers.contactPreference.email = E-bostiwch fi pan fo neges yn fy nghyfrif
+checkYourAnswers.contactPreference.email = E-bostiwch fi pan fo gennyf neges digidol
 checkYourAnswers.contactPreference.post = Anfonwch lythyrau ataf drwy’r post
 checkYourAnswers.contactPreference.change.hidden = sut yr hoffech i ni gysylltu â chi
 checkYourAnswers.emailAddress.key = Cyfeiriad e-bost
 checkYourAnswers.emailAddress.change.hidden = cyfeiriad e-bost
-checkYourAnswers.correspondenceAddress.key = NOT_FOUND
-checkYourAnswers.correspondenceAddress.change.hidden = NOT_FOUND
+checkYourAnswers.correspondenceAddress.key = Cyfeiriad
+checkYourAnswers.correspondenceAddress.change.hidden = cyfeiriad
 
 emailVerificationJourney.signature = Rheoli’ch Gwasanaeth Toll Alcohol

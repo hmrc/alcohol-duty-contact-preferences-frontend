@@ -89,13 +89,14 @@ class NavigatorSpec extends SpecBase {
           ) mustBe controllers.changePreferences.routes.EnrolledEmailsController.onPageLoad()
         }
 
+        // TODO: Change to correspondence address page when ready
         "must go to the Check Your Answers page if the user is currently on email and has selected post" in {
           navigator.nextPage(
             ContactPreferencePage,
             NormalMode,
             userAnswers.set(ContactPreferencePage, false).success.value,
             None
-          ) mustBe routes.CheckYourAnswersController.onPageLoad()
+          ) mustBe controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad()
         }
 
         "must go to the Enrolled Letters page if the user is currently on post and has selected post" in {
@@ -124,7 +125,7 @@ class NavigatorSpec extends SpecBase {
             NormalMode,
             userAnswersPostWithEmail.set(ExistingEmailPage, true).success.value,
             None
-          ) mustBe routes.CheckYourAnswersController.onPageLoad()
+          ) mustBe controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad()
         }
 
         "must go to the What Email Address page if the user selects No" in {
@@ -177,12 +178,13 @@ class NavigatorSpec extends SpecBase {
           Some(true)
         ) mustBe controllers.changePreferences.routes.EnrolledEmailsController.onPageLoad()
 
+        // TODO: Change to correspondence address page when ready
         navigator.nextPage(
           ContactPreferencePage,
           CheckMode,
           userAnswers.set(ContactPreferencePage, false).success.value,
           Some(true)
-        ) mustBe routes.CheckYourAnswersController.onPageLoad()
+        ) mustBe controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad()
 
         navigator.nextPage(
           ContactPreferencePage,
@@ -198,13 +200,13 @@ class NavigatorSpec extends SpecBase {
           CheckMode,
           userAnswers.set(ContactPreferencePage, true).success.value,
           Some(false)
-        ) mustBe routes.CheckYourAnswersController.onPageLoad()
+        ) mustBe controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad()
       }
 
       "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
         case object UnknownPage extends Page
-        navigator.nextPage(UnknownPage, CheckMode, userAnswers, Some(false)) mustBe routes.CheckYourAnswersController
-          .onPageLoad()
+        navigator.nextPage(UnknownPage, CheckMode, userAnswers, Some(false)) mustBe
+          controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad()
       }
     }
   }
@@ -222,7 +224,8 @@ class NavigatorSpec extends SpecBase {
       )
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result).value mustBe routes.CheckYourAnswersController.onPageLoad().url
+      redirectLocation(result).value mustBe
+        controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad().url
     }
 
     "when the email provided is not verified, but is locked, then redirect to the check your answers page" in {

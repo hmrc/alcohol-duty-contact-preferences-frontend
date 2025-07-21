@@ -114,4 +114,39 @@ class PageCheckHelperSpec extends SpecBase {
     }
   }
 
+  "checkDetailsForCheckYourAnswers" - {
+    "must return a Right containing false if the user has selected post" in {
+      val result = testHelper.checkDetailsForCheckYourAnswers(userAnswersPostNoEmail)
+
+      result mustBe Right(false)
+    }
+
+    "must return a Right containing false if the user has selected email and the email is already in the set of verified email addresses" in {
+      val result = testHelper.checkDetailsForCheckYourAnswers(userAnswers.copy(emailAddress = Some(emailAddress2)))
+
+      result mustBe Right(false)
+    }
+
+    "must return a Right containing true if the user has selected email and the email is not in the set of verified email addresses" in {
+      val result = testHelper.checkDetailsForCheckYourAnswers(userAnswers)
+
+      result mustBe Right(true)
+    }
+
+    "must return a Left containing an ErrorModel if the user has not selected a contact preference" in {
+      val result = testHelper.checkDetailsForCheckYourAnswers(emptyUserAnswers)
+
+      result mustBe Left(
+        ErrorModel(BAD_REQUEST, "Error on Check Your Answers: User answers do not contain the required data.")
+      )
+    }
+
+    "must return a Left containing an ErrorModel if the user has selected email but not provided an email address" in {
+      val result = testHelper.checkDetailsForCheckYourAnswers(userAnswersPostWithEmail)
+
+      result mustBe Left(
+        ErrorModel(BAD_REQUEST, "Error on Check Your Answers: User answers do not contain the required data.")
+      )
+    }
+  }
 }
