@@ -57,13 +57,14 @@ class CheckYourAnswersController @Inject() (
             .value
             .map {
               case Right(EmailVerificationDetails(_, isVerified, isLocked)) =>
-                if (isLocked) { Redirect(controllers.changePreferences.routes.EmailLockedController.onPageLoad()) }
-                else if (!isVerified) {
-                  logger.warn("Entered email is neither verified nor locked")
-                  Redirect(routes.JourneyRecoveryController.onPageLoad())
-                } else {
+                if (isVerified) {
                   val summaryList = summaryListHelper.createSummaryList(request.userAnswers)
                   Ok(view(summaryList))
+                } else if (isLocked) {
+                  Redirect(controllers.changePreferences.routes.EmailLockedController.onPageLoad())
+                } else {
+                  logger.warn("Entered email is neither verified nor locked")
+                  Redirect(routes.JourneyRecoveryController.onPageLoad())
                 }
               case Left(error)                                              =>
                 logger.warn(s"Error checking email verification status. Status: ${error.status}")
