@@ -73,6 +73,9 @@ changePreferences.enter-email-address.heading = Pa gyfeiriad e-bost y dylem ei d
 changePreferences.enter-email-address.empty-error = Nodwch gyfeiriad e-bost
 changePreferences.enter-email-address.format-error = Nodwch gyfeiriad e-bost yn y fformat cywir, megis enw@enghraifft.com
 
+correspondenceAddress.title = Eich cyfeiriad gohebu
+correspondenceAddress.heading = Eich cyfeiriad gohebu
+
 emailLocked.title = Ni allwch ofyn am god cadarnhau arall
 emailLocked.heading = Ni allwch ofyn am god cadarnhau arall
 emailLocked.guidance1 = Er mwyn cadw’ch cyfrif yn ddiogel, rydym yn cyfyngu ar nifer y troeon y gallwch ofyn am god cadarnhau e-bost.
@@ -89,5 +92,8 @@ checkYourAnswers.emailAddress.key = Cyfeiriad e-bost
 checkYourAnswers.emailAddress.change.hidden = cyfeiriad e-bost
 checkYourAnswers.correspondenceAddress.key = Cyfeiriad
 checkYourAnswers.correspondenceAddress.change.hidden = cyfeiriad
+
+preferenceUpdated.title = Mae’ch dewis o ran cysylltu wedi’i ddiweddaru
+preferenceUpdated.heading = Mae’ch dewis o ran cysylltu wedi’i ddiweddaru
 
 emailVerificationJourney.signature = Rheoli’ch Gwasanaeth Toll Alcohol

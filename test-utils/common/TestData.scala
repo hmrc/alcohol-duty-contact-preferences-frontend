@@ -134,4 +134,17 @@ trait TestData extends ModelGenerators {
 
   val testRedirectUri: RedirectUri = RedirectUri("/test-uri")
 
+  val contactPreferenceSubmissionPost = PaperlessPreferenceSubmission(
+    paperlessPreference = false,
+    emailAddress = None,
+    emailVerification = None,
+    bouncedEmail = None
+  )
+
+  val contactPreferenceSubmissionEmail = PaperlessPreferenceSubmission(
+    paperlessPreference = true,
+    emailAddress = Some(emailAddress),
+    emailVerification = Some(true),
+    bouncedEmail = Some(false)
+  )
 }

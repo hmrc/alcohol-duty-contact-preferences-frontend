@@ -85,14 +85,12 @@ class CheckYourAnswersController @Inject() (
   }
 
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
-    pageCheckHelper.createSubmissionForCheckYourAnswers(request.userAnswers) match {
+    pageCheckHelper.checkDetailsToCreateSubmission(request.userAnswers) match {
       case Right(contactPreferenceSubmission) =>
         // TODO: add connector and backend code to submit contact preferences, obtain response and delete user answers
-        logger.debug(s"Created contact preference submission: $contactPreferenceSubmission")
+        logger.debug(s"Created contact preference submission: ${Json.toJson(contactPreferenceSubmission)}")
         val submissionResponse = EitherT.rightT[Future, ErrorModel](
-          PaperlessPreferenceSubmittedSuccess(
-            PaperlessPreferenceSubmittedResponse(Instant.now(), "910000000000")
-          )
+          PaperlessPreferenceSubmittedSuccess(PaperlessPreferenceSubmittedResponse(Instant.now(), "910000000000"))
         )
 
         submissionResponse.foldF(
@@ -102,8 +100,9 @@ class CheckYourAnswersController @Inject() (
           },
           submissionResponseDetails => {
             logger.info("Successfully submitted contact preferences")
+            logger.debug(s"Submission response: $submissionResponseDetails")
             val session =
-              request.session + (submissionDetailsKey -> Json.toJson(submissionResponseDetails.success).toString)
+              request.session + (submissionDetailsKey -> Json.toJson(contactPreferenceSubmission).toString)
             Future.successful(
               Redirect(controllers.changePreferences.routes.PreferenceUpdatedController.onPageLoad())
                 .withSession(session)

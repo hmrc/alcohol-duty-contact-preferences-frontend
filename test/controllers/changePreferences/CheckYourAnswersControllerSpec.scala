@@ -33,8 +33,11 @@ import views.html.changePreferences.CheckYourAnswersView
 
 class CheckYourAnswersControllerSpec extends SpecBase {
 
-  lazy val checkYourAnswersRoute: String =
+  lazy val checkYourAnswersGetRoute: String =
     controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad().url
+
+  lazy val checkYourAnswersPostRoute: String =
+    controllers.changePreferences.routes.CheckYourAnswersController.onSubmit().url
 
   "CheckYourAnswersController" - {
     "onPageLoad" - {
@@ -48,7 +51,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           .build()
 
         running(application) {
-          val request = FakeRequest(GET, checkYourAnswersRoute)
+          val request = FakeRequest(GET, checkYourAnswersGetRoute)
 
           val result = route(application, request).value
 
@@ -78,7 +81,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           .build()
 
         running(application) {
-          val request = FakeRequest(GET, checkYourAnswersRoute)
+          val request = FakeRequest(GET, checkYourAnswersGetRoute)
 
           val result = route(application, request).value
 
@@ -109,7 +112,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           .build()
 
         running(application) {
-          val request = FakeRequest(GET, checkYourAnswersRoute)
+          val request = FakeRequest(GET, checkYourAnswersGetRoute)
 
           val result = route(application, request).value
 
@@ -136,7 +139,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           .build()
 
         running(application) {
-          val request = FakeRequest(GET, checkYourAnswersRoute)
+          val request = FakeRequest(GET, checkYourAnswersGetRoute)
 
           val result = route(application, request).value
 
@@ -158,12 +161,12 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           .build()
 
         running(application) {
-          val request = FakeRequest(GET, checkYourAnswersRoute)
+          val request = FakeRequest(GET, checkYourAnswersGetRoute)
 
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
+          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(pageCheckHelper, times(0)).checkDetailsForCheckYourAnswers(any())
           verify(summaryListHelper, times(0)).createSummaryList(any())(any())
@@ -183,7 +186,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           .build()
 
         running(application) {
-          val request = FakeRequest(GET, checkYourAnswersRoute)
+          val request = FakeRequest(GET, checkYourAnswersGetRoute)
 
           val result = route(application, request).value
 
@@ -197,13 +200,80 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       }
     }
 
-    "onSubmit" - {}
+    "onSubmit" - {
+      "must redirect to the Contact Preference Updated page if submission is successful" in new SetUp {
+        when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Right(contactPreferenceSubmissionEmail)
+
+        val completeUserAnswers = userAnswers.copy(verifiedEmailAddresses = Set(emailAddress))
+
+        val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
+          .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(POST, checkYourAnswersPostRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.changePreferences.routes.PreferenceUpdatedController
+            .onPageLoad()
+            .url
+
+          verify(pageCheckHelper, times(1)).checkDetailsToCreateSubmission(eqTo(completeUserAnswers))
+        }
+      }
+
+      "must redirect to Journey Recovery if submission is not successful" in new SetUp {
+        // TODO when connector for submission has been added
+      }
+
+      "must redirect to Journey Recovery if user answers do not exist" in new SetUp {
+        val application = applicationBuilder(userAnswers = None)
+          .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(POST, checkYourAnswersPostRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+
+          verify(pageCheckHelper, times(0)).checkDetailsForCheckYourAnswers(any())
+        }
+      }
+
+      "must redirect to Journey Recovery if PageCheckHelper returns an error when creating the submission" in new SetUp {
+        when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Left(
+          ErrorModel(BAD_REQUEST, "Error from helper")
+        )
+
+        val application = applicationBuilder(userAnswers = Some(userAnswersPostWithEmail))
+          .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(POST, checkYourAnswersPostRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+
+          verify(pageCheckHelper, times(1)).checkDetailsToCreateSubmission(eqTo(userAnswersPostWithEmail))
+        }
+      }
+
+    }
   }
 
   class SetUp {
     val pageCheckHelper          = mock[PageCheckHelper]
     val summaryListHelper        = mock[CheckYourAnswersSummaryListHelper]
     val emailVerificationService = mock[EmailVerificationService]
+    // TODO: Add mock connector for contact preference submission
 
     val row1             = SummaryListRow(key = Key(Text("Row1Key")), value = Value(Text("Row1Value")))
     val row2             = SummaryListRow(key = Key(Text("Row2Key")), value = Value(Text("Row2Value")))

@@ -35,7 +35,7 @@ class CheckYourAnswersSummaryListHelper @Inject() {
         SummaryListViewModel(rows =
           Seq(
             contactPreferenceRow(emailSelected = false),
-            correspondenceAddressRow("") // TODO: Use correspondence address
+            correspondenceAddressRow("TODO") // TODO: Use correspondence address
           )
         )
       case (Some(true), Some(email)) =>

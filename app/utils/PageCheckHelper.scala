@@ -97,9 +97,7 @@ class PageCheckHelper @Inject() {
     }
   }
 
-  def createSubmissionForCheckYourAnswers(
-    userAnswers: UserAnswers
-  ): Either[ErrorModel, PaperlessPreferenceSubmission] = {
+  def checkDetailsToCreateSubmission(userAnswers: UserAnswers): Either[ErrorModel, PaperlessPreferenceSubmission] = {
     val contactPreferenceOption = userAnswers.get(ContactPreferencePage)
     val enteredEmailAddress     = userAnswers.emailAddress
 
@@ -114,14 +112,18 @@ class PageCheckHelper @Inject() {
           )
         )
       case (Some(true), Some(email)) =>
-        Right(
-          PaperlessPreferenceSubmission(
-            paperlessPreference = true,
-            emailAddress = Some(email),
-            emailVerification = Some(true),
-            bouncedEmail = Some(false)
+        if (userAnswers.verifiedEmailAddresses.contains(email)) {
+          Right(
+            PaperlessPreferenceSubmission(
+              paperlessPreference = true,
+              emailAddress = Some(email),
+              emailVerification = Some(true),
+              bouncedEmail = Some(false)
+            )
           )
-        )
+        } else {
+          Left(ErrorModel(BAD_REQUEST, "Error creating submission: Email address is not verified."))
+        }
       case _                         =>
         Left(ErrorModel(BAD_REQUEST, "Error creating submission: User answers do not contain the required data."))
     }

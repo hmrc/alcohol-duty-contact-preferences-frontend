@@ -73,6 +73,9 @@ changePreferences.enter-email-address.heading = What is the email address we sho
 changePreferences.enter-email-address.empty-error = Enter an email address
 changePreferences.enter-email-address.format-error = Enter an email address in the correct format, like name@example.com
 
+correspondenceAddress.title = Your correspondence address
+correspondenceAddress.heading = Your correspondence address
+
 emailLocked.title = You cannot request another confirmation code
 emailLocked.heading = You cannot request another confirmation code
 emailLocked.guidance1 = To keep your account secure, we limit how many times you can request an email confirmation code.
@@ -89,5 +92,8 @@ checkYourAnswers.emailAddress.key = Email address
 checkYourAnswers.emailAddress.change.hidden = email address
 checkYourAnswers.correspondenceAddress.key = Address
 checkYourAnswers.correspondenceAddress.change.hidden = address
+
+preferenceUpdated.title = Your contact preference has been updated
+preferenceUpdated.heading = Your contact preference has been updated
 
 emailVerificationJourney.signature = Manage your Alcohol Duty Service

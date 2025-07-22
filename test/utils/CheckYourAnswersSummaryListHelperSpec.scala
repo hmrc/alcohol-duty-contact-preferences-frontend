@@ -63,7 +63,7 @@ class CheckYourAnswersSummaryListHelperSpec extends SpecBase {
 
   val correspondenceAddressRow = SummaryListRowViewModel(
     key = KeyViewModel(HtmlContent(messages("checkYourAnswers.correspondenceAddress.key"))),
-    value = ValueViewModel(HtmlContent("")), // TODO: Add correspondence address
+    value = ValueViewModel(HtmlContent("TODO")), // TODO: Add correspondence address
     actions = Seq(
       ActionItemViewModel(
         HtmlContent(messages("site.change")),
