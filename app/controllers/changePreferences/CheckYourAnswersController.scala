@@ -16,9 +16,9 @@
 
 package controllers.changePreferences
 
-import cats.data.EitherT
 import com.google.inject.Inject
 import config.Constants.submissionDetailsKey
+import connectors.SubmitPreferencesConnector
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import controllers.routes
 import models._
@@ -31,7 +31,6 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.{CheckYourAnswersSummaryListHelper, PageCheckHelper}
 import views.html.changePreferences.CheckYourAnswersView
 
-import java.time.Instant
 import scala.concurrent.{ExecutionContext, Future}
 
 class CheckYourAnswersController @Inject() (
@@ -42,6 +41,7 @@ class CheckYourAnswersController @Inject() (
   pageCheckHelper: PageCheckHelper,
   summaryListHelper: CheckYourAnswersSummaryListHelper,
   emailVerificationService: EmailVerificationService,
+  submitPreferencesConnector: SubmitPreferencesConnector,
   val controllerComponents: MessagesControllerComponents,
   view: CheckYourAnswersView
 )(implicit ec: ExecutionContext)
@@ -89,28 +89,24 @@ class CheckYourAnswersController @Inject() (
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
     pageCheckHelper.checkDetailsToCreateSubmission(request.userAnswers) match {
       case Right(contactPreferenceSubmission) =>
-        // TODO: ADR-2151 - add connector and backend code to submit contact preferences, obtain response and delete user answers
-        logger.debug(s"Created contact preference submission: ${Json.toJson(contactPreferenceSubmission)}")
-        val submissionResponse = EitherT.rightT[Future, ErrorModel](
-          PaperlessPreferenceSubmittedSuccess(PaperlessPreferenceSubmittedResponse(Instant.now(), "910000000000"))
-        )
-
-        submissionResponse.foldF(
-          error => {
-            logger.warn(error.message)
-            Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-          },
-          submissionResponseDetails => {
-            logger.info("Successfully submitted contact preferences")
-            logger.debug(s"Submission response: $submissionResponseDetails")
-            val session =
-              request.session + (submissionDetailsKey -> Json.toJson(contactPreferenceSubmission).toString)
-            Future.successful(
-              Redirect(controllers.changePreferences.routes.PreferenceUpdatedController.onPageLoad())
-                .withSession(session)
-            )
-          }
-        )
+        submitPreferencesConnector
+          .submitContactPreferences(contactPreferenceSubmission, request.appaId)
+          .foldF(
+            error => {
+              logger.warn(error.message)
+              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+            },
+            submissionResponseDetails => {
+              logger.info("Successfully submitted contact preferences")
+              logger.debug(s"Submission response: $submissionResponseDetails")
+              val session =
+                request.session + (submissionDetailsKey -> Json.toJson(contactPreferenceSubmission).toString)
+              Future.successful(
+                Redirect(controllers.changePreferences.routes.PreferenceUpdatedController.onPageLoad())
+                  .withSession(session)
+              )
+            }
+          )
       case Left(error)                        =>
         logger.warn(error.message)
         Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
