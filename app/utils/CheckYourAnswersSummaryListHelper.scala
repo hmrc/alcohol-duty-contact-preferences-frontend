@@ -35,7 +35,7 @@ class CheckYourAnswersSummaryListHelper @Inject() {
         SummaryListViewModel(rows =
           Seq(
             contactPreferenceRow(emailSelected = false),
-            correspondenceAddressRow("TODO") // TODO: Use correspondence address
+            correspondenceAddressRow("TODO") // TODO: ADR-1609 - Use correspondence address
           )
         )
       case (Some(true), Some(email)) =>
@@ -46,7 +46,9 @@ class CheckYourAnswersSummaryListHelper @Inject() {
           )
         )
       case _                         =>
-        throw new RuntimeException("User answers do not contain the required data but not picked up by PageCheckHelper")
+        throw new IllegalStateException(
+          "User answers do not contain the required data but not picked up by PageCheckHelper"
+        )
     }
   }
 

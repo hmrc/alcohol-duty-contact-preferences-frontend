@@ -101,7 +101,7 @@ class Navigator @Inject() (
         logger.info("User selected email and is currently on email. Redirecting to /enrolled-emails")
         controllers.changePreferences.routes.EnrolledEmailsController.onPageLoad()
       case (Some(false), true, _)     =>
-        // TODO: Change to correspondence address page when ready
+        // TODO: ADR-1609 - Change to correspondence address page when ready
         logger.info("User selected post and is currently on email. Redirecting to Check Your Answers")
         controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad()
       case (Some(false), false, _)    =>

@@ -225,7 +225,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       }
 
       "must redirect to Journey Recovery if submission is not successful" in new SetUp {
-        // TODO when connector for submission has been added
+        // TODO: ADR-2151 - Add test when connector for submission has been added
       }
 
       "must redirect to Journey Recovery if user answers do not exist" in new SetUp {
@@ -273,7 +273,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
     val pageCheckHelper          = mock[PageCheckHelper]
     val summaryListHelper        = mock[CheckYourAnswersSummaryListHelper]
     val emailVerificationService = mock[EmailVerificationService]
-    // TODO: Add mock connector for contact preference submission
+    // TODO: ADR-2151 - Add mock connector for contact preference submission
 
     val row1             = SummaryListRow(key = Key(Text("Row1Key")), value = Value(Text("Row1Value")))
     val row2             = SummaryListRow(key = Key(Text("Row2Key")), value = Value(Text("Row2Value")))

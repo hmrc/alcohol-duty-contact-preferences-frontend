@@ -89,7 +89,7 @@ class NavigatorSpec extends SpecBase {
           ) mustBe controllers.changePreferences.routes.EnrolledEmailsController.onPageLoad()
         }
 
-        // TODO: Change to correspondence address page when ready
+        // TODO: ADR-1609 - Change to correspondence address page when ready
         "must go to the Check Your Answers page if the user is currently on email and has selected post" in {
           navigator.nextPage(
             ContactPreferencePage,
@@ -178,7 +178,7 @@ class NavigatorSpec extends SpecBase {
           Some(true)
         ) mustBe controllers.changePreferences.routes.EnrolledEmailsController.onPageLoad()
 
-        // TODO: Change to correspondence address page when ready
+        // TODO: ADR-1609 - Change to correspondence address page when ready
         navigator.nextPage(
           ContactPreferencePage,
           CheckMode,

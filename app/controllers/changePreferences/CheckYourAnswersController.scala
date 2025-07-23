@@ -54,7 +54,9 @@ class CheckYourAnswersController @Inject() (
       case Right(mustCheckVerificationStatus) =>
         if (mustCheckVerificationStatus) {
           val enteredEmail = request.userAnswers.emailAddress.getOrElse(
-            throw new RuntimeException("Entered email address missing from user answers")
+            throw new IllegalStateException(
+              "Entered email address missing from user answers but not picked up by PageCheckHelper"
+            )
           )
           emailVerificationService
             .retrieveAddressStatusAndAddToCache(VerificationDetails(request.credId), enteredEmail, request.userAnswers)
@@ -87,7 +89,7 @@ class CheckYourAnswersController @Inject() (
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
     pageCheckHelper.checkDetailsToCreateSubmission(request.userAnswers) match {
       case Right(contactPreferenceSubmission) =>
-        // TODO: add connector and backend code to submit contact preferences, obtain response and delete user answers
+        // TODO: ADR-2151 - add connector and backend code to submit contact preferences, obtain response and delete user answers
         logger.debug(s"Created contact preference submission: ${Json.toJson(contactPreferenceSubmission)}")
         val submissionResponse = EitherT.rightT[Future, ErrorModel](
           PaperlessPreferenceSubmittedSuccess(PaperlessPreferenceSubmittedResponse(Instant.now(), "910000000000"))

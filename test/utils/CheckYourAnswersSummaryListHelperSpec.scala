@@ -86,14 +86,14 @@ class CheckYourAnswersSummaryListHelperSpec extends SpecBase {
     }
 
     "must throw an exception if no contact preference is selected" in {
-      val exception = intercept[RuntimeException] {
+      val exception = intercept[IllegalStateException] {
         summaryListHelper.createSummaryList(emptyUserAnswers)
       }
       exception.getMessage mustBe "User answers do not contain the required data but not picked up by PageCheckHelper"
     }
 
     "must throw an exception if email is selected but no email address is provided" in {
-      val exception = intercept[RuntimeException] {
+      val exception = intercept[IllegalStateException] {
         summaryListHelper.createSummaryList(userAnswersPostWithEmail)
       }
       exception.getMessage mustBe "User answers do not contain the required data but not picked up by PageCheckHelper"
