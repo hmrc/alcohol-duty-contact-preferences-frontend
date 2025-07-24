@@ -20,7 +20,7 @@ import cats.data.EitherT
 import config.FrontendAppConfig
 import models.{ErrorModel, PaperlessPreferenceSubmission, PaperlessPreferenceSubmittedResponse}
 import play.api.Logging
-import play.api.http.Status.INTERNAL_SERVER_ERROR
+import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReadsInstances, HttpResponse, StringContextOps, UpstreamErrorResponse}
@@ -43,27 +43,31 @@ class SubmitPreferencesConnector @Inject() (
       .put(url"${config.ecpSubmitContactPreferencesUrl(appaId)}")
       .withBody(Json.toJson(contactPreferenceSubmission))
       .execute[Either[UpstreamErrorResponse, HttpResponse]]
-      .flatMap {
-        case Right(response)     =>
+      .map {
+        case Right(response) if response.status == OK =>
           Try(response.json.as[PaperlessPreferenceSubmittedResponse]) match {
-            case Success(successResponse) => Future.successful(Right(successResponse))
+            case Success(successResponse) => Right(successResponse)
             case Failure(_)               =>
               logger.warn(s"Invalid JSON format, failed to parse as PaperlessPreferenceSubmittedResponse")
-              Future.successful(
-                Left(
-                  ErrorModel(
-                    INTERNAL_SERVER_ERROR,
-                    "Invalid JSON format. Could not parse response as PaperlessPreferenceSubmittedResponse"
-                  )
+              Left(
+                ErrorModel(
+                  INTERNAL_SERVER_ERROR,
+                  "Invalid JSON format. Could not parse response as PaperlessPreferenceSubmittedResponse"
                 )
               )
           }
-        case Left(errorResponse) =>
+        case Left(errorResponse)                      =>
           logger.warn(
             s"Unexpected response when submitting contact preferences. Status: ${errorResponse.statusCode}, Message: ${errorResponse.message}"
           )
-          Future.successful(
-            Left(ErrorModel(errorResponse.statusCode, s"Unexpected response. Status: ${errorResponse.statusCode}"))
+          Left(ErrorModel(errorResponse.statusCode, s"Unexpected response. Status: ${errorResponse.statusCode}"))
+        case Right(response)                          =>
+          logger.warn(s"Unexpected status code when submitting contact preferences: ${response.status}")
+          Left(
+            ErrorModel(
+              INTERNAL_SERVER_ERROR,
+              s"Unexpected status code when submitting contact preferences: ${response.status}"
+            )
           )
       }
   }
