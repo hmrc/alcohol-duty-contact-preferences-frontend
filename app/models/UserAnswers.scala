@@ -90,7 +90,8 @@ case class SubscriptionSummary(
   paperlessReference: Boolean,
   emailAddress: Option[String],
   emailVerification: Option[Boolean],
-  bouncedEmail: Option[Boolean]
+  bouncedEmail: Option[Boolean],
+  correspondenceAddress: String
 )
 
 object SubscriptionSummary {

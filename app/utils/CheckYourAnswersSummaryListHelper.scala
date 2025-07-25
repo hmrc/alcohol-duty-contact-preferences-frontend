@@ -35,7 +35,7 @@ class CheckYourAnswersSummaryListHelper @Inject() {
         SummaryListViewModel(rows =
           Seq(
             contactPreferenceRow(emailSelected = false),
-            correspondenceAddressRow("TODO") // TODO: ADR-1609 - Use correspondence address
+            correspondenceAddressRow(userAnswers.subscriptionSummary.correspondenceAddress)
           )
         )
       case (Some(true), Some(email)) =>
@@ -80,7 +80,7 @@ class CheckYourAnswersSummaryListHelper @Inject() {
   private def correspondenceAddressRow(correspondenceAddress: String)(implicit messages: Messages): SummaryListRow =
     SummaryListRowViewModel(
       key = KeyViewModel(HtmlContent(messages("checkYourAnswers.correspondenceAddress.key"))),
-      value = ValueViewModel(HtmlContent(correspondenceAddress)),
+      value = ValueViewModel(HtmlContent(correspondenceAddress.replace("\n", "<br>"))),
       actions = Seq(
         ActionItemViewModel(
           HtmlContent(messages("site.change")),
