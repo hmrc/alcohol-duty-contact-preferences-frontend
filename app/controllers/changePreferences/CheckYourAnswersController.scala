@@ -96,11 +96,10 @@ class CheckYourAnswersController @Inject() (
               logger.warn(error.message)
               Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
             },
-            submissionResponseDetails => {
+            submissionResponse => {
               logger.info("Successfully submitted contact preferences")
-              logger.debug(s"Submission response: $submissionResponseDetails")
               val session =
-                request.session + (submissionDetailsKey -> Json.toJson(contactPreferenceSubmission).toString)
+                request.session + (submissionDetailsKey -> Json.toJson(submissionResponse).toString)
               Future.successful(
                 Redirect(controllers.changePreferences.routes.PreferenceUpdatedController.onPageLoad())
                   .withSession(session)
