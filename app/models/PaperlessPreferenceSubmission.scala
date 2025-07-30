@@ -31,6 +31,7 @@ object PaperlessPreferenceSubmission {
   import JsonHelpers.booleanReads
   import JsonHelpers.booleanWrites
 
+
   implicit val paperlessPreferenceFormat: OFormat[PaperlessPreferenceSubmission] =
     Json.format[PaperlessPreferenceSubmission]
 }
