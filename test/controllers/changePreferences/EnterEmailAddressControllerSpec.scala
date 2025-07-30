@@ -168,7 +168,7 @@ class EnterEmailAddressControllerSpec extends SpecBase {
             HttpResponse(OK, "Test success")
           )
           when(mockNavigator.enterEmailAddressNavigation(any(), any())(any(), any(), any())) thenReturn Future
-            .successful(Redirect(routes.CheckYourAnswersController.onPageLoad().url))
+            .successful(Redirect(controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad().url))
 
           val application =
             applicationBuilder(userAnswers = Some(emptyUserAnswers.copy(verifiedEmailAddresses = Set(emailAddress2))))
@@ -185,7 +185,8 @@ class EnterEmailAddressControllerSpec extends SpecBase {
             val result  = route(application, request).value
 
             status(result) mustEqual SEE_OTHER
-            redirectLocation(result).value mustEqual routes.CheckYourAnswersController.onPageLoad().url
+            redirectLocation(result).value mustEqual
+              controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad().url
             verify(mockUserAnswersService, times(1)).set(any())(any())
             verify(mockNavigator, times(1)).enterEmailAddressNavigation(any(), any())(any(), any(), any())
           }

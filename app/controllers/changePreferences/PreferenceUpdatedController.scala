@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,31 +14,34 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.changePreferences
 
-import com.google.inject.Inject
-import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import play.api.i18n.{I18nSupport, MessagesApi}
+import config.Constants.submissionDetailsKey
+import controllers.actions.IdentifierAction
+import play.api.Logging
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import viewmodels.govuk.summarylist._
-import views.html.CheckYourAnswersView
+import views.html.changePreferences.PreferenceUpdatedView
 
-class CheckYourAnswersController @Inject() (
-  override val messagesApi: MessagesApi,
+import javax.inject.Inject
+
+class PreferenceUpdatedController @Inject() (
   identify: IdentifierAction,
-  getData: DataRetrievalAction,
-  requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  view: CheckYourAnswersView
+  view: PreferenceUpdatedView
 ) extends FrontendBaseController
-    with I18nSupport {
+    with I18nSupport
+    with Logging {
 
-  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    val list = SummaryListViewModel(
-      rows = Seq.empty
-    )
-
-    Ok(view(list))
+  def onPageLoad(): Action[AnyContent] = identify { implicit request =>
+    request.session.get(submissionDetailsKey) match {
+      case None                    =>
+        logger.warn("Submission details not present in session")
+        Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+      case Some(submissionDetails) =>
+        logger.debug(submissionDetails)
+        Ok(view())
+    }
   }
 }

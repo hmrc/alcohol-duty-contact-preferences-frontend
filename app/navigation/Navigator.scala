@@ -46,7 +46,7 @@ class Navigator @Inject() (
     case ExistingEmailPage     =>
       userAnswers =>
         userAnswers.get(ExistingEmailPage) match {
-          case Some(true)  => routes.CheckYourAnswersController.onPageLoad()
+          case Some(true)  => controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad()
           case Some(false) => controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode)
           case None        => routes.JourneyRecoveryController.onPageLoad()
         }
@@ -62,14 +62,14 @@ class Navigator @Inject() (
       userAnswers =>
         hasChanged =>
           if (hasChanged) contactPreferenceRoute(userAnswers)
-          else routes.CheckYourAnswersController.onPageLoad()
+          else controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad()
     case _                     =>
       _ =>
         _ =>
           logger.warn(
             "Navigation attempted from a page that doesn't exist in the route map in check mode. Redirecting to Check Your Answers."
           )
-          routes.CheckYourAnswersController.onPageLoad()
+          controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad()
   }
 
   def nextPage(page: Page, mode: Mode, userAnswers: UserAnswers, hasAnswerChanged: Option[Boolean]): Call = mode match {
@@ -101,8 +101,9 @@ class Navigator @Inject() (
         logger.info("User selected email and is currently on email. Redirecting to /enrolled-emails")
         controllers.changePreferences.routes.EnrolledEmailsController.onPageLoad()
       case (Some(false), true, _)     =>
+        // TODO: ADR-1609 - Change to correspondence address page when ready
         logger.info("User selected post and is currently on email. Redirecting to Check Your Answers")
-        routes.CheckYourAnswersController.onPageLoad()
+        controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad()
       case (Some(false), false, _)    =>
         logger.info("User selected post and is currently on post. Redirecting to /enrolled-letters")
         controllers.changePreferences.routes.EnrolledLettersController.onPageLoad()
@@ -123,7 +124,7 @@ class Navigator @Inject() (
     (isVerified, isLocked) match {
       case (true, _)      =>
         logger.info("User has a verified email address. Redirecting to Check Your Answers")
-        Future.successful(Redirect(routes.CheckYourAnswersController.onPageLoad()))
+        Future.successful(Redirect(controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad()))
       case (false, true)  =>
         logger.info("User has been locked out for the entered email address.")
         Future.successful(Redirect(controllers.changePreferences.routes.EmailLockedController.onPageLoad()))

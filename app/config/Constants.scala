@@ -17,6 +17,7 @@
 package config
 
 object Constants {
+  val submissionDetailsKey: String = "submission-response"
 
   val ukTimeZoneStringId = "Europe/London"
 

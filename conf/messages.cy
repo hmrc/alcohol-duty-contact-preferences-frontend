@@ -2,10 +2,11 @@ service.name = Rheoli’ch Toll Alcohol
 
 site.back = Yn ôl
 site.remove = NOT_FOUND
-site.change = NOT_FOUND
+site.change = Newid
 site.no = Na
 site.yes = Iawn
 site.continue = Parhau
+site.submit = Cyflwyno
 site.start = NOT_FOUND
 site.startAgain = NOT_FOUND
 site.signIn = NOT_FOUND
@@ -31,9 +32,6 @@ error.summary.title = Mae problem.
 index.title = NOT_FOUND
 index.heading = NOT_FOUND
 index.guidance = NOT_FOUND
-
-checkYourAnswers.title = NOT_FOUND
-checkYourAnswers.heading = NOT_FOUND
 
 journeyRecovery.continue.title = NOT_FOUND
 journeyRecovery.continue.heading = NOT_FOUND
@@ -75,9 +73,27 @@ changePreferences.enter-email-address.heading = Pa gyfeiriad e-bost y dylem ei d
 changePreferences.enter-email-address.empty-error = Nodwch gyfeiriad e-bost
 changePreferences.enter-email-address.format-error = Nodwch gyfeiriad e-bost yn y fformat cywir, megis enw@enghraifft.com
 
+correspondenceAddress.title = Eich cyfeiriad gohebu
+correspondenceAddress.heading = Eich cyfeiriad gohebu
+
 emailLocked.title = Ni allwch ofyn am god cadarnhau arall
 emailLocked.heading = Ni allwch ofyn am god cadarnhau arall
 emailLocked.guidance1 = Er mwyn cadw’ch cyfrif yn ddiogel, rydym yn cyfyngu ar nifer y troeon y gallwch ofyn am god cadarnhau e-bost.
 emailLocked.guidance2 = Gallwch roi cynnig arall arni ymhen 24 awr.
+
+checkYourAnswers.title = Gwiriwch eich atebion
+checkYourAnswers.heading = Gwiriwch eich atebion
+checkYourAnswers.h2 = Dewis o ran cysylltu
+checkYourAnswers.contactPreference.key = Sut yr hoffech i ni gysylltu â chi?
+checkYourAnswers.contactPreference.email = E-bostiwch fi pan fo gennyf neges digidol
+checkYourAnswers.contactPreference.post = Anfonwch lythyrau ataf drwy’r post
+checkYourAnswers.contactPreference.change.hidden = sut yr hoffech i ni gysylltu â chi
+checkYourAnswers.emailAddress.key = Cyfeiriad e-bost
+checkYourAnswers.emailAddress.change.hidden = cyfeiriad e-bost
+checkYourAnswers.correspondenceAddress.key = Cyfeiriad
+checkYourAnswers.correspondenceAddress.change.hidden = cyfeiriad
+
+preferenceUpdated.title = Mae’ch dewis o ran cysylltu wedi’i ddiweddaru
+preferenceUpdated.heading = Mae’ch dewis o ran cysylltu wedi’i ddiweddaru
 
 emailVerificationJourney.signature = Rheoli’ch Gwasanaeth Toll Alcohol
