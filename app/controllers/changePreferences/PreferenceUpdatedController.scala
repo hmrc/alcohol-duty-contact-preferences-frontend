@@ -37,7 +37,7 @@ class PreferenceUpdatedController @Inject() (
 ) extends FrontendBaseController
     with I18nSupport
     with Logging {
-      
+
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     request.session.get(submissionDetailsKey) match {
       case None                     =>
