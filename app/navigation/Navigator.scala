@@ -91,7 +91,7 @@ class Navigator @Inject() (
       case (true, Some(false)) =>
         logger.info("User is currently on email and changing to post. Redirecting to /correspondence-address")
         controllers.changePreferences.routes.CorrespondenceAddressController.onPageLoad()
-      case (true, Some(true)) =>
+      case (true, Some(true))  =>
         logger.info("User is currently on email and updating their email. Redirecting to /existing-email")
         controllers.changePreferences.routes.ExistingEmailController.onPageLoad()
       case (false, Some(true)) =>
