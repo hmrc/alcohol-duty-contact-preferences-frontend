@@ -57,9 +57,7 @@ class SubmitPreferencesConnector @Inject() (
               )
           }
         case Left(errorResponse)                      =>
-          logger.warn(
-            s"Unexpected response when submitting contact preferences. Status: ${errorResponse.statusCode}, Message: ${errorResponse.message}"
-          )
+          logger.warn(s"Unexpected response when submitting contact preferences. Status: ${errorResponse.statusCode}")
           Left(ErrorModel(errorResponse.statusCode, s"Unexpected response. Status: ${errorResponse.statusCode}"))
         case Right(response)                          =>
           logger.warn(s"Unexpected status code when submitting contact preferences: ${response.status}")

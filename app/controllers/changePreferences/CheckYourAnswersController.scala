@@ -92,10 +92,7 @@ class CheckYourAnswersController @Inject() (
         submitPreferencesConnector
           .submitContactPreferences(contactPreferenceSubmission, request.appaId)
           .foldF(
-            error => {
-              logger.warn(error.message)
-              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-            },
+            _ => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())),
             submissionResponse => {
               logger.info("Successfully submitted contact preferences")
               val session =
