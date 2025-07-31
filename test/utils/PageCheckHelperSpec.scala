@@ -103,6 +103,14 @@ class PageCheckHelperSpec extends SpecBase {
       )
     }
 
+    "must return a Left containing an ErrorModel if the user has a bounced email" in {
+      val result = testHelper.checkDetailsForExistingEmailPage(userAnswersPostWithBouncedEmail)
+
+      result mustBe Left(
+        ErrorModel(BAD_REQUEST, "Error on existing email page: User has a bounced email.")
+      )
+    }
+
     "must return a Left containing an ErrorModel if the user's email in the subscription summary is not verified" in {
       val result = testHelper.checkDetailsForExistingEmailPage(userAnswersPostWithUnverifiedEmail)
 

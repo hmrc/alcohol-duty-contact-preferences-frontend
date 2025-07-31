@@ -64,6 +64,7 @@ class PageCheckHelper @Inject() {
 
   def checkDetailsForExistingEmailPage(userAnswers: UserAnswers): Either[ErrorModel, String] = {
     val existingEmail             = userAnswers.subscriptionSummary.emailAddress
+    val hasBouncedEmail           = userAnswers.subscriptionSummary.bouncedEmail.contains(true)
     val isExistingEmailVerified   = userAnswers.subscriptionSummary.emailVerification.contains(true)
     val isEmailPreferenceSelected = userAnswers.get(ContactPreferencePage).contains(true)
 
@@ -71,7 +72,9 @@ class PageCheckHelper @Inject() {
       case None        =>
         Left(ErrorModel(BAD_REQUEST, "Error on existing email page: User has no email in subscription summary."))
       case Some(email) =>
-        if (!isExistingEmailVerified) {
+        if (hasBouncedEmail) {
+          Left(ErrorModel(BAD_REQUEST, "Error on existing email page: User has a bounced email."))
+        } else if (!isExistingEmailVerified) {
           Left(
             ErrorModel(
               BAD_REQUEST,

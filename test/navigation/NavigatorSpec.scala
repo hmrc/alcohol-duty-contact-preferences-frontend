@@ -53,7 +53,26 @@ class NavigatorSpec extends SpecBase {
       }
 
       "from the Contact Preference page (i.e. when entering the service)" - {
-        "must go to the What Email Address page if the user is currently on post, has selected email and has no email in ETMP" in {
+        // TODO: ADR-1609 - Change to correspondence address page when ready
+        "must go to the Correspondence Address page if the user is currently on email and changing to post" in {
+          navigator.nextPage(
+            ContactPreferencePage,
+            NormalMode,
+            userAnswers,
+            None
+          ) mustBe controllers.changePreferences.routes.CorrespondenceAddressController.onPageLoad()
+        }
+
+        "must go to the Existing Email page if the user is currently on email and updating their email" in {
+          navigator.nextPage(
+            ContactPreferencePage,
+            NormalMode,
+            userAnswers.set(ContactPreferencePage, true).success.value,
+            None
+          ) mustBe controllers.changePreferences.routes.ExistingEmailController.onPageLoad()
+        }
+
+        "must go to the What Email Address page if the user is currently on post, changing to email and has no email in ETMP" in {
           navigator.nextPage(
             ContactPreferencePage,
             NormalMode,
@@ -62,7 +81,7 @@ class NavigatorSpec extends SpecBase {
           ) mustBe controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode)
         }
 
-        "must go to the What Email Address page if the user is currently on post, has selected email and has an unverified email in ETMP" in {
+        "must go to the What Email Address page if the user is currently on post, changing to email and has an unverified email in ETMP" in {
           navigator.nextPage(
             ContactPreferencePage,
             NormalMode,
@@ -71,7 +90,7 @@ class NavigatorSpec extends SpecBase {
           ) mustBe controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode)
         }
 
-        "must go to the Existing Email page if the user is currently on post, has selected email and has a verified email in ETMP" in {
+        "must go to the Existing Email page if the user is currently on post, changing to email and has a verified email in ETMP" in {
           navigator.nextPage(
             ContactPreferencePage,
             NormalMode,
@@ -80,14 +99,14 @@ class NavigatorSpec extends SpecBase {
           ) mustBe controllers.changePreferences.routes.ExistingEmailController.onPageLoad()
         }
 
-        // TODO: ADR-1609 - Change to correspondence address page when ready
-        "must go to the Check Your Answers page if the user is currently on email and has selected post" in {
+        // TODO: ADR-1642 - Bounced email page
+        "must go to the Bounced Email page if the user is currently on post, changing to email and has a bounced email" in {
           navigator.nextPage(
             ContactPreferencePage,
             NormalMode,
-            userAnswers,
+            userAnswersPostWithBouncedEmail,
             None
-          ) mustBe controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad()
+          ) mustBe routes.IndexController.onPageLoad()
         }
 
         "must redirect to journey recovery if the contact preference is missing" in {
@@ -95,6 +114,15 @@ class NavigatorSpec extends SpecBase {
             ContactPreferencePage,
             NormalMode,
             emptyUserAnswers,
+            None
+          ) mustBe routes.JourneyRecoveryController.onPageLoad()
+        }
+
+        "must redirect to journey recovery if the user is on post and post is selected (no such link from BTA)" in {
+          navigator.nextPage(
+            ContactPreferencePage,
+            NormalMode,
+            userAnswersPostNoEmail.set(ContactPreferencePage, false).success.value,
             None
           ) mustBe routes.JourneyRecoveryController.onPageLoad()
         }
@@ -130,48 +158,7 @@ class NavigatorSpec extends SpecBase {
       }
     }
 
-    // TODO: Contact preference page check mode will be removed under Elmer's suggested changes
     "in Check mode" - {
-      "must go from the Contact Preference page to the next page in normal mode if the answer has changed" in {
-        navigator.nextPage(
-          ContactPreferencePage,
-          CheckMode,
-          userAnswersPostNoEmail,
-          Some(true)
-        ) mustBe controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode)
-
-        navigator.nextPage(
-          ContactPreferencePage,
-          NormalMode,
-          userAnswersPostWithUnverifiedEmail,
-          None
-        ) mustBe controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode)
-
-        navigator.nextPage(
-          ContactPreferencePage,
-          CheckMode,
-          userAnswersPostWithEmail,
-          Some(true)
-        ) mustBe controllers.changePreferences.routes.ExistingEmailController.onPageLoad()
-
-        // TODO: ADR-1609 - Change to correspondence address page when ready
-        navigator.nextPage(
-          ContactPreferencePage,
-          CheckMode,
-          userAnswers,
-          Some(true)
-        ) mustBe controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad()
-      }
-
-      "must go from the Contact Preference page to the Check Your Answers page if the answer has not changed" in {
-        navigator.nextPage(
-          ContactPreferencePage,
-          CheckMode,
-          userAnswers.set(ContactPreferencePage, true).success.value,
-          Some(false)
-        ) mustBe controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad()
-      }
-
       "must go from a page that doesn't exist in the edit route map to CheckYourAnswers" in {
         case object UnknownPage extends Page
         navigator.nextPage(UnknownPage, CheckMode, userAnswers, Some(false)) mustBe
