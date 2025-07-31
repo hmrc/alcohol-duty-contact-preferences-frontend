@@ -73,7 +73,7 @@ class ExistingEmailControllerSpec extends SpecBase {
         }
       }
 
-      "must populate the view correctly on a GET if user answers already exist" in {
+      "must populate the view correctly on a GET if the question has already been answered" in {
         val mockHelper = mock[PageCheckHelper]
 
         when(mockHelper.checkDetailsForExistingEmailPage(any())) thenReturn Right(emailAddress)

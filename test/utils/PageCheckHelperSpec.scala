@@ -25,9 +25,12 @@ class PageCheckHelperSpec extends SpecBase {
 
   val testHelper = new PageCheckHelper()
 
+  // TODO: Purpose and position of this page will change under Elmer's suggestions
   "checkDetailsForEnrolledEmailsPage" - {
     "must return a Right containing the email address if the user is currently on email and has selected email" in {
-      val result = testHelper.checkDetailsForEnrolledEmailsPage(userAnswers)
+      val result = testHelper.checkDetailsForEnrolledEmailsPage(
+        userAnswers.set(ContactPreferencePage, true).success.value
+      )
 
       result mustBe Right(emailAddress)
     }
@@ -39,16 +42,18 @@ class PageCheckHelperSpec extends SpecBase {
     }
 
     "must return a Left containing an ErrorModel if the user has not selected email on the contact preference page" in {
-      val result = testHelper.checkDetailsForEnrolledEmailsPage(
-        userAnswers.set(ContactPreferencePage, false).success.value
-      )
+      val result = testHelper.checkDetailsForEnrolledEmailsPage(userAnswers)
 
       result mustBe Left(ErrorModel(BAD_REQUEST, "Error on enrolled emails page: User has not selected email."))
     }
 
     "must return a Left containing an ErrorModel if the user has no email in the subscription summary" in {
       val result = testHelper.checkDetailsForEnrolledEmailsPage(
-        userAnswers.copy(subscriptionSummary = subscriptionSummaryEmail.copy(emailAddress = None))
+        userAnswers
+          .copy(subscriptionSummary = subscriptionSummaryEmail.copy(emailAddress = None))
+          .set(ContactPreferencePage, true)
+          .success
+          .value
       )
 
       result mustBe Left(
@@ -60,9 +65,12 @@ class PageCheckHelperSpec extends SpecBase {
     }
   }
 
+  // TODO: This page will be removed under Elmer's suggestions
   "checkDetailsForEnrolledLettersPage" - {
     "must return a Right containing Unit if the user is currently on post and has selected post" in {
-      val result = testHelper.checkDetailsForEnrolledLettersPage(userAnswersPostNoEmail)
+      val result = testHelper.checkDetailsForEnrolledLettersPage(
+        userAnswersPostNoEmail.set(ContactPreferencePage, false).success.value
+      )
 
       result mustBe Right(())
     }
@@ -73,10 +81,8 @@ class PageCheckHelperSpec extends SpecBase {
       result mustBe Left(ErrorModel(BAD_REQUEST, "Error on enrolled letters page: User is currently on email."))
     }
 
-    "must return a Left containing an ErrorModel if the user has not selected email on the contact preference page" in {
-      val result = testHelper.checkDetailsForEnrolledLettersPage(
-        userAnswersPostNoEmail.set(ContactPreferencePage, true).success.value
-      )
+    "must return a Left containing an ErrorModel if the user has not selected post on the contact preference page" in {
+      val result = testHelper.checkDetailsForEnrolledLettersPage(userAnswersPostNoEmail)
 
       result mustBe Left(ErrorModel(BAD_REQUEST, "Error on enrolled letters page: User has not selected post."))
     }
@@ -97,6 +103,14 @@ class PageCheckHelperSpec extends SpecBase {
       )
     }
 
+    "must return a Left containing an ErrorModel if the user has a bounced email" in {
+      val result = testHelper.checkDetailsForExistingEmailPage(userAnswersPostWithBouncedEmail)
+
+      result mustBe Left(
+        ErrorModel(BAD_REQUEST, "Error on existing email page: User has a bounced email.")
+      )
+    }
+
     "must return a Left containing an ErrorModel if the user's email in the subscription summary is not verified" in {
       val result = testHelper.checkDetailsForExistingEmailPage(userAnswersPostWithUnverifiedEmail)
 
@@ -105,35 +119,61 @@ class PageCheckHelperSpec extends SpecBase {
       )
     }
 
-    "must return a Left containing an ErrorModel if the user has not selected email on the contact preference page" in {
+    "must return a Left containing an ErrorModel if the contact preference in user answers is not email" in {
       val result = testHelper.checkDetailsForExistingEmailPage(
         userAnswersPostWithEmail.set(ContactPreferencePage, false).success.value
       )
 
-      result mustBe Left(ErrorModel(BAD_REQUEST, "Error on existing email page: User has not selected email."))
+      result mustBe Left(
+        ErrorModel(BAD_REQUEST, "Error on existing email page: Contact preference in user answers is not email.")
+      )
+    }
+  }
+
+  "checkDetailsForCorrespondenceAddressPage" - {
+    "must return a Right containing Unit if the user is currently on email and contact preference in user answers is post" in {
+      val result = testHelper.checkDetailsForCorrespondenceAddressPage(userAnswers)
+
+      result mustBe Right(())
+    }
+
+    "must return a Left containing an ErrorModel if the user is currently on post" in {
+      val result = testHelper.checkDetailsForCorrespondenceAddressPage(userAnswersPostNoEmail)
+
+      result mustBe Left(ErrorModel(BAD_REQUEST, "Error on correspondence address page: User is currently on post."))
+    }
+
+    "must return a Left containing an ErrorModel if the contact preference in user answers is not post" in {
+      val result = testHelper.checkDetailsForCorrespondenceAddressPage(
+        userAnswers.set(ContactPreferencePage, true).success.value
+      )
+
+      result mustBe Left(
+        ErrorModel(BAD_REQUEST, "Error on correspondence address page: Contact preference in user answers is not post.")
+      )
     }
   }
 
   "checkDetailsForCheckYourAnswers" - {
-    "must return a Right containing false if the user has selected post" in {
-      val result = testHelper.checkDetailsForCheckYourAnswers(userAnswersPostNoEmail)
-
-      result mustBe Right(false)
-    }
-
-    "must return a Right containing false if the user has selected email and the email is already in the set of verified email addresses" in {
-      val result = testHelper.checkDetailsForCheckYourAnswers(userAnswers.copy(emailAddress = Some(emailAddress2)))
-
-      result mustBe Right(false)
-    }
-
-    "must return a Right containing true if the user has selected email and the email is not in the set of verified email addresses" in {
+    "must return a Right containing false if the contact preference in user answers is post" in {
       val result = testHelper.checkDetailsForCheckYourAnswers(userAnswers)
+
+      result mustBe Right(false)
+    }
+
+    "must return a Right containing false if the contact preference is email and the user's email is already in the set of verified email addresses" in {
+      val result = testHelper.checkDetailsForCheckYourAnswers(userAnswersPostWithEmail)
+
+      result mustBe Right(false)
+    }
+
+    "must return a Right containing true if the contact preference is email and the email is not in the set of verified email addresses" in {
+      val result = testHelper.checkDetailsForCheckYourAnswers(userAnswersPostNoEmail)
 
       result mustBe Right(true)
     }
 
-    "must return a Left containing an ErrorModel if the user has not selected a contact preference" in {
+    "must return a Left containing an ErrorModel if the contact preference in user answers is not set" in {
       val result = testHelper.checkDetailsForCheckYourAnswers(emptyUserAnswers)
 
       result mustBe Left(
@@ -141,8 +181,8 @@ class PageCheckHelperSpec extends SpecBase {
       )
     }
 
-    "must return a Left containing an ErrorModel if the user has selected email but not provided an email address" in {
-      val result = testHelper.checkDetailsForCheckYourAnswers(userAnswersPostWithEmail)
+    "must return a Left containing an ErrorModel if the contact preference is email but user has not provided an email address" in {
+      val result = testHelper.checkDetailsForCheckYourAnswers(userAnswersPostNoEmail.copy(emailAddress = None))
 
       result mustBe Left(
         ErrorModel(BAD_REQUEST, "Error on Check Your Answers: User answers do not contain the required data.")
@@ -151,26 +191,26 @@ class PageCheckHelperSpec extends SpecBase {
   }
 
   "checkDetailsToCreateSubmission" - {
-    "must return a Right containing the correct submission details if the user has selected post" in {
-      val result = testHelper.checkDetailsToCreateSubmission(userAnswersPostNoEmail)
+    "must return a Right containing the correct submission details if the contact preference in user answers is post" in {
+      val result = testHelper.checkDetailsToCreateSubmission(userAnswers)
 
       result mustBe Right(contactPreferenceSubmissionPost)
     }
 
-    "must return a Right containing the correct submission details if the user has selected email and the email is verified" in {
+    "must return a Right containing the correct submission details if the contact preference is email and the email is verified" in {
       val result =
-        testHelper.checkDetailsToCreateSubmission(userAnswers.copy(verifiedEmailAddresses = Set(emailAddress)))
+        testHelper.checkDetailsToCreateSubmission(userAnswersPostWithEmail)
 
       result mustBe Right(contactPreferenceSubmissionEmail)
     }
 
-    "must return a Left containing an ErrorModel if the user has selected email and the email is not verified" in {
-      val result = testHelper.checkDetailsToCreateSubmission(userAnswers)
+    "must return a Left containing an ErrorModel if the contact preference is email and the email is not verified" in {
+      val result = testHelper.checkDetailsToCreateSubmission(userAnswersPostNoEmail)
 
       result mustBe Left(ErrorModel(BAD_REQUEST, "Error creating submission: Email address is not verified."))
     }
 
-    "must return a Left containing an ErrorModel if the user has not selected a contact preference" in {
+    "must return a Left containing an ErrorModel if the contact preference in user answers is not set" in {
       val result = testHelper.checkDetailsToCreateSubmission(emptyUserAnswers)
 
       result mustBe Left(
@@ -178,8 +218,8 @@ class PageCheckHelperSpec extends SpecBase {
       )
     }
 
-    "must return a Left containing an ErrorModel if the user has selected email but not provided an email address" in {
-      val result = testHelper.checkDetailsToCreateSubmission(userAnswersPostWithEmail)
+    "must return a Left containing an ErrorModel if the contact preference is email but user has not provided an email address" in {
+      val result = testHelper.checkDetailsToCreateSubmission(userAnswersPostNoEmail.copy(emailAddress = None))
 
       result mustBe Left(
         ErrorModel(BAD_REQUEST, "Error creating submission: User answers do not contain the required data.")

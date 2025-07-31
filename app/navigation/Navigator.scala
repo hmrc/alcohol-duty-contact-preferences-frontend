@@ -82,32 +82,37 @@ class Navigator @Inject() (
   private def contactPreferenceRoute(userAnswers: UserAnswers): Call = {
     val selectedEmail      = userAnswers.get(ContactPreferencePage)
     val paperlessReference = userAnswers.subscriptionSummary.paperlessReference
+    val hasBouncedEmail    = userAnswers.subscriptionSummary.bouncedEmail.contains(true)
     val hasVerifiedEmail   =
       userAnswers.subscriptionSummary.emailAddress.isDefined && userAnswers.subscriptionSummary.emailVerification
         .contains(true)
 
-    (selectedEmail, paperlessReference, hasVerifiedEmail) match {
-      case (Some(true), false, false) =>
-        logger.info(
-          "User selected email and is currently on post with no verified email in ETMP. Redirecting to /what-email-address"
-        )
-        controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode)
-      case (Some(true), false, true)  =>
-        logger.info(
-          "User selected email and is currently on post but has a verified email in ETMP. Redirecting to /existing-email"
-        )
+    (paperlessReference, selectedEmail) match {
+      case (true, Some(false)) =>
+        logger.info("User is currently on email and changing to post. Redirecting to /correspondence-address")
+        controllers.changePreferences.routes.CorrespondenceAddressController.onPageLoad()
+      case (true, Some(true))  =>
+        logger.info("User is currently on email and updating their email. Redirecting to /existing-email")
         controllers.changePreferences.routes.ExistingEmailController.onPageLoad()
-      case (Some(true), true, _)      =>
-        logger.info("User selected email and is currently on email. Redirecting to /enrolled-emails")
-        controllers.changePreferences.routes.EnrolledEmailsController.onPageLoad()
-      case (Some(false), true, _)     =>
-        // TODO: ADR-1609 - Change to correspondence address page when ready
-        logger.info("User selected post and is currently on email. Redirecting to Check Your Answers")
-        controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad()
-      case (Some(false), false, _)    =>
-        logger.info("User selected post and is currently on post. Redirecting to /enrolled-letters")
-        controllers.changePreferences.routes.EnrolledLettersController.onPageLoad()
-      case _                          =>
+      case (false, Some(true)) =>
+        if (hasBouncedEmail) {
+          // TODO: ADR-1642 - Bounced email page
+          logger.info(
+            "User is currently on post, changing to email and has a bounced email. Redirecting to /email-error"
+          )
+          routes.IndexController.onPageLoad()
+        } else if (hasVerifiedEmail) {
+          logger.info(
+            "User is currently on post, changing to email and has a verified email in ETMP. Redirecting to /existing-email"
+          )
+          controllers.changePreferences.routes.ExistingEmailController.onPageLoad()
+        } else {
+          logger.info(
+            "User is currently on post, changing to email and has no verified email in ETMP. Redirecting to /what-email-address"
+          )
+          controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode)
+        }
+      case _                   =>
         routes.JourneyRecoveryController.onPageLoad()
     }
   }

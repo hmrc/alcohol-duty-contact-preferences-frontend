@@ -48,10 +48,10 @@ class EnterEmailAddressControllerSpec extends SpecBase {
 
   "EnterEmailAddressController" - {
 
-    "onPageLoad in normal mode" - {
-      "must return OK with the correct view" in {
+    "onPageLoad" - {
+      "must return OK with the correct view in normal mode" in {
 
-        val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+        val application = applicationBuilder(userAnswers = Some(userAnswersPostNoEmail)).build()
 
         running(application) {
           val request = FakeRequest(GET, enterEmailAddressNormalRoute)
@@ -67,11 +67,9 @@ class EnterEmailAddressControllerSpec extends SpecBase {
           ).toString
         }
       }
-    }
 
-    "onPageLoad in check mode" - {
-      "must populate the view correctly on a GET" in {
-        val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+      "must populate the view correctly on a GET in check mode" in {
+        val application = applicationBuilder(userAnswers = Some(userAnswersPostWithEmail)).build()
 
         running(application) {
           val request = FakeRequest(GET, enterEmailAddressCheckRoute)
@@ -88,8 +86,9 @@ class EnterEmailAddressControllerSpec extends SpecBase {
         }
       }
 
-      "must redirect to Journey Recovery for a GET if user answers do not exist" in {
-        val application = applicationBuilder(userAnswers = None).build()
+      "must redirect to Journey Recovery for a GET if user answers do not contain an email address in check mode" in {
+        val application =
+          applicationBuilder(userAnswers = Some(userAnswersPostNoEmail.copy(emailAddress = None))).build()
 
         running(application) {
           val request = FakeRequest(GET, enterEmailAddressCheckRoute)
@@ -101,11 +100,24 @@ class EnterEmailAddressControllerSpec extends SpecBase {
         }
       }
 
-      "must redirect to Journey Recovery for a GET if the question has not been answered" in {
-        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
+      "must redirect to Journey Recovery for a GET if user answers do not exist" in {
+        val application = applicationBuilder(userAnswers = None).build()
 
         running(application) {
-          val request = FakeRequest(GET, enterEmailAddressCheckRoute)
+          val request = FakeRequest(GET, enterEmailAddressNormalRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+        }
+      }
+
+      "must redirect to Journey Recovery for a GET if contact preference in user answers is not email" in {
+        val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, enterEmailAddressNormalRoute)
 
           val result = route(application, request).value
 
@@ -117,7 +129,7 @@ class EnterEmailAddressControllerSpec extends SpecBase {
 
     "onSubmit" - {
       "must return a Bad Request and errors when invalid data is submitted" in {
-        val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+        val application = applicationBuilder(userAnswers = Some(userAnswersPostWithEmail)).build()
 
         running(application) {
           val request =
@@ -134,6 +146,7 @@ class EnterEmailAddressControllerSpec extends SpecBase {
           contentAsString(result) mustEqual view(boundForm, NormalMode)(request, getMessages(application)).toString
         }
       }
+
       "if entered email matches a verified email in the cache" - {
         "must redirect to Journey Recovery when the user answers set operation is unsuccessful" in {
           val mockUserAnswersService = mock[UserAnswersService]
@@ -160,6 +173,7 @@ class EnterEmailAddressControllerSpec extends SpecBase {
             verify(mockUserAnswersService, times(1)).set(any())(any())
           }
         }
+
         "must go to Check Your Answers when the user answers set operation is successful" in {
           val mockUserAnswersService = mock[UserAnswersService]
           val mockNavigator          = mock[Navigator]
@@ -192,9 +206,9 @@ class EnterEmailAddressControllerSpec extends SpecBase {
           }
         }
       }
+
       "if entered email doesn't match a verified email in the cache" - {
         "must redirect to Journey Recovery if there is an error getting the verification details" in {
-
           val mockEmailVerificationService = mock[EmailVerificationService]
 
           when(
@@ -203,12 +217,11 @@ class EnterEmailAddressControllerSpec extends SpecBase {
             ErrorModel(INTERNAL_SERVER_ERROR, "Test error")
           )
 
-          val application =
-            applicationBuilder(userAnswers = Some(emptyUserAnswers))
-              .overrides(
-                bind[EmailVerificationService].toInstance(mockEmailVerificationService)
-              )
-              .build()
+          val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+            .overrides(
+              bind[EmailVerificationService].toInstance(mockEmailVerificationService)
+            )
+            .build()
 
           running(application) {
             val request =
@@ -223,8 +236,8 @@ class EnterEmailAddressControllerSpec extends SpecBase {
             )
           }
         }
-        "must redirect successfully if getting verification details is successful" in {
 
+        "must redirect successfully if getting verification details is successful" in {
           val mockEmailVerificationService = mock[EmailVerificationService]
           val mockNavigator                = mock[Navigator]
 
