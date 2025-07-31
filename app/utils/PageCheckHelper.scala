@@ -150,4 +150,21 @@ class PageCheckHelper @Inject() {
         Left(ErrorModel(BAD_REQUEST, "Error creating submission: User answers do not contain the required data."))
     }
   }
+
+  def checkDetailsForPreferenceUpdatedPage(userAnswers: UserAnswers): Either[ErrorModel, Option[String]] =
+    userAnswers.get(ContactPreferencePage) match {
+      case Some(true)  =>
+        userAnswers.emailAddress match {
+          case Some(email) => Right(Some(email))
+          case None        =>
+            Left(
+              ErrorModel(
+                INTERNAL_SERVER_ERROR,
+                "Contact preference updated to email but email not found in user answers"
+              )
+            )
+        }
+      case Some(false) => Right(None)
+      case None        => Left(ErrorModel(INTERNAL_SERVER_ERROR, "Contact preference updated but not found in user answers"))
+    }
 }

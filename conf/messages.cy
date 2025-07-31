@@ -100,5 +100,8 @@ checkYourAnswers.correspondenceAddress.change.hidden = cyfeiriad
 
 preferenceUpdated.title = Mae’ch dewis o ran cysylltu wedi’i ddiweddaru
 preferenceUpdated.heading = Mae’ch dewis o ran cysylltu wedi’i ddiweddaru
+preferenceUpdated.email.guidance1 = Byddwn ni’n anfon e-bost atoch yn {0} pan fo neges newydd yn eich cyfrif.
+preferenceUpdated.email.guidance2 = Efallai y caiff rhai negeseuon eu hanfon drwy’r post o hyd, os yw’r gyfraith yn gofyn am hynny.
+preferenceUpdated.post.guidance = Byddwn ni’n anfon llythyrau atoch ynglŷn â’ch Datganiadau Toll Alcohol drwy’r post.
 
 emailVerificationJourney.signature = Rheoli’ch Gwasanaeth Toll Alcohol

@@ -17,13 +17,16 @@
 package controllers.changePreferences
 
 import config.Constants.submissionDetailsKey
+import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.PaperlessPreferenceSubmittedResponse
+import pages.changePreferences.ContactPreferencePage
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.PageCheckHelper
 import views.html.changePreferences.PreferenceUpdatedView
 
 import javax.inject.Inject
@@ -32,8 +35,10 @@ class PreferenceUpdatedController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
+  helper: PageCheckHelper,
   val controllerComponents: MessagesControllerComponents,
-  view: PreferenceUpdatedView
+  view: PreferenceUpdatedView,
+  appConfig: FrontendAppConfig
 ) extends FrontendBaseController
     with I18nSupport
     with Logging {
@@ -46,9 +51,14 @@ class PreferenceUpdatedController @Inject() (
       case Some(submissionResponse) =>
         Json.fromJson[PaperlessPreferenceSubmittedResponse](Json.parse(submissionResponse)).asOpt match {
           case Some(_) =>
-            Ok(view())
+            helper.checkDetailsForPreferenceUpdatedPage(request.userAnswers) match {
+              case Right(updatedEmailOption) => Ok(view(updatedEmailOption, appConfig.businessTaxAccountUrl))
+              case Left(error)               =>
+                logger.warn(error.message)
+                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+            }
           case None    =>
-            logger.warn("Submission response not valid")
+            logger.warn("Submission response format not valid")
             Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
     }

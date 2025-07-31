@@ -100,5 +100,8 @@ checkYourAnswers.correspondenceAddress.change.hidden = address
 
 preferenceUpdated.title = Your contact preference has been updated
 preferenceUpdated.heading = Your contact preference has been updated
+preferenceUpdated.email.guidance1 = We will email you at {0} when you have a new message in your account.
+preferenceUpdated.email.guidance2 = Some messages may still be sent by post if required by law.
+preferenceUpdated.post.guidance = We will send you letters about your Alcohol Duty returns by post.
 
 emailVerificationJourney.signature = Manage your Alcohol Duty Service
