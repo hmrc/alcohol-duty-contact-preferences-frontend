@@ -24,6 +24,7 @@ import javax.inject.Inject
 
 class PageCheckHelper @Inject() {
 
+  // TODO: Purpose and position of this page will change under Elmer's suggestions
   def checkDetailsForEnrolledEmailsPage(userAnswers: UserAnswers): Either[ErrorModel, String] = {
     val isOnEmail                 = userAnswers.subscriptionSummary.paperlessReference
     val isEmailPreferenceSelected = userAnswers.get(ContactPreferencePage).contains(true)
@@ -47,6 +48,7 @@ class PageCheckHelper @Inject() {
     }
   }
 
+  // TODO: This page will be removed under Elmer's suggestions
   def checkDetailsForEnrolledLettersPage(userAnswers: UserAnswers): Either[ErrorModel, Unit] = {
     val isOnEmail                = userAnswers.subscriptionSummary.paperlessReference
     val isPostPreferenceSelected = userAnswers.get(ContactPreferencePage).contains(false)
@@ -77,10 +79,27 @@ class PageCheckHelper @Inject() {
             )
           )
         } else if (!isEmailPreferenceSelected) {
-          Left(ErrorModel(BAD_REQUEST, "Error on existing email page: User has not selected email."))
+          Left(
+            ErrorModel(BAD_REQUEST, "Error on existing email page: Contact preference in user answers is not email.")
+          )
         } else {
           Right(email)
         }
+    }
+  }
+
+  def checkDetailsForCorrespondenceAddressPage(userAnswers: UserAnswers): Either[ErrorModel, Unit] = {
+    val isOnEmail                = userAnswers.subscriptionSummary.paperlessReference
+    val isPostPreferenceSelected = userAnswers.get(ContactPreferencePage).contains(false)
+
+    if (!isOnEmail) {
+      Left(ErrorModel(BAD_REQUEST, "Error on correspondence address page: User is currently on post."))
+    } else if (!isPostPreferenceSelected) {
+      Left(
+        ErrorModel(BAD_REQUEST, "Error on correspondence address page: Contact preference in user answers is not post.")
+      )
+    } else {
+      Right((): Unit)
     }
   }
 

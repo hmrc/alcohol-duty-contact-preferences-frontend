@@ -91,7 +91,7 @@ class ContactPreferenceControllerSpec extends SpecBase {
           val view = application.injector.instanceOf[ContactPreferenceView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(form.fill(true), NormalMode)(
+          contentAsString(result) mustEqual view(form.fill(false), NormalMode)(
             request,
             getMessages(application)
           ).toString
@@ -101,7 +101,7 @@ class ContactPreferenceControllerSpec extends SpecBase {
 
     "onPageLoad in check mode" - {
       "must populate the view correctly on a GET" in {
-        val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+        val application = applicationBuilder(userAnswers = Some(userAnswersPostNoEmail)).build()
 
         running(application) {
           val request = FakeRequest(GET, contactPreferenceCheckRoute)
@@ -179,7 +179,7 @@ class ContactPreferenceControllerSpec extends SpecBase {
         when(mockUserAnswersConnector.set(any())(any())) thenReturn Future.successful(mock[HttpResponse])
         when(mockNavigator.nextPage(eqTo(ContactPreferencePage), any(), any(), any())) thenReturn onwardRoute
 
-        val application = applicationBuilder(userAnswers = Some(userAnswers))
+        val application = applicationBuilder(userAnswers = Some(userAnswersPostNoEmail))
           .overrides(
             bind[Navigator].toInstance(mockNavigator),
             bind[UserAnswersConnector].toInstance(mockUserAnswersConnector)
@@ -209,7 +209,7 @@ class ContactPreferenceControllerSpec extends SpecBase {
         when(mockUserAnswersConnector.set(any())(any())) thenReturn Future.successful(mock[HttpResponse])
         when(mockNavigator.nextPage(eqTo(ContactPreferencePage), any(), any(), any())) thenReturn onwardRoute
 
-        val application = applicationBuilder(userAnswers = Some(userAnswers))
+        val application = applicationBuilder(userAnswers = Some(userAnswersPostNoEmail))
           .overrides(
             bind[Navigator].toInstance(mockNavigator),
             bind[UserAnswersConnector].toInstance(mockUserAnswersConnector)

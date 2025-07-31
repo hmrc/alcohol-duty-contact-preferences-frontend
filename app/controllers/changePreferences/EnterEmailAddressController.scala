@@ -22,6 +22,7 @@ import controllers.routes
 import forms.EnterEmailAddressFormProvider
 import models.{CheckMode, EmailVerificationDetails, ErrorModel, Mode, NormalMode, UserAnswers, VerificationDetails}
 import navigation.Navigator
+import pages.changePreferences.ContactPreferencePage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -51,16 +52,23 @@ class EnterEmailAddressController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {
-    implicit request =>
-      mode match {
-        case NormalMode => Future.successful(Ok(view(form, mode)))
-        case CheckMode  =>
-          request.userAnswers.emailAddress match {
-            case None        => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
-            case Some(value) => Future.successful(Ok(view(form.fill(value), mode)))
-          }
-      }
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
+    request.userAnswers.get(ContactPreferencePage) match {
+      case Some(true) =>
+        mode match {
+          case NormalMode => Ok(view(form, mode))
+          case CheckMode  =>
+            request.userAnswers.emailAddress match {
+              case Some(value) => Ok(view(form.fill(value), mode))
+              case None        =>
+                logger.warn("No email address in user answers in check mode")
+                Redirect(routes.JourneyRecoveryController.onPageLoad())
+            }
+        }
+      case _          =>
+        logger.warn("Contact preference in user answers is not email")
+        Redirect(routes.JourneyRecoveryController.onPageLoad())
+    }
   }
 
   def onSubmit(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData).async {

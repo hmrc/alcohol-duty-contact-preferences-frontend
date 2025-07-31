@@ -44,36 +44,6 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       "must return OK and the correct view if no call to email verification is needed" in new SetUp {
         when(pageCheckHelper.checkDetailsForCheckYourAnswers(any())) thenReturn Right(false)
 
-        val application = applicationBuilder(userAnswers = Some(userAnswersPostNoEmail))
-          .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
-          .overrides(bind[CheckYourAnswersSummaryListHelper].toInstance(summaryListHelper))
-          .overrides(bind[EmailVerificationService].toInstance(emailVerificationService))
-          .build()
-
-        running(application) {
-          val request = FakeRequest(GET, checkYourAnswersGetRoute)
-
-          val result = route(application, request).value
-
-          val view = application.injector.instanceOf[CheckYourAnswersView]
-
-          status(result) mustEqual OK
-          contentAsString(result) mustEqual view(dummySummaryList)(
-            request,
-            getMessages(application)
-          ).toString
-
-          verify(pageCheckHelper, times(1)).checkDetailsForCheckYourAnswers(eqTo(userAnswersPostNoEmail))
-          verify(summaryListHelper, times(1)).createSummaryList(eqTo(userAnswersPostNoEmail))(any())
-          verify(emailVerificationService, times(0)).retrieveAddressStatusAndAddToCache(any(), any(), any())(any())
-        }
-      }
-
-      "must return OK and the correct view if a call to email verification is made and the email is verified" in new SetUp {
-        when(pageCheckHelper.checkDetailsForCheckYourAnswers(any())) thenReturn Right(true)
-        when(emailVerificationService.retrieveAddressStatusAndAddToCache(any(), any(), any())(any())) thenReturn
-          EitherT.rightT(EmailVerificationDetails(emailAddress, isVerified = true, isLocked = false))
-
         val application = applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
           .overrides(bind[CheckYourAnswersSummaryListHelper].toInstance(summaryListHelper))
@@ -95,8 +65,38 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           verify(pageCheckHelper, times(1)).checkDetailsForCheckYourAnswers(eqTo(userAnswers))
           verify(summaryListHelper, times(1)).createSummaryList(eqTo(userAnswers))(any())
+          verify(emailVerificationService, times(0)).retrieveAddressStatusAndAddToCache(any(), any(), any())(any())
+        }
+      }
+
+      "must return OK and the correct view if a call to email verification is made and the email is verified" in new SetUp {
+        when(pageCheckHelper.checkDetailsForCheckYourAnswers(any())) thenReturn Right(true)
+        when(emailVerificationService.retrieveAddressStatusAndAddToCache(any(), any(), any())(any())) thenReturn
+          EitherT.rightT(EmailVerificationDetails(emailAddress, isVerified = true, isLocked = false))
+
+        val application = applicationBuilder(userAnswers = Some(userAnswersPostNoEmail))
+          .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
+          .overrides(bind[CheckYourAnswersSummaryListHelper].toInstance(summaryListHelper))
+          .overrides(bind[EmailVerificationService].toInstance(emailVerificationService))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, checkYourAnswersGetRoute)
+
+          val result = route(application, request).value
+
+          val view = application.injector.instanceOf[CheckYourAnswersView]
+
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(dummySummaryList)(
+            request,
+            getMessages(application)
+          ).toString
+
+          verify(pageCheckHelper, times(1)).checkDetailsForCheckYourAnswers(eqTo(userAnswersPostNoEmail))
+          verify(summaryListHelper, times(1)).createSummaryList(eqTo(userAnswersPostNoEmail))(any())
           verify(emailVerificationService, times(1))
-            .retrieveAddressStatusAndAddToCache(any(), eqTo(emailAddress), eqTo(userAnswers))(any())
+            .retrieveAddressStatusAndAddToCache(any(), eqTo(emailAddress), eqTo(userAnswersPostNoEmail))(any())
         }
       }
 
@@ -105,7 +105,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         when(emailVerificationService.retrieveAddressStatusAndAddToCache(any(), any(), any())(any())) thenReturn
           EitherT.rightT(EmailVerificationDetails(emailAddress, isVerified = false, isLocked = true))
 
-        val application = applicationBuilder(userAnswers = Some(userAnswers))
+        val application = applicationBuilder(userAnswers = Some(userAnswersPostNoEmail))
           .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
           .overrides(bind[CheckYourAnswersSummaryListHelper].toInstance(summaryListHelper))
           .overrides(bind[EmailVerificationService].toInstance(emailVerificationService))
@@ -120,10 +120,10 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           redirectLocation(result).value mustEqual
             controllers.changePreferences.routes.EmailLockedController.onPageLoad().url
 
-          verify(pageCheckHelper, times(1)).checkDetailsForCheckYourAnswers(eqTo(userAnswers))
+          verify(pageCheckHelper, times(1)).checkDetailsForCheckYourAnswers(eqTo(userAnswersPostNoEmail))
           verify(summaryListHelper, times(0)).createSummaryList(any())(any())
           verify(emailVerificationService, times(1))
-            .retrieveAddressStatusAndAddToCache(any(), eqTo(emailAddress), eqTo(userAnswers))(any())
+            .retrieveAddressStatusAndAddToCache(any(), eqTo(emailAddress), eqTo(userAnswersPostNoEmail))(any())
         }
       }
 
@@ -132,7 +132,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         when(emailVerificationService.retrieveAddressStatusAndAddToCache(any(), any(), any())(any())) thenReturn
           EitherT.rightT(EmailVerificationDetails(emailAddress, isVerified = false, isLocked = false))
 
-        val application = applicationBuilder(userAnswers = Some(userAnswers))
+        val application = applicationBuilder(userAnswers = Some(userAnswersPostNoEmail))
           .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
           .overrides(bind[CheckYourAnswersSummaryListHelper].toInstance(summaryListHelper))
           .overrides(bind[EmailVerificationService].toInstance(emailVerificationService))
@@ -146,10 +146,10 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
-          verify(pageCheckHelper, times(1)).checkDetailsForCheckYourAnswers(eqTo(userAnswers))
+          verify(pageCheckHelper, times(1)).checkDetailsForCheckYourAnswers(eqTo(userAnswersPostNoEmail))
           verify(summaryListHelper, times(0)).createSummaryList(any())(any())
           verify(emailVerificationService, times(1))
-            .retrieveAddressStatusAndAddToCache(any(), eqTo(emailAddress), eqTo(userAnswers))(any())
+            .retrieveAddressStatusAndAddToCache(any(), eqTo(emailAddress), eqTo(userAnswersPostNoEmail))(any())
         }
       }
 
@@ -179,7 +179,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           ErrorModel(BAD_REQUEST, "Error from helper")
         )
 
-        val application = applicationBuilder(userAnswers = Some(userAnswersPostWithEmail))
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
           .overrides(bind[CheckYourAnswersSummaryListHelper].toInstance(summaryListHelper))
           .overrides(bind[EmailVerificationService].toInstance(emailVerificationService))
@@ -193,7 +193,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
-          verify(pageCheckHelper, times(1)).checkDetailsForCheckYourAnswers(eqTo(userAnswersPostWithEmail))
+          verify(pageCheckHelper, times(1)).checkDetailsForCheckYourAnswers(eqTo(emptyUserAnswers))
           verify(summaryListHelper, times(0)).createSummaryList(any())(any())
           verify(emailVerificationService, times(0)).retrieveAddressStatusAndAddToCache(any(), any(), any())(any())
         }

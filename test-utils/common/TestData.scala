@@ -63,9 +63,9 @@ trait TestData extends ModelGenerators {
     appaId = appaId,
     userId = userId,
     subscriptionSummary = subscriptionSummaryEmail,
-    emailAddress = Some(emailAddress),
+    emailAddress = None,
     verifiedEmailAddresses = verifiedEmailAddresses,
-    data = JsObject(Seq("contactPreferenceEmail" -> Json.toJson(true))),
+    data = JsObject(Seq("contactPreferenceEmail" -> Json.toJson(false))),
     startedTime = Instant.now(clock),
     lastUpdated = Instant.now(clock)
   )
@@ -74,8 +74,8 @@ trait TestData extends ModelGenerators {
     appaId = appaId,
     userId = userId,
     subscriptionSummary = subscriptionSummaryPostWithEmail,
-    emailAddress = None,
-    verifiedEmailAddresses = verifiedEmailAddresses,
+    emailAddress = Some(emailAddress),
+    verifiedEmailAddresses = Set(emailAddress),
     data = JsObject(Seq("contactPreferenceEmail" -> Json.toJson(true))),
     startedTime = Instant.now(clock),
     lastUpdated = Instant.now(clock)
@@ -89,9 +89,9 @@ trait TestData extends ModelGenerators {
     appaId = appaId,
     userId = userId,
     subscriptionSummary = subscriptionSummaryPostNoEmail,
-    emailAddress = None,
+    emailAddress = Some(emailAddress),
     verifiedEmailAddresses = verifiedEmailAddresses,
-    data = JsObject(Seq("contactPreferenceEmail" -> Json.toJson(false))),
+    data = JsObject(Seq("contactPreferenceEmail" -> Json.toJson(true))),
     startedTime = Instant.now(clock),
     lastUpdated = Instant.now(clock)
   )

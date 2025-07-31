@@ -74,13 +74,13 @@ class CheckYourAnswersSummaryListHelperSpec extends SpecBase {
 
   "CheckYourAnswersSummaryListHelper" - {
     "must return a summary list with the correct rows if email is selected" in {
-      val summaryList = summaryListHelper.createSummaryList(userAnswers)
+      val summaryList = summaryListHelper.createSummaryList(userAnswersPostNoEmail)
 
       summaryList mustBe SummaryListViewModel(rows = Seq(contactPreferenceRowEmail, emailAddressRow))
     }
 
     "must return a summary list with the correct rows if post is selected" in {
-      val summaryList = summaryListHelper.createSummaryList(userAnswersPostNoEmail)
+      val summaryList = summaryListHelper.createSummaryList(userAnswers)
 
       summaryList mustBe SummaryListViewModel(rows = Seq(contactPreferenceRowPost, correspondenceAddressRow))
     }
@@ -94,7 +94,7 @@ class CheckYourAnswersSummaryListHelperSpec extends SpecBase {
 
     "must throw an exception if email is selected but no email address is provided" in {
       val exception = intercept[IllegalStateException] {
-        summaryListHelper.createSummaryList(userAnswersPostWithEmail)
+        summaryListHelper.createSummaryList(userAnswersPostWithEmail.copy(emailAddress = None))
       }
       exception.getMessage mustBe "User answers do not contain the required data but not picked up by PageCheckHelper"
     }
