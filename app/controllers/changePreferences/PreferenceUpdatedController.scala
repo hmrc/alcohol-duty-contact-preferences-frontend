@@ -20,7 +20,6 @@ import config.Constants.submissionDetailsKey
 import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.PaperlessPreferenceSubmittedResponse
-import pages.changePreferences.ContactPreferencePage
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Json

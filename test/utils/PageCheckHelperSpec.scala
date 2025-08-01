@@ -226,4 +226,34 @@ class PageCheckHelperSpec extends SpecBase {
       )
     }
   }
+
+  "checkDetailsForPreferenceUpdatedPage" - {
+    "must return a Right containing Some(email) if the user has submitted email as their preference" in {
+      val result = testHelper.checkDetailsForPreferenceUpdatedPage(userAnswersPostWithEmail)
+
+      result mustBe Right(Some(emailAddress))
+    }
+
+    "must return a Right containing None if the user has submitted post as their preference" in {
+      val result = testHelper.checkDetailsForPreferenceUpdatedPage(userAnswers)
+
+      result mustBe Right(None)
+    }
+
+    "must return a Left containing an ErrorModel if the contact preference in user answers is not set" in {
+      val result = testHelper.checkDetailsForPreferenceUpdatedPage(emptyUserAnswers)
+
+      result mustBe Left(
+        ErrorModel(INTERNAL_SERVER_ERROR, "Contact preference updated but not found in user answers")
+      )
+    }
+
+    "must return a Left containing an ErrorModel if the user has submitted email but no email address is found in user answers" in {
+      val result = testHelper.checkDetailsForPreferenceUpdatedPage(userAnswersPostNoEmail.copy(emailAddress = None))
+
+      result mustBe Left(
+        ErrorModel(INTERNAL_SERVER_ERROR, "Contact preference updated to email but email not found in user answers")
+      )
+    }
+  }
 }
