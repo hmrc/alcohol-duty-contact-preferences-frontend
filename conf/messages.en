@@ -96,7 +96,6 @@ checkYourAnswers.contactPreference.change.hidden = how you would like to be cont
 checkYourAnswers.emailAddress.key = Email address
 checkYourAnswers.emailAddress.change.hidden = email address
 checkYourAnswers.correspondenceAddress.key = Address
-checkYourAnswers.correspondenceAddress.change.hidden = address
 
 preferenceUpdated.title = Your contact preference has been updated
 preferenceUpdated.heading = Your contact preference has been updated
