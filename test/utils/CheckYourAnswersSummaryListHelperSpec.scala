@@ -63,13 +63,7 @@ class CheckYourAnswersSummaryListHelperSpec extends SpecBase {
 
   val correspondenceAddressRow = SummaryListRowViewModel(
     key = KeyViewModel(HtmlContent(messages("checkYourAnswers.correspondenceAddress.key"))),
-    value = ValueViewModel(HtmlContent(correspondenceAddress.replace("\n", "<br>"))),
-    actions = Seq(
-      ActionItemViewModel(
-        HtmlContent(messages("site.change")),
-        controllers.changePreferences.routes.CorrespondenceAddressController.onPageLoad().url
-      ).withVisuallyHiddenText(messages("checkYourAnswers.correspondenceAddress.change.hidden"))
-    )
+    value = ValueViewModel(HtmlContent(correspondenceAddress.replace("\n", "<br>")))
   )
 
   "CheckYourAnswersSummaryListHelper" - {

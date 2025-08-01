@@ -96,7 +96,6 @@ checkYourAnswers.contactPreference.change.hidden = sut yr hoffech i ni gysylltu 
 checkYourAnswers.emailAddress.key = Cyfeiriad e-bost
 checkYourAnswers.emailAddress.change.hidden = cyfeiriad e-bost
 checkYourAnswers.correspondenceAddress.key = Cyfeiriad
-checkYourAnswers.correspondenceAddress.change.hidden = cyfeiriad
 
 preferenceUpdated.title = Mae’ch dewis o ran cysylltu wedi’i ddiweddaru
 preferenceUpdated.heading = Mae’ch dewis o ran cysylltu wedi’i ddiweddaru
