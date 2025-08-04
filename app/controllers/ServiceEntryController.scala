@@ -38,7 +38,7 @@ class ServiceEntryController @Inject() (
     with I18nSupport
     with Logging {
 
-  def onPageLoad(mode: EntryMode): Action[AnyContent] = identify.async { implicit request =>
+  def createUserAnswersAndRedirect(mode: EntryMode): Action[AnyContent] = identify.async { implicit request =>
     userAnswersConnector.createUserAnswers(UserDetails(request.appaId, request.userId)).flatMap {
       case Right(ua)   =>
         mode match {
