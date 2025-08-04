@@ -155,4 +155,6 @@ trait TestData extends ModelGenerators {
     emailVerification = Some(true),
     bouncedEmail = Some(false)
   )
+
+  val testSubmissionResponse = PaperlessPreferenceSubmittedResponse(Instant.now(clock), "910000000000")
 }
