@@ -69,6 +69,9 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   def ecpGetEmailVerificationUrl(credId: String): String =
     s"$contactPreferencesHost/alcohol-duty-contact-preferences/get-email-verification/$credId"
 
+  def ecpSubmitContactPreferencesUrl(appaId: String): String =
+    s"$contactPreferencesHost/alcohol-duty-contact-preferences/submit-preferences/$appaId"
+
   private val startEmailVerificationContinueBaseUrl: String   =
     configuration.get[String]("microservice.services.contact-preferences-frontend.prefix")
   private val startEmailVerificationContinueUrlSuffix: String =

@@ -18,6 +18,7 @@ package controllers.changePreferences
 
 import base.SpecBase
 import cats.data.EitherT
+import connectors.SubmitPreferencesConnector
 import controllers.routes
 import models.{EmailVerificationDetails, ErrorModel}
 import org.mockito.ArgumentMatchers.any
@@ -203,11 +204,14 @@ class CheckYourAnswersControllerSpec extends SpecBase {
     "onSubmit" - {
       "must redirect to the Contact Preference Updated page if submission is successful" in new SetUp {
         when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Right(contactPreferenceSubmissionEmail)
+        when(submitPreferencesConnector.submitContactPreferences(any(), any())(any())) thenReturn
+          EitherT.rightT(testSubmissionResponse)
 
         val completeUserAnswers = userAnswers.copy(verifiedEmailAddresses = Set(emailAddress))
 
         val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
           .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
+          .overrides(bind[SubmitPreferencesConnector].toInstance(submitPreferencesConnector))
           .build()
 
         running(application) {
@@ -221,16 +225,41 @@ class CheckYourAnswersControllerSpec extends SpecBase {
             .url
 
           verify(pageCheckHelper, times(1)).checkDetailsToCreateSubmission(eqTo(completeUserAnswers))
+          verify(submitPreferencesConnector, times(1))
+            .submitContactPreferences(eqTo(contactPreferenceSubmissionEmail), eqTo(appaId))(any())
         }
       }
 
       "must redirect to Journey Recovery if submission is not successful" in new SetUp {
-        // TODO: ADR-2151 - Add test when connector for submission has been added
+        when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Right(contactPreferenceSubmissionEmail)
+        when(submitPreferencesConnector.submitContactPreferences(any(), any())(any())) thenReturn
+          EitherT.leftT(ErrorModel(INTERNAL_SERVER_ERROR, "Unexpected response"))
+
+        val completeUserAnswers = userAnswers.copy(verifiedEmailAddresses = Set(emailAddress))
+
+        val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
+          .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
+          .overrides(bind[SubmitPreferencesConnector].toInstance(submitPreferencesConnector))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(POST, checkYourAnswersPostRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+
+          verify(pageCheckHelper, times(1)).checkDetailsToCreateSubmission(eqTo(completeUserAnswers))
+          verify(submitPreferencesConnector, times(1))
+            .submitContactPreferences(eqTo(contactPreferenceSubmissionEmail), eqTo(appaId))(any())
+        }
       }
 
       "must redirect to Journey Recovery if user answers do not exist" in new SetUp {
         val application = applicationBuilder(userAnswers = None)
           .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
+          .overrides(bind[SubmitPreferencesConnector].toInstance(submitPreferencesConnector))
           .build()
 
         running(application) {
@@ -242,6 +271,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(pageCheckHelper, times(0)).checkDetailsForCheckYourAnswers(any())
+          verify(submitPreferencesConnector, times(0)).submitContactPreferences(any(), any())(any())
         }
       }
 
@@ -252,6 +282,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
         val application = applicationBuilder(userAnswers = Some(userAnswersPostWithEmail))
           .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
+          .overrides(bind[SubmitPreferencesConnector].toInstance(submitPreferencesConnector))
           .build()
 
         running(application) {
@@ -263,6 +294,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(pageCheckHelper, times(1)).checkDetailsToCreateSubmission(eqTo(userAnswersPostWithEmail))
+          verify(submitPreferencesConnector, times(0)).submitContactPreferences(any(), any())(any())
         }
       }
 
@@ -270,10 +302,10 @@ class CheckYourAnswersControllerSpec extends SpecBase {
   }
 
   class SetUp {
-    val pageCheckHelper          = mock[PageCheckHelper]
-    val summaryListHelper        = mock[CheckYourAnswersSummaryListHelper]
-    val emailVerificationService = mock[EmailVerificationService]
-    // TODO: ADR-2151 - Add mock connector for contact preference submission
+    val pageCheckHelper            = mock[PageCheckHelper]
+    val summaryListHelper          = mock[CheckYourAnswersSummaryListHelper]
+    val emailVerificationService   = mock[EmailVerificationService]
+    val submitPreferencesConnector = mock[SubmitPreferencesConnector]
 
     val row1             = SummaryListRow(key = Key(Text("Row1Key")), value = Value(Text("Row1Value")))
     val row2             = SummaryListRow(key = Key(Text("Row2Key")), value = Value(Text("Row2Value")))

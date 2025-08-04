@@ -17,9 +17,11 @@
 package controllers.changePreferences
 
 import config.Constants.submissionDetailsKey
-import controllers.actions.IdentifierAction
+import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import models.PaperlessPreferenceSubmittedResponse
 import play.api.Logging
 import play.api.i18n.I18nSupport
+import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import views.html.changePreferences.PreferenceUpdatedView
@@ -28,20 +30,27 @@ import javax.inject.Inject
 
 class PreferenceUpdatedController @Inject() (
   identify: IdentifierAction,
+  getData: DataRetrievalAction,
+  requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
   view: PreferenceUpdatedView
 ) extends FrontendBaseController
     with I18nSupport
     with Logging {
 
-  def onPageLoad(): Action[AnyContent] = identify { implicit request =>
+  def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     request.session.get(submissionDetailsKey) match {
-      case None                    =>
-        logger.warn("Submission details not present in session")
+      case None                     =>
+        logger.warn("Submission response not present in session")
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-      case Some(submissionDetails) =>
-        logger.debug(submissionDetails)
-        Ok(view())
+      case Some(submissionResponse) =>
+        Json.fromJson[PaperlessPreferenceSubmittedResponse](Json.parse(submissionResponse)).asOpt match {
+          case Some(_) =>
+            Ok(view())
+          case None    =>
+            logger.warn("Submission response not valid")
+            Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
+        }
     }
   }
 }

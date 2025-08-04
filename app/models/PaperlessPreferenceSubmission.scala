@@ -28,15 +28,11 @@ case class PaperlessPreferenceSubmission(
 )
 
 object PaperlessPreferenceSubmission {
+  import JsonHelpers.booleanReads
+  import JsonHelpers.booleanWrites
+
   implicit val paperlessPreferenceFormat: OFormat[PaperlessPreferenceSubmission] =
     Json.format[PaperlessPreferenceSubmission]
-}
-
-case class PaperlessPreferenceSubmittedSuccess(success: PaperlessPreferenceSubmittedResponse)
-
-object PaperlessPreferenceSubmittedSuccess {
-  implicit val paperlessPreferenceSubmittedSuccessFormat: OFormat[PaperlessPreferenceSubmittedSuccess] =
-    Json.format[PaperlessPreferenceSubmittedSuccess]
 }
 
 case class PaperlessPreferenceSubmittedResponse(processingDate: Instant, formBundleNumber: String)
