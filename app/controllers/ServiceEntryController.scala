@@ -61,8 +61,7 @@ class ServiceEntryController @Inject() (
               for {
                 updatedAnswers <- Future.fromTry(ua.set(ContactPreferencePage, true))
                 _              <- userAnswersConnector.set(updatedAnswers)
-              } yield Redirect(controllers.routes.IndexController.onPageLoad())
-              // TODO: Redirect to bounced email page
+              } yield Redirect(controllers.changePreferences.routes.EmailErrorController.onPageLoad())
             } else {
               logger.warn("Error on service entry: User does not have a bounced email")
               Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
