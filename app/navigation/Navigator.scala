@@ -61,8 +61,12 @@ class Navigator @Inject() (
     case ContactPreferencePage =>
       userAnswers =>
         hasChanged =>
-          if (hasChanged) contactPreferenceRoute(userAnswers)
-          else controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad()
+          if (hasChanged) { contactPreferenceRoute(userAnswers) }
+          else if (userAnswers.get(ContactPreferencePage).contains(false)) {
+            controllers.changePreferences.routes.CorrespondenceAddressController.onPageLoad()
+          } else {
+            controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad()
+          }
     case _                     =>
       _ =>
         _ =>
@@ -101,9 +105,8 @@ class Navigator @Inject() (
         logger.info("User selected email and is currently on email. Redirecting to /enrolled-emails")
         controllers.changePreferences.routes.EnrolledEmailsController.onPageLoad()
       case (Some(false), true, _)     =>
-        // TODO: ADR-1609 - Change to correspondence address page when ready
-        logger.info("User selected post and is currently on email. Redirecting to Check Your Answers")
-        controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad()
+        logger.info("User selected post and is currently on email. Redirecting to /correspondence-address")
+        controllers.changePreferences.routes.CorrespondenceAddressController.onPageLoad()
       case (Some(false), false, _)    =>
         logger.info("User selected post and is currently on post. Redirecting to /enrolled-letters")
         controllers.changePreferences.routes.EnrolledLettersController.onPageLoad()

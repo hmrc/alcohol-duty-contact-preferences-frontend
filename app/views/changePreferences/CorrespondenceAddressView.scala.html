@@ -14,20 +14,40 @@
  * limitations under the License.
  *@
 
-@import components.{Link, PageHeading, Paragraph, SectionBreak}
+@import components.{Link, PageHeading, Paragraph}
+@import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 
 @this(
         layout: templates.Layout,
+        govukButton: GovukButton,
+        govukSummaryList: GovukSummaryList,
         pageHeading: PageHeading,
         paragraph: Paragraph,
-        link: Link,
-        sectionBreak: SectionBreak
+        link: Link
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(addressSummaryList: SummaryList)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("correspondenceAddress.title"))) {
 
     @pageHeading(messages("correspondenceAddress.heading"))
 
+    @govukSummaryList(addressSummaryList)
+
+    @paragraph(messages("correspondenceAddress.guidance"))
+
+    @paragraph(content = HtmlContent(
+        messages("correspondenceAddress.contact.text1") +
+        link(
+          id = "change-correspondence-address-link",
+          text = messages("correspondenceAddress.contact.linkText"),
+          href = messages("correspondenceAddress.contact.url"),
+          newTab = true
+        ) + " " + messages("correspondenceAddress.contact.text2")
+    ))
+
+    @govukButton(
+        ButtonViewModel("continueButton", messages("site.continue"))
+            .asLink(controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad().url)
+    )
 }

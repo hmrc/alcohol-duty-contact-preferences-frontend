@@ -14,20 +14,36 @@
  * limitations under the License.
  *@
 
-@import components.{Link, PageHeading, Paragraph, SectionBreak}
+@import components.{Link, Paragraph}
+@import uk.gov.hmrc.govukfrontend.views.Aliases.Panel
 
 @this(
         layout: templates.Layout,
-        pageHeading: PageHeading,
+        govukPanel: GovukPanel,
         paragraph: Paragraph,
-        link: Link,
-        sectionBreak: SectionBreak
+        link: Link
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(updatedEmail: Option[String], businessTaxAccountUrl: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("preferenceUpdated.title")), showBackLink = false) {
 
-    @pageHeading(messages("preferenceUpdated.heading"))
+    @govukPanel(Panel(
+        title = Text(messages("preferenceUpdated.heading"))
+    ))
 
+    @if(updatedEmail.isDefined) {
+        @paragraph(messages("preferenceUpdated.email.guidance1", updatedEmail.get))
+        @paragraph(messages("preferenceUpdated.email.guidance2"))
+    } else {
+        @paragraph(messages("preferenceUpdated.post.guidance"))
+    }
+
+    @paragraph(content = HtmlContent(
+        link(
+            id = "business-tax-account-link",
+            text = messages("site.returnToBusinessAccount"),
+            href = businessTaxAccountUrl
+        )
+    ))
 }

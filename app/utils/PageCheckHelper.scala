@@ -62,6 +62,7 @@ class PageCheckHelper @Inject() {
 
   def checkDetailsForExistingEmailPage(userAnswers: UserAnswers): Either[ErrorModel, String] = {
     val existingEmail             = userAnswers.subscriptionSummary.emailAddress
+    val hasBouncedEmail           = userAnswers.subscriptionSummary.bouncedEmail.contains(true)
     val isExistingEmailVerified   = userAnswers.subscriptionSummary.emailVerification.contains(true)
     val isEmailPreferenceSelected = userAnswers.get(ContactPreferencePage).contains(true)
 
@@ -69,7 +70,9 @@ class PageCheckHelper @Inject() {
       case None        =>
         Left(ErrorModel(BAD_REQUEST, "Error on existing email page: User has no email in subscription summary."))
       case Some(email) =>
-        if (!isExistingEmailVerified) {
+        if (hasBouncedEmail) {
+          Left(ErrorModel(BAD_REQUEST, "Error on existing email page: User has a bounced email."))
+        } else if (!isExistingEmailVerified) {
           Left(
             ErrorModel(
               BAD_REQUEST,
@@ -81,6 +84,21 @@ class PageCheckHelper @Inject() {
         } else {
           Right(email)
         }
+    }
+  }
+
+  def checkDetailsForCorrespondenceAddressPage(userAnswers: UserAnswers): Either[ErrorModel, Unit] = {
+    val isOnEmail                = userAnswers.subscriptionSummary.paperlessReference
+    val isPostPreferenceSelected = userAnswers.get(ContactPreferencePage).contains(false)
+
+    if (!isOnEmail) {
+      Left(ErrorModel(BAD_REQUEST, "Error on correspondence address page: User is currently on post."))
+    } else if (!isPostPreferenceSelected) {
+      Left(
+        ErrorModel(BAD_REQUEST, "Error on correspondence address page: User has not selected post.")
+      )
+    } else {
+      Right((): Unit)
     }
   }
 
@@ -128,4 +146,21 @@ class PageCheckHelper @Inject() {
         Left(ErrorModel(BAD_REQUEST, "Error creating submission: User answers do not contain the required data."))
     }
   }
+
+  def checkDetailsForPreferenceUpdatedPage(userAnswers: UserAnswers): Either[ErrorModel, Option[String]] =
+    userAnswers.get(ContactPreferencePage) match {
+      case Some(true)  =>
+        userAnswers.emailAddress match {
+          case Some(email) => Right(Some(email))
+          case None        =>
+            Left(
+              ErrorModel(
+                INTERNAL_SERVER_ERROR,
+                "Contact preference updated to email but email not found in user answers"
+              )
+            )
+        }
+      case Some(false) => Right(None)
+      case None        => Left(ErrorModel(INTERNAL_SERVER_ERROR, "Contact preference updated but not found in user answers"))
+    }
 }
