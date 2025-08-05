@@ -31,7 +31,7 @@ The service runs on port `16005` by default.
 2. Change the following:
     - **CredId**: * *Provide from stub data if email verification is to be stubbed, otherwise use any value* *
     - **Redirect URL**: 
-      - User changing contact preference: http://localhost:16005/manage-alcohol-duty/contact-preference/start/contact-preference
+      - User changing contact preference: http://localhost:16005/manage-alcohol-duty/contact-preference/start/change-preference
       - User on email, updating their email address: http://localhost:16005/manage-alcohol-duty/contact-preference/start/update-email
       - User with bounced email: http://localhost:16005/manage-alcohol-duty/contact-preference/start/bounced-email
     - **Affinity group**: Organisation
