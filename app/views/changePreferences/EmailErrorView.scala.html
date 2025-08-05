@@ -14,33 +14,29 @@
  * limitations under the License.
  *@
 
-@import components.{Link, Paragraph, PageHeading}
-@import uk.gov.hmrc.govukfrontend.views.Aliases.Panel
+@import components.{Paragraph, PageHeading}
 @import models.NormalMode
 
 @this(
         layout: templates.Layout,
-        govukPanel: GovukPanel,
         paragraph: Paragraph,
         govukButton: GovukButton,
         pageHeading: PageHeading,
-        link: Link
 )
 
-@(businessTaxAccountUrl: String)(implicit request: Request[_], messages: Messages)
+@()(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("emailError.title")), showBackLink = false) {
+@layout(pageTitle = titleNoForm(messages("emailError.title"))) {
 
-@pageHeading(messages("emailError.title"))
+    @pageHeading(messages("emailError.heading"))
 
-        @paragraph(messages("emailError.p1"))
-        @paragraph(messages("emailError.p2"))
+    @paragraph(messages("emailError.p1"))
+    @paragraph(messages("emailError.p2"))
 
-
-        @govukButton(
-            ButtonViewModel("continueButton", messages("site.continue"))
-                .asLink(controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode).url)
-)
+    @govukButton(
+        ButtonViewModel("continueButton", messages("site.continue"))
+        .asLink(controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode).url)
+    )
 }
 
 

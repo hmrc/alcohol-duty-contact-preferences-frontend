@@ -69,6 +69,7 @@ existingEmail.no = No, I want to use a different email
 existingEmail.error.required = Select ‘Yes’ if {0} is your email
 
 emailError.title = You need to update your email
+emailError.heading = You need to update your email
 emailError.p1 = We were unable to contact the email address linked to your account, so your contact preference has been changed to post.
 emailError.p2 = You need to update your email address if you want to continue receiving emails when you have a message in your account.
 

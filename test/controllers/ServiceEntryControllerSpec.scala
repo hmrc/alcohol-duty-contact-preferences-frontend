@@ -140,8 +140,8 @@ class ServiceEntryControllerSpec extends SpecBase {
           val result = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.routes.IndexController.onPageLoad().url
-          // TODO: Change to bounced email page
+          redirectLocation(result).value mustEqual
+            controllers.changePreferences.routes.EmailErrorController.onPageLoad().url
 
           verify(mockUserAnswersConnector, times(1)).createUserAnswers(any())(any())
           verify(mockUserAnswersConnector, times(1)).set(eqTo(userAnswersWithContactPreference))(any())

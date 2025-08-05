@@ -69,6 +69,7 @@ existingEmail.no = Na, hoffwn ddefnyddio cyfeiriad e-bost gwahanol
 existingEmail.error.required = Dewiswch ‘Iawn’ os {0} yw’ch e-bost
 
 emailError.title = Mae angen i chi ddiweddaru’ch cyfeiriad e-bost
+emailError.heading = Mae angen i chi ddiweddaru’ch cyfeiriad e-bost
 emailError.p1 = Doedden ni ddim yn gallu cysylltu â’r cyfeiriad e-bost sy’n gysylltiedig â’ch cyfrif, felly mae’ch dewis o ran cysylltu wedi’i newid i ohebiaeth drwy’r post.
 emailError.p2 = Mae angen i chi ddiweddaru’ch cyfeiriad e-bost os ydych chi’n dymuno parhau i gael e-byst pan fo neges yn eich cyfrif.
 

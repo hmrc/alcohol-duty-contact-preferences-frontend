@@ -16,7 +16,6 @@
 
 package controllers.changePreferences
 
-import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import play.api.Logging
 import play.api.i18n.I18nSupport
@@ -31,16 +30,14 @@ class EmailErrorController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   val controllerComponents: MessagesControllerComponents,
-  view: EmailErrorView,
-  appConfig: FrontendAppConfig
+  view: EmailErrorView
 ) extends FrontendBaseController
     with I18nSupport
     with Logging {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     request.userAnswers.subscriptionSummary.bouncedEmail match {
-      case Some(true) =>
-        Ok(view(appConfig.businessTaxAccountUrl))
+      case Some(true) => Ok(view())
       case _          =>
         logger.warn("Bounced email flag is not set. Redirecting to journey recovery.")
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
