@@ -49,19 +49,9 @@ class ContactPreferenceControllerSpec extends SpecBase {
 
   "ContactPreferenceController" - {
 
-    "onPageLoad in normal mode" - {
-      "must create user answers, then return OK and the correct view for a GET if user answers do not exist" in {
-        val mockUserAnswersConnector = mock[UserAnswersConnector]
-
-        when(mockUserAnswersConnector.createUserAnswers(any())(any())) thenReturn Future.successful(
-          Right(userAnswersPostNoEmail)
-        )
-
-        val application = applicationBuilder(userAnswers = None)
-          .overrides(
-            bind[UserAnswersConnector].toInstance(mockUserAnswersConnector)
-          )
-          .build()
+    "onPageLoad" - {
+      "must return OK and the correct view for a GET in normal mode" in {
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
         running(application) {
           val request = FakeRequest(GET, contactPreferenceNormalRoute)
@@ -71,16 +61,11 @@ class ContactPreferenceControllerSpec extends SpecBase {
           val view = application.injector.instanceOf[ContactPreferenceView]
 
           status(result) mustEqual OK
-          contentAsString(result) mustEqual view(form, NormalMode)(
-            request,
-            getMessages(application)
-          ).toString
-
-          verify(mockUserAnswersConnector, times(1)).createUserAnswers(eqTo(userDetails))(any())
+          contentAsString(result) mustEqual view(form, NormalMode)(request, getMessages(application)).toString
         }
       }
 
-      "must populate the view correctly on a GET if user answers already exist" in {
+      "must populate the view correctly on a GET in normal mode if the question has previously been answered" in {
         val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
 
         running(application) {
@@ -97,10 +82,8 @@ class ContactPreferenceControllerSpec extends SpecBase {
           ).toString
         }
       }
-    }
 
-    "onPageLoad in check mode" - {
-      "must populate the view correctly on a GET" in {
+      "must populate the view correctly on a GET in check mode" in {
         val application = applicationBuilder(userAnswers = Some(userAnswersPostNoEmail)).build()
 
         running(application) {
@@ -128,7 +111,7 @@ class ContactPreferenceControllerSpec extends SpecBase {
         }
       }
 
-      "must redirect to Journey Recovery for a GET if the question has not been answered" in {
+      "must redirect to Journey Recovery for a GET if the question has not been answered in check mode" in {
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
         running(application) {

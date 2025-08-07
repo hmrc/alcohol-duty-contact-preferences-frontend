@@ -30,13 +30,15 @@ The service runs on port `16005` by default.
 
 2. Change the following:
     - **CredId**: * *Provide from stub data if email verification is to be stubbed, otherwise use any value* *
-    - **Redirect URL**: The first page of the journey,
-      http://localhost:16005/manage-alcohol-duty/contact-preference/method
+    - **Redirect URL**: 
+      - User changing contact preference: http://localhost:16005/manage-alcohol-duty/contact-preference/start/change-preference
+      - User on email, updating their email address: http://localhost:16005/manage-alcohol-duty/contact-preference/start/update-email
+      - User with bounced email: http://localhost:16005/manage-alcohol-duty/contact-preference/start/bounced-email
     - **Affinity group**: Organisation
     - **Enrolments**: Add an enrolment with:
-        - **Enrolment Key**: HMRC-AD-ORG
-        - **Identifier Name**: APPAID
-        - **Identifier Value**: * *Provide from stub data* *
+      - **Enrolment Key**: HMRC-AD-ORG
+      - **Identifier Name**: APPAID
+      - **Identifier Value**: * *Provide from stub data* *
 
 See the email-verification service's README for information on the
 [email verification API endpoints](https://github.com/hmrc/email-verification?tab=readme-ov-file#api).

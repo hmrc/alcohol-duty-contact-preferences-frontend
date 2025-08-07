@@ -20,11 +20,10 @@ import connectors.UserAnswersConnector
 import controllers.actions._
 import controllers.routes
 import forms.ContactPreferenceFormProvider
-import models.{CheckMode, Mode, NormalMode, UserAnswers, UserDetails}
+import models.{CheckMode, Mode, NormalMode, UserAnswers}
 import navigation.Navigator
 import pages.changePreferences.ContactPreferencePage
 import play.api.Logging
-import play.api.data.Form
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
@@ -50,23 +49,18 @@ class ContactPreferenceController @Inject() (
 
   val form = formProvider()
 
-  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData).async { implicit request =>
+  def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     mode match {
       case NormalMode =>
-        request.userAnswers match {
-          case None                  =>
-            userAnswersConnector.createUserAnswers(UserDetails(request.appaId, request.userId)).map {
-              case Right(_)    => Ok(view(form, mode))
-              case Left(error) =>
-                logger.warn(s"Error creating user answers: ${error.message}")
-                Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
-            }
-          case Some(existingAnswers) => Future.successful(Ok(view(getPreparedForm(existingAnswers), mode)))
+        val preparedForm = request.userAnswers.get(ContactPreferencePage) match {
+          case None        => form
+          case Some(value) => form.fill(value)
         }
+        Ok(view(preparedForm, mode))
       case CheckMode  =>
-        request.userAnswers.flatMap(_.get(ContactPreferencePage)) match {
-          case None        => Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
-          case Some(value) => Future.successful(Ok(view(form.fill(value), mode)))
+        request.userAnswers.get(ContactPreferencePage) match {
+          case None        => Redirect(routes.JourneyRecoveryController.onPageLoad())
+          case Some(value) => Ok(view(form.fill(value), mode))
         }
     }
   }
@@ -85,11 +79,6 @@ class ContactPreferenceController @Inject() (
             } yield Redirect(navigator.nextPage(ContactPreferencePage, mode, updatedAnswers, maybeAnswerChanged))
           }
         )
-  }
-
-  private def getPreparedForm(ua: UserAnswers): Form[Boolean] = ua.get(ContactPreferencePage) match {
-    case None        => form
-    case Some(value) => form.fill(value)
   }
 
   private def hasAnswerChanged(mode: Mode, ua: UserAnswers, submittedValue: Boolean): Option[Boolean] = mode match {
