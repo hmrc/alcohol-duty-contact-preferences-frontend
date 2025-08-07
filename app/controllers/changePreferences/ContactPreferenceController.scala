@@ -51,7 +51,12 @@ class ContactPreferenceController @Inject() (
 
   def onPageLoad(mode: Mode): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     mode match {
-      case NormalMode => Ok(view(form, mode))
+      case NormalMode =>
+        val preparedForm = request.userAnswers.get(ContactPreferencePage) match {
+          case None        => form
+          case Some(value) => form.fill(value)
+        }
+        Ok(view(preparedForm, mode))
       case CheckMode  =>
         request.userAnswers.get(ContactPreferencePage) match {
           case None        => Redirect(routes.JourneyRecoveryController.onPageLoad())

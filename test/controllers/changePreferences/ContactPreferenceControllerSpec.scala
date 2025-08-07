@@ -51,7 +51,7 @@ class ContactPreferenceControllerSpec extends SpecBase {
 
     "onPageLoad" - {
       "must return OK and the correct view for a GET in normal mode" in {
-        val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers)).build()
 
         running(application) {
           val request = FakeRequest(GET, contactPreferenceNormalRoute)
@@ -62,6 +62,24 @@ class ContactPreferenceControllerSpec extends SpecBase {
 
           status(result) mustEqual OK
           contentAsString(result) mustEqual view(form, NormalMode)(request, getMessages(application)).toString
+        }
+      }
+
+      "must populate the view correctly on a GET in normal mode if the question has previously been answered" in {
+        val application = applicationBuilder(userAnswers = Some(userAnswers)).build()
+
+        running(application) {
+          val request = FakeRequest(GET, contactPreferenceNormalRoute)
+
+          val result = route(application, request).value
+
+          val view = application.injector.instanceOf[ContactPreferenceView]
+
+          status(result) mustEqual OK
+          contentAsString(result) mustEqual view(form.fill(false), NormalMode)(
+            request,
+            getMessages(application)
+          ).toString
         }
       }
 
