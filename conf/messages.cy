@@ -108,4 +108,7 @@ preferenceUpdated.email.guidance1 = Byddwn ni’n anfon e-bost atoch yn {0} pan 
 preferenceUpdated.email.guidance2 = Efallai y caiff rhai negeseuon eu hanfon drwy’r post o hyd, os yw’r gyfraith yn gofyn am hynny.
 preferenceUpdated.post.guidance = Byddwn ni’n anfon llythyrau atoch ynglŷn â’ch Datganiadau Toll Alcohol drwy’r post.
 
+emailFound.title = Byddwn ni’n anfon e-bost atoch pan fo gennych neges ddigidol - Rheoli eich Toll Alcohol - GOV.UK
+emailFound.heading = Byddwn ni’n anfon e-bost atoch yn {0} pan fo gennych neges ddigidol
+
 emailVerificationJourney.signature = Rheoli’ch Gwasanaeth Toll Alcohol

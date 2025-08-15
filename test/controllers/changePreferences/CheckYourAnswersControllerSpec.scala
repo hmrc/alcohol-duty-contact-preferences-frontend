@@ -202,7 +202,38 @@ class CheckYourAnswersControllerSpec extends SpecBase {
     }
 
     "onSubmit" - {
-      "must redirect to the Contact Preference Updated page if submission is successful" in new SetUp {
+      "must redirect to the Email Found page if submission is successful and emails match" in new SetUp {
+        when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Right(contactPreferenceSubmissionEmail)
+        when(submitPreferencesConnector.submitContactPreferences(any(), any())(any())) thenReturn
+          EitherT.rightT(testSubmissionResponse)
+
+        val completeUserAnswers = userAnswers.copy(
+          emailAddress = Some(emailAddress),
+          subscriptionSummary = userAnswers.subscriptionSummary.copy(emailAddress = Some(emailAddress))
+        )
+
+        val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
+          .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
+          .overrides(bind[SubmitPreferencesConnector].toInstance(submitPreferencesConnector))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(POST, checkYourAnswersPostRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.changePreferences.routes.EmailFoundController
+            .onPageLoad()
+            .url
+
+          verify(pageCheckHelper, times(1)).checkDetailsToCreateSubmission(eqTo(completeUserAnswers))
+          verify(submitPreferencesConnector, times(1))
+            .submitContactPreferences(eqTo(contactPreferenceSubmissionEmail), eqTo(appaId))(any())
+        }
+      }
+
+      "must redirect to the Contact Preference Updated page if submission is successful and emails don't match" in new SetUp {
         when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Right(contactPreferenceSubmissionEmail)
         when(submitPreferencesConnector.submitContactPreferences(any(), any())(any())) thenReturn
           EitherT.rightT(testSubmissionResponse)

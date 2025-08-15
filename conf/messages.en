@@ -108,4 +108,7 @@ preferenceUpdated.email.guidance1 = We will email you at {0} when you have a new
 preferenceUpdated.email.guidance2 = Some messages may still be sent by post if required by law.
 preferenceUpdated.post.guidance = We will send you letters about your Alcohol Duty returns by post.
 
+emailFound.title = We will email you when you have a digital message - Manage your Alcohol Duty - GOV.UK
+emailFound.heading = We will email you at {0} when you have a digital message
+
 emailVerificationJourney.signature = Manage your Alcohol Duty Service
