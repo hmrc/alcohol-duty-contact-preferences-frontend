@@ -89,18 +89,27 @@ class CheckYourAnswersController @Inject() (
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
     pageCheckHelper.checkDetailsToCreateSubmission(request.userAnswers) match {
       case Right(contactPreferenceSubmission) =>
+        val shouldGoToEmailFoundPage =
+          (request.userAnswers.emailAddress, request.userAnswers.subscriptionSummary.emailAddress) match {
+            case (Some(entered), Some(existing)) => entered.equalsIgnoreCase(existing)
+            case _                               => false
+          }
+
         submitPreferencesConnector
           .submitContactPreferences(contactPreferenceSubmission, request.appaId)
           .foldF(
             _ => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())),
             submissionResponse => {
               logger.info("Successfully submitted contact preferences")
-              val session =
-                request.session + (submissionDetailsKey -> Json.toJson(submissionResponse).toString)
-              Future.successful(
-                Redirect(controllers.changePreferences.routes.PreferenceUpdatedController.onPageLoad())
-                  .withSession(session)
-              )
+              val session = request.session + (submissionDetailsKey -> Json.toJson(submissionResponse).toString)
+
+              val redirectTo = if (shouldGoToEmailFoundPage) {
+                controllers.changePreferences.routes.EmailFoundController.onPageLoad()
+              } else {
+                controllers.changePreferences.routes.PreferenceUpdatedController.onPageLoad()
+              }
+
+              Future.successful(Redirect(redirectTo).withSession(session))
             }
           )
       case Left(error)                        =>
