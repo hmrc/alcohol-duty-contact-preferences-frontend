@@ -25,15 +25,14 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import utils.PageCheckHelper
-import views.html.changePreferences.EmailFoundView
+import views.html.changePreferences.SameEmailSubmittedView
 
-class EmailFoundControllerSpec extends SpecBase {
+class SameEmailSubmittedControllerSpec extends SpecBase {
 
-  lazy val emailFoundRoute: String = controllers.changePreferences.routes.EmailFoundController.onPageLoad().url
+  lazy val emailFoundRoute: String = controllers.changePreferences.routes.SameEmailSubmittedController.onPageLoad().url
   val testEmail                    = "test@example.com"
 
-  "EmailFoundController" - {
-
+  "SameEmailSubmittedController" - {
     "must return OK and the correct view for a GET when emails match" in {
       val mockHelper = mock[PageCheckHelper]
 
@@ -46,7 +45,7 @@ class EmailFoundControllerSpec extends SpecBase {
       running(application) {
         val request = FakeRequest(GET, emailFoundRoute)
         val result  = route(application, request).value
-        val view    = application.injector.instanceOf[EmailFoundView]
+        val view    = application.injector.instanceOf[SameEmailSubmittedView]
 
         status(result) mustEqual OK
         contentAsString(result) mustEqual view(appConfig.businessTaxAccountUrl, testEmail)(

@@ -225,7 +225,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual
-            controllers.changePreferences.routes.EmailFoundController.onPageLoad().url
+            controllers.changePreferences.routes.SameEmailSubmittedController.onPageLoad().url
 
           verify(pageCheckHelper, times(1)).checkDetailsToCreateSubmission(eqTo(completeUserAnswers))
           verify(submitPreferencesConnector, never).submitContactPreferences(any(), any())(any())

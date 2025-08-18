@@ -103,8 +103,12 @@ class CheckYourAnswersController @Inject() (
             }
           )
 
+      case Right(Left(errorMessage)) =>
+        logger.warn(s"Error in submission data: $errorMessage")
+        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+
       case Left(ErrorModel(CONFLICT, _)) =>
-        Future.successful(Redirect(controllers.changePreferences.routes.EmailFoundController.onPageLoad()))
+        Future.successful(Redirect(controllers.changePreferences.routes.SameEmailSubmittedController.onPageLoad()))
 
       case Left(error) =>
         logger.warn(error.message)

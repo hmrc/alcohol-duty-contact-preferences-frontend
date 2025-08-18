@@ -23,17 +23,17 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 import utils.PageCheckHelper
-import views.html.changePreferences.EmailFoundView
+import views.html.changePreferences.SameEmailSubmittedView
 
 import javax.inject.Inject
 
-class EmailFoundController @Inject() (
+class SameEmailSubmittedController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   helper: PageCheckHelper,
   val controllerComponents: MessagesControllerComponents,
-  view: EmailFoundView,
+  view: SameEmailSubmittedView,
   appConfig: FrontendAppConfig
 ) extends FrontendBaseController
     with I18nSupport

@@ -40,7 +40,7 @@ POST        /check-answers                               controllers.changePrefe
 
 GET         /confirmation                                controllers.changePreferences.PreferenceUpdatedController.onPageLoad()
 
-GET         /confirmation-digital-message                                controllers.changePreferences.EmailFoundController.onPageLoad()
+GET         /confirmation-digital-message                                controllers.changePreferences.SameEmailSubmittedController.onPageLoad()
 
 GET         /email-error                                      controllers.changePreferences.EmailErrorController.onPageLoad()
 
