@@ -42,7 +42,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   val accessibilityStatementUrl: String = configuration.get[String]("accessibility-statement.host") ++
     configuration.get[String]("accessibility-statement.url")
 
-  private val exitSurveyBaseUrl: String = configuration.get[Service]("microservice.services.feedback-frontend").baseUrl
+  private val exitSurveyBaseUrl: String = configuration.get[String]("urls.feedbackFrontendBase")
   val exitSurveyUrl: String             = s"$exitSurveyBaseUrl/feedback/alcohol-duty-contact-preferences-frontend"
 
   val languageTranslationEnabled: Boolean =
