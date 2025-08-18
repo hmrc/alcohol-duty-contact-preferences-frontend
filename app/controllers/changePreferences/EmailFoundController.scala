@@ -40,7 +40,7 @@ class EmailFoundController @Inject() (
     with Logging {
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    helper.checkDetailsForExistingEmailPage(request.userAnswers) match {
+    helper.checkDetailsForEmailFoundPage(request.userAnswers) match {
       case Right(email) => Ok(view(appConfig.businessTaxAccountUrl, email))
       case Left(error)  =>
         logger.warn(error.message)

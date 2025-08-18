@@ -30,13 +30,14 @@ import views.html.changePreferences.EmailFoundView
 class EmailFoundControllerSpec extends SpecBase {
 
   lazy val emailFoundRoute: String = controllers.changePreferences.routes.EmailFoundController.onPageLoad().url
+  val testEmail                    = "test@example.com"
 
   "EmailFoundController" - {
 
-    "must return OK and the correct view for a GET" in {
+    "must return OK and the correct view for a GET when emails match" in {
       val mockHelper = mock[PageCheckHelper]
 
-      when(mockHelper.checkDetailsForExistingEmailPage(any())) thenReturn Right("test@example.com")
+      when(mockHelper.checkDetailsForEmailFoundPage(any())) thenReturn Right(testEmail)
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(bind[PageCheckHelper].toInstance(mockHelper))
@@ -44,27 +45,20 @@ class EmailFoundControllerSpec extends SpecBase {
 
       running(application) {
         val request = FakeRequest(GET, emailFoundRoute)
-
-        val result = route(application, request).value
-
-        val view = application.injector.instanceOf[EmailFoundView]
+        val result  = route(application, request).value
+        val view    = application.injector.instanceOf[EmailFoundView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(appConfig.businessTaxAccountUrl, "test@example.com")(
+        contentAsString(result) mustEqual view(appConfig.businessTaxAccountUrl, testEmail)(
           request,
-          getMessages(application)
+          messages(application)
         ).toString
-
-        verify(mockHelper, times(1)).checkDetailsForExistingEmailPage(eqTo(emptyUserAnswers))
+        verify(mockHelper, times(1)).checkDetailsForEmailFoundPage(eqTo(emptyUserAnswers))
       }
     }
 
     "must redirect to Journey Recovery for a GET if user answers do not exist" in {
       val mockHelper = mock[PageCheckHelper]
-
-      when(mockHelper.checkDetailsForExistingEmailPage(any())) thenReturn Left(
-        ErrorModel(BAD_REQUEST, "Error from helper")
-      )
 
       val application = applicationBuilder(userAnswers = None)
         .overrides(bind[PageCheckHelper].toInstance(mockHelper))
@@ -72,22 +66,19 @@ class EmailFoundControllerSpec extends SpecBase {
 
       running(application) {
         val request = FakeRequest(GET, emailFoundRoute)
-
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-
-        verify(mockHelper, times(0)).checkDetailsForExistingEmailPage(any())
+        verify(mockHelper, never).checkDetailsForEmailFoundPage(any())
       }
     }
 
-    "must redirect to Journey Recovery for a GET if the helper returns an error when checking the user's details" in {
+    "must redirect to Journey Recovery when emails don't match" in {
       val mockHelper = mock[PageCheckHelper]
 
-      when(mockHelper.checkDetailsForExistingEmailPage(any())) thenReturn Left(
-        ErrorModel(BAD_REQUEST, "Error from helper")
-      )
+      when(mockHelper.checkDetailsForEmailFoundPage(any()))
+        .thenReturn(Left(ErrorModel(BAD_REQUEST, "Submitted email does not match subscription email")))
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(bind[PageCheckHelper].toInstance(mockHelper))
@@ -95,13 +86,11 @@ class EmailFoundControllerSpec extends SpecBase {
 
       running(application) {
         val request = FakeRequest(GET, emailFoundRoute)
-
-        val result = route(application, request).value
+        val result  = route(application, request).value
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-
-        verify(mockHelper, times(1)).checkDetailsForExistingEmailPage(eqTo(emptyUserAnswers))
+        verify(mockHelper, times(1)).checkDetailsForEmailFoundPage(eqTo(emptyUserAnswers))
       }
     }
   }

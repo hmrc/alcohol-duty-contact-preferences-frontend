@@ -203,38 +203,39 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
     "onSubmit" - {
       "must redirect to the Email Found page if submission is successful and emails match" in new SetUp {
-        when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Right(contactPreferenceSubmissionEmail)
-        when(submitPreferencesConnector.submitContactPreferences(any(), any())(any())) thenReturn
-          EitherT.rightT(testSubmissionResponse)
+        when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Left(
+          ErrorModel(CONFLICT, "Email matches existing subscription")
+        )
 
         val completeUserAnswers = userAnswers.copy(
           emailAddress = Some(emailAddress),
-          subscriptionSummary = userAnswers.subscriptionSummary.copy(emailAddress = Some(emailAddress))
+          subscriptionSummary = userAnswers.subscriptionSummary.copy(
+            emailAddress = Some(emailAddress),
+            paperlessReference = true
+          )
         )
 
         val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
           .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
-          .overrides(bind[SubmitPreferencesConnector].toInstance(submitPreferencesConnector))
           .build()
 
         running(application) {
           val request = FakeRequest(POST, checkYourAnswersPostRoute)
-
-          val result = route(application, request).value
+          val result  = route(application, request).value
 
           status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.changePreferences.routes.EmailFoundController
-            .onPageLoad()
-            .url
+          redirectLocation(result).value mustEqual
+            controllers.changePreferences.routes.EmailFoundController.onPageLoad().url
 
           verify(pageCheckHelper, times(1)).checkDetailsToCreateSubmission(eqTo(completeUserAnswers))
-          verify(submitPreferencesConnector, times(1))
-            .submitContactPreferences(eqTo(contactPreferenceSubmissionEmail), eqTo(appaId))(any())
+          verify(submitPreferencesConnector, never).submitContactPreferences(any(), any())(any())
         }
       }
 
       "must redirect to the Contact Preference Updated page if submission is successful and emails don't match" in new SetUp {
-        when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Right(contactPreferenceSubmissionEmail)
+        when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Right(
+          Right(contactPreferenceSubmissionEmail)
+        )
         when(submitPreferencesConnector.submitContactPreferences(any(), any())(any())) thenReturn
           EitherT.rightT(testSubmissionResponse)
 
@@ -262,7 +263,9 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       }
 
       "must redirect to Journey Recovery if submission is not successful" in new SetUp {
-        when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Right(contactPreferenceSubmissionEmail)
+        when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Right(
+          Right(contactPreferenceSubmissionEmail)
+        )
         when(submitPreferencesConnector.submitContactPreferences(any(), any())(any())) thenReturn
           EitherT.leftT(ErrorModel(INTERNAL_SERVER_ERROR, "Unexpected response"))
 

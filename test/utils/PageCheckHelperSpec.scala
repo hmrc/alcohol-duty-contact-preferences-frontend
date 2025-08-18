@@ -192,14 +192,14 @@ class PageCheckHelperSpec extends SpecBase {
     "must return a Right containing the correct submission details if the user has selected post" in {
       val result = testHelper.checkDetailsToCreateSubmission(userAnswers)
 
-      result mustBe Right(contactPreferenceSubmissionPost)
+      result mustBe Right(Right(contactPreferenceSubmissionPost))
     }
 
     "must return a Right containing the correct submission details if the user has selected email and the email is verified" in {
       val result =
         testHelper.checkDetailsToCreateSubmission(userAnswersPostWithEmail)
 
-      result mustBe Right(contactPreferenceSubmissionEmail)
+      result mustBe Right(Right(contactPreferenceSubmissionEmail))
     }
 
     "must return a Left containing an ErrorModel if the user has selected email and the email is not verified" in {

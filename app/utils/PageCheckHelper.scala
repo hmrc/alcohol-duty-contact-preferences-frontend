@@ -18,7 +18,7 @@ package utils
 
 import models.{ErrorModel, PaperlessPreferenceSubmission, UserAnswers}
 import pages.changePreferences.ContactPreferencePage
-import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR}
+import play.api.http.Status.{BAD_REQUEST, CONFLICT, INTERNAL_SERVER_ERROR}
 
 import javax.inject.Inject
 
@@ -115,37 +115,49 @@ class PageCheckHelper @Inject() {
     }
   }
 
-  def checkDetailsToCreateSubmission(userAnswers: UserAnswers): Either[ErrorModel, PaperlessPreferenceSubmission] = {
-    val contactPreferenceOption = userAnswers.get(ContactPreferencePage)
-    val enteredEmailAddress     = userAnswers.emailAddress
+  def checkDetailsToCreateSubmission(
+    userAnswers: UserAnswers
+  ): Either[ErrorModel, Either[String, PaperlessPreferenceSubmission]] =
+    (userAnswers.emailAddress, userAnswers.subscriptionSummary.emailAddress) match {
+      case (Some(entered), Some(subscriptionEmail))
+          if entered.equalsIgnoreCase(subscriptionEmail) &&
+            userAnswers.subscriptionSummary.paperlessReference =>
+        Left(ErrorModel(CONFLICT, "Email matches existing subscription"))
+      case _ =>
+        val contactPreferenceOption = userAnswers.get(ContactPreferencePage)
+        val enteredEmailAddress     = userAnswers.emailAddress
 
-    (contactPreferenceOption, enteredEmailAddress) match {
-      case (Some(false), _)          =>
-        Right(
-          PaperlessPreferenceSubmission(
-            paperlessPreference = false,
-            emailAddress = None,
-            emailVerification = None,
-            bouncedEmail = None
-          )
-        )
-      case (Some(true), Some(email)) =>
-        if (userAnswers.verifiedEmailAddresses.contains(email)) {
-          Right(
-            PaperlessPreferenceSubmission(
-              paperlessPreference = true,
-              emailAddress = Some(email),
-              emailVerification = Some(true),
-              bouncedEmail = Some(false)
+        (contactPreferenceOption, enteredEmailAddress) match {
+          case (Some(false), _)          =>
+            Right(
+              Right(
+                PaperlessPreferenceSubmission(
+                  paperlessPreference = false,
+                  emailAddress = None,
+                  emailVerification = None,
+                  bouncedEmail = None
+                )
+              )
             )
-          )
-        } else {
-          Left(ErrorModel(BAD_REQUEST, "Error creating submission: Email address is not verified."))
+          case (Some(true), Some(email)) =>
+            if (userAnswers.verifiedEmailAddresses.contains(email)) {
+              Right(
+                Right(
+                  PaperlessPreferenceSubmission(
+                    paperlessPreference = true,
+                    emailAddress = Some(email),
+                    emailVerification = Some(true),
+                    bouncedEmail = Some(false)
+                  )
+                )
+              )
+            } else {
+              Left(ErrorModel(BAD_REQUEST, "Error creating submission: Email address is not verified."))
+            }
+          case _                         =>
+            Left(ErrorModel(BAD_REQUEST, "Error creating submission: User answers do not contain the required data."))
         }
-      case _                         =>
-        Left(ErrorModel(BAD_REQUEST, "Error creating submission: User answers do not contain the required data."))
     }
-  }
 
   def checkDetailsForPreferenceUpdatedPage(userAnswers: UserAnswers): Either[ErrorModel, Option[String]] =
     userAnswers.get(ContactPreferencePage) match {
@@ -162,5 +174,19 @@ class PageCheckHelper @Inject() {
         }
       case Some(false) => Right(None)
       case None        => Left(ErrorModel(INTERNAL_SERVER_ERROR, "Contact preference updated but not found in user answers"))
+    }
+
+  def checkDetailsForEmailFoundPage(userAnswers: UserAnswers): Either[ErrorModel, String] =
+    if (!userAnswers.subscriptionSummary.paperlessReference) {
+      Left(ErrorModel(BAD_REQUEST, "User is not currently on email"))
+    } else if (!userAnswers.get(ContactPreferencePage).contains(true)) {
+      Left(ErrorModel(BAD_REQUEST, "User has not selected email as contact preference"))
+    } else {
+      (userAnswers.emailAddress, userAnswers.subscriptionSummary.emailAddress) match {
+        case (Some(entered), Some(subscriptionEmail)) if entered.equalsIgnoreCase(subscriptionEmail) =>
+          Right(entered)
+        case _                                                                                       =>
+          Left(ErrorModel(INTERNAL_SERVER_ERROR, "Unexpected error: Email validation failed"))
+      }
     }
 }
