@@ -198,14 +198,7 @@ class PageCheckHelperSpec extends SpecBase {
     "must return a Right containing the correct submission details if the user has selected email and the email is verified" in {
       val result = testHelper.checkDetailsToCreateSubmission(userAnswersPostWithEmail)
 
-      val expected = PaperlessPreferenceSubmission(
-        paperlessPreference = true,
-        emailAddress = Some("john.doe@example.com"),
-        emailVerification = Some(true),
-        bouncedEmail = Some(false)
-      )
-
-      result mustBe Right(expected)
+      result mustBe Right(contactPreferenceSubmissionEmail)
     }
 
     "must return a Left containing an ErrorModel if the user has selected email and the email is not verified" in {
@@ -322,6 +315,22 @@ class PageCheckHelperSpec extends SpecBase {
       result mustBe Left(
         ErrorModel(INTERNAL_SERVER_ERROR, "Contact preference updated to email but email not found in user answers")
       )
+    }
+    "checkDetailsForSameEmailSubmittedPage" - {
+      "must return Right with email when user is already on email, has selected email, and the emails match" in {
+        val subscriptionEmail            = "existing@example.com"
+        val userAnswersWithMatchingEmail = userAnswersPostWithEmail.copy(
+          subscriptionSummary = userAnswersPostWithEmail.subscriptionSummary.copy(
+            emailAddress = Some(subscriptionEmail),
+            paperlessReference = true
+          ),
+          emailAddress = Some(subscriptionEmail)
+        )
+
+        val result = testHelper.checkDetailsForSameEmailSubmittedPage(userAnswersWithMatchingEmail)
+
+        result mustBe Right(subscriptionEmail)
+      }
     }
   }
 }
