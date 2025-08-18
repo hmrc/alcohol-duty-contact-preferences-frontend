@@ -201,8 +201,8 @@ class PageCheckHelperSpec extends SpecBase {
       val expected = PaperlessPreferenceSubmission(
         paperlessPreference = true,
         emailAddress = Some("john.doe@example.com"),
-        emailVerification = None,
-        bouncedEmail = None
+        emailVerification = Some(true),
+        bouncedEmail = Some(false)
       )
 
       result mustBe Right(expected)
@@ -264,8 +264,8 @@ class PageCheckHelperSpec extends SpecBase {
         PaperlessPreferenceSubmission(
           paperlessPreference = true,
           emailAddress = Some(newEmail),
-          emailVerification = None,
-          bouncedEmail = None
+          emailVerification = Some(true),
+          bouncedEmail = Some(false)
         )
       )
     }
@@ -288,8 +288,8 @@ class PageCheckHelperSpec extends SpecBase {
         PaperlessPreferenceSubmission(
           paperlessPreference = true,
           emailAddress = Some(newEmail),
-          emailVerification = None,
-          bouncedEmail = None
+          emailVerification = Some(true),
+          bouncedEmail = Some(false)
         )
       )
     }

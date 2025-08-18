@@ -143,8 +143,8 @@ class PageCheckHelper @Inject() {
             PaperlessPreferenceSubmission(
               paperlessPreference = true,
               emailAddress = Some(email),
-              emailVerification = None,
-              bouncedEmail = None
+              emailVerification = Some(true),
+              bouncedEmail = Some(false)
             )
           )
         } else {
