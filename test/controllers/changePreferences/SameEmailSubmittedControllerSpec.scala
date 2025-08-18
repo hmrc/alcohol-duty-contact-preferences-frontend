@@ -36,7 +36,7 @@ class SameEmailSubmittedControllerSpec extends SpecBase {
     "must return OK and the correct view for a GET when emails match" in {
       val mockHelper = mock[PageCheckHelper]
 
-      when(mockHelper.checkDetailsForEmailFoundPage(any())) thenReturn Right(testEmail)
+      when(mockHelper.checkDetailsForSameEmailSubmittedPage(any())) thenReturn Right(testEmail)
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
         .overrides(bind[PageCheckHelper].toInstance(mockHelper))
@@ -52,7 +52,7 @@ class SameEmailSubmittedControllerSpec extends SpecBase {
           request,
           messages(application)
         ).toString
-        verify(mockHelper, times(1)).checkDetailsForEmailFoundPage(eqTo(emptyUserAnswers))
+        verify(mockHelper, times(1)).checkDetailsForSameEmailSubmittedPage(eqTo(emptyUserAnswers))
       }
     }
 
@@ -69,14 +69,14 @@ class SameEmailSubmittedControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-        verify(mockHelper, never).checkDetailsForEmailFoundPage(any())
+        verify(mockHelper, never).checkDetailsForSameEmailSubmittedPage(any())
       }
     }
 
     "must redirect to Journey Recovery when emails don't match" in {
       val mockHelper = mock[PageCheckHelper]
 
-      when(mockHelper.checkDetailsForEmailFoundPage(any()))
+      when(mockHelper.checkDetailsForSameEmailSubmittedPage(any()))
         .thenReturn(Left(ErrorModel(BAD_REQUEST, "Submitted email does not match subscription email")))
 
       val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
@@ -89,7 +89,7 @@ class SameEmailSubmittedControllerSpec extends SpecBase {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
-        verify(mockHelper, times(1)).checkDetailsForEmailFoundPage(eqTo(emptyUserAnswers))
+        verify(mockHelper, times(1)).checkDetailsForSameEmailSubmittedPage(eqTo(emptyUserAnswers))
       }
     }
   }

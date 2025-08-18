@@ -17,9 +17,9 @@
 package utils
 
 import base.SpecBase
-import models.ErrorModel
+import models.{ErrorModel, PaperlessPreferenceSubmission}
 import pages.changePreferences.ContactPreferencePage
-import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR}
+import play.api.http.Status.{BAD_REQUEST, CONFLICT, INTERNAL_SERVER_ERROR}
 
 class PageCheckHelperSpec extends SpecBase {
 
@@ -192,14 +192,20 @@ class PageCheckHelperSpec extends SpecBase {
     "must return a Right containing the correct submission details if the user has selected post" in {
       val result = testHelper.checkDetailsToCreateSubmission(userAnswers)
 
-      result mustBe Right(Right(contactPreferenceSubmissionPost))
+      result mustBe Right(contactPreferenceSubmissionPost)
     }
 
     "must return a Right containing the correct submission details if the user has selected email and the email is verified" in {
-      val result =
-        testHelper.checkDetailsToCreateSubmission(userAnswersPostWithEmail)
+      val result = testHelper.checkDetailsToCreateSubmission(userAnswersPostWithEmail)
 
-      result mustBe Right(Right(contactPreferenceSubmissionEmail))
+      val expected = PaperlessPreferenceSubmission(
+        paperlessPreference = true,
+        emailAddress = Some("john.doe@example.com"),
+        emailVerification = None,
+        bouncedEmail = None
+      )
+
+      result mustBe Right(expected)
     }
 
     "must return a Left containing an ErrorModel if the user has selected email and the email is not verified" in {
@@ -221,6 +227,70 @@ class PageCheckHelperSpec extends SpecBase {
 
       result mustBe Left(
         ErrorModel(BAD_REQUEST, "Error creating submission: User answers do not contain the required data.")
+      )
+    }
+
+    "must return a Left with CONFLICT when user submits the same email as their existing email" in {
+      val subscriptionEmail        = "existing@example.com"
+      val userAnswersWithSameEmail = userAnswersPostWithEmail.copy(
+        subscriptionSummary = userAnswersPostWithEmail.subscriptionSummary.copy(
+          emailAddress = Some(subscriptionEmail),
+          paperlessReference = true
+        ),
+        emailAddress = Some(subscriptionEmail)
+      )
+
+      val result = testHelper.checkDetailsToCreateSubmission(userAnswersWithSameEmail)
+
+      result mustBe Left(ErrorModel(CONFLICT, "Email matches existing subscription"))
+    }
+
+    "must return Right with submission when user submits different email from subscribed email" in {
+      val subscriptionEmail = "existing@example.com"
+      val newEmail          = "new@example.com"
+
+      val userAnswersWithNewEmail = userAnswersPostWithEmail.copy(
+        subscriptionSummary = userAnswersPostWithEmail.subscriptionSummary.copy(
+          emailAddress = Some(subscriptionEmail),
+          paperlessReference = true
+        ),
+        emailAddress = Some(newEmail),
+        verifiedEmailAddresses = Set(newEmail)
+      )
+
+      val result = testHelper.checkDetailsToCreateSubmission(userAnswersWithNewEmail)
+
+      result mustBe Right(
+        PaperlessPreferenceSubmission(
+          paperlessPreference = true,
+          emailAddress = Some(newEmail),
+          emailVerification = None,
+          bouncedEmail = None
+        )
+      )
+    }
+
+    "must return Right with submission when user has no existing subscription email" in {
+      val newEmail = "new@example.com"
+
+      val userAnswersNoSubscriptionEmail = userAnswersPostWithEmail.copy(
+        subscriptionSummary = userAnswersPostWithEmail.subscriptionSummary.copy(
+          emailAddress = None,
+          paperlessReference = false
+        ),
+        emailAddress = Some(newEmail),
+        verifiedEmailAddresses = Set(newEmail)
+      )
+
+      val result = testHelper.checkDetailsToCreateSubmission(userAnswersNoSubscriptionEmail)
+
+      result mustBe Right(
+        PaperlessPreferenceSubmission(
+          paperlessPreference = true,
+          emailAddress = Some(newEmail),
+          emailVerification = None,
+          bouncedEmail = None
+        )
       )
     }
   }

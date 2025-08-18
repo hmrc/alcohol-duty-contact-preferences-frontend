@@ -88,7 +88,7 @@ class CheckYourAnswersController @Inject() (
 
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
     pageCheckHelper.checkDetailsToCreateSubmission(request.userAnswers) match {
-      case Right(Right(contactPreferenceSubmission)) =>
+      case Right(contactPreferenceSubmission) =>
         submitPreferencesConnector
           .submitContactPreferences(contactPreferenceSubmission, request.appaId)
           .foldF(
@@ -102,10 +102,6 @@ class CheckYourAnswersController @Inject() (
               )
             }
           )
-
-      case Right(Left(errorMessage)) =>
-        logger.warn(s"Error in submission data: $errorMessage")
-        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
 
       case Left(ErrorModel(CONFLICT, _)) =>
         Future.successful(Redirect(controllers.changePreferences.routes.SameEmailSubmittedController.onPageLoad()))

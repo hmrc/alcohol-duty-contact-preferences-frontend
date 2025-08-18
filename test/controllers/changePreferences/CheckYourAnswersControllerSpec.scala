@@ -202,7 +202,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
     }
 
     "onSubmit" - {
-      "must redirect to the Email Found page if submission is successful and emails match" in new SetUp {
+      "must redirect to the Same Email Submitted page if user is updating their email and has submitted the same email" in new SetUp {
         when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Left(
           ErrorModel(CONFLICT, "Email matches existing subscription")
         )
@@ -232,9 +232,9 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         }
       }
 
-      "must redirect to the Contact Preference Updated page if submission is successful and emails don't match" in new SetUp {
+      "must redirect to the Contact Preference Updated page if submission is successful" in new SetUp {
         when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Right(
-          Right(contactPreferenceSubmissionEmail)
+          contactPreferenceSubmissionEmail
         )
         when(submitPreferencesConnector.submitContactPreferences(any(), any())(any())) thenReturn
           EitherT.rightT(testSubmissionResponse)
@@ -264,7 +264,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
       "must redirect to Journey Recovery if submission is not successful" in new SetUp {
         when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Right(
-          Right(contactPreferenceSubmissionEmail)
+          contactPreferenceSubmissionEmail
         )
         when(submitPreferencesConnector.submitContactPreferences(any(), any())(any())) thenReturn
           EitherT.leftT(ErrorModel(INTERNAL_SERVER_ERROR, "Unexpected response"))
