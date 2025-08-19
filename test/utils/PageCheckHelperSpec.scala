@@ -316,22 +316,24 @@ class PageCheckHelperSpec extends SpecBase {
         ErrorModel(INTERNAL_SERVER_ERROR, "Contact preference updated to email but email not found in user answers")
       )
     }
-    "checkDetailsForSameEmailSubmittedPage" - {
-      "must return a Right with email when user is already on email, has selected email, and the emails match" in {
-        val subscriptionEmail            = "existing@example.com"
-        val userAnswersWithMatchingEmail = userAnswersPostWithEmail.copy(
-          subscriptionSummary = userAnswersPostWithEmail.subscriptionSummary.copy(
-            emailAddress = Some(subscriptionEmail),
-            paperlessReference = true
-          ),
-          emailAddress = Some(subscriptionEmail)
-        )
+  }
 
-        val result = testHelper.checkDetailsForSameEmailSubmittedPage(userAnswersWithMatchingEmail)
+  "checkDetailsForSameEmailSubmittedPage" - {
+    "must return a Right with email when user is already on email, has selected email, and the emails match" in {
+      val subscriptionEmail            = "existing@example.com"
+      val userAnswersWithMatchingEmail = userAnswersPostWithEmail.copy(
+        subscriptionSummary = userAnswersPostWithEmail.subscriptionSummary.copy(
+          emailAddress = Some(subscriptionEmail),
+          paperlessReference = true
+        ),
+        emailAddress = Some(subscriptionEmail)
+      )
 
-        result mustBe Right(subscriptionEmail)
-      }
+      val result = testHelper.checkDetailsForSameEmailSubmittedPage(userAnswersWithMatchingEmail)
+
+      result mustBe Right(subscriptionEmail)
     }
+
     "must return a Left when user is not on email" in {
       val userAnswers = emptyUserAnswers
         .set(ContactPreferencePage, true)
@@ -352,6 +354,7 @@ class PageCheckHelperSpec extends SpecBase {
       testHelper.checkDetailsForSameEmailSubmittedPage(userAnswers) mustBe
         Left(ErrorModel(BAD_REQUEST, "User has not selected email as contact preference"))
     }
+
     "must return a Left when emails don't match" in {
       val userAnswers = emptyUserAnswers
         .set(ContactPreferencePage, true)
