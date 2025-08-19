@@ -18,7 +18,10 @@ package utils
 
 import base.SpecBase
 import models.CheckMode
+import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchersSugar.eqTo
 import play.api.i18n.Messages
+import services.CountryService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import viewmodels.govuk.summarylist._
 
@@ -26,7 +29,9 @@ class CheckYourAnswersSummaryListHelperSpec extends SpecBase {
 
   implicit val messages: Messages = getMessages(app)
 
-  val summaryListHelper = new CheckYourAnswersSummaryListHelper
+  val mockCountryService = mock[CountryService]
+
+  val summaryListHelper = new CheckYourAnswersSummaryListHelper(mockCountryService)
 
   val contactPreferenceRowEmail = SummaryListRowViewModel(
     key = KeyViewModel(HtmlContent(messages("checkYourAnswers.contactPreference.key"))),
@@ -61,19 +66,29 @@ class CheckYourAnswersSummaryListHelperSpec extends SpecBase {
     )
   )
 
+  val correspondenceAddressWithCountry = correspondenceAddress + "\nUnited Kingdom"
+
   val correspondenceAddressRow = SummaryListRowViewModel(
     key = KeyViewModel(HtmlContent(messages("checkYourAnswers.correspondenceAddress.key"))),
-    value = ValueViewModel(HtmlContent(correspondenceAddress.replace("\n", "<br>")))
+    value = ValueViewModel(HtmlContent(correspondenceAddressWithCountry.replace("\n", "<br>")))
   )
 
-  "CheckYourAnswersSummaryListHelper" - {
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    reset(mockCountryService)
+  }
+
+  "createSummaryList" - {
     "must return a summary list with the correct rows if email is selected" in {
       val summaryList = summaryListHelper.createSummaryList(userAnswersPostNoEmail)
 
       summaryList mustBe SummaryListViewModel(rows = Seq(contactPreferenceRowEmail, emailAddressRow))
+      verify(mockCountryService, times(0)).tryLookupCountryName(any())
     }
 
     "must return a summary list with the correct rows if post is selected" in {
+      when(mockCountryService.tryLookupCountryName(any())) thenReturn Some("United Kingdom")
+
       val summaryList = summaryListHelper.createSummaryList(userAnswers)
 
       summaryList mustBe SummaryListViewModel(rows = Seq(contactPreferenceRowPost, correspondenceAddressRow))
@@ -91,6 +106,30 @@ class CheckYourAnswersSummaryListHelperSpec extends SpecBase {
         summaryListHelper.createSummaryList(userAnswersPostWithEmail.copy(emailAddress = None))
       }
       exception.getMessage mustBe "User answers do not contain the required data but not picked up by PageCheckHelper"
+    }
+  }
+
+  "getFullCorrespondenceAddress" - {
+    "must return an address with a country if the CountryService is able to look up the country name" in {
+      when(mockCountryService.tryLookupCountryName(any())) thenReturn Some("United Kingdom")
+
+      summaryListHelper.getFullCorrespondenceAddress(subscriptionSummaryEmail) mustBe correspondenceAddressWithCountry
+      verify(mockCountryService, times(1)).tryLookupCountryName(eqTo(countryCode))
+    }
+
+    "must return an address with no country if the CountryService is unable to look up the country name" in {
+      when(mockCountryService.tryLookupCountryName(any())) thenReturn None
+
+      summaryListHelper.getFullCorrespondenceAddress(subscriptionSummaryEmail) mustBe correspondenceAddress
+      verify(mockCountryService, times(1)).tryLookupCountryName(eqTo(countryCode))
+    }
+
+    "must return an address with no country if country code is missing from the subscription summary" in {
+      summaryListHelper.getFullCorrespondenceAddress(
+        subscriptionSummaryEmail.copy(countryCode = None)
+      ) mustBe correspondenceAddress
+
+      verify(mockCountryService, times(0)).tryLookupCountryName(any())
     }
   }
 }

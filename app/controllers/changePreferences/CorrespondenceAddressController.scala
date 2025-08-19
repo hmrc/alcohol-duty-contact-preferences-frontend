@@ -24,7 +24,7 @@ import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.PageCheckHelper
+import utils.{CheckYourAnswersSummaryListHelper, PageCheckHelper}
 import viewmodels.govuk.summarylist._
 import views.html.changePreferences.CorrespondenceAddressView
 
@@ -34,7 +34,8 @@ class CorrespondenceAddressController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  helper: PageCheckHelper,
+  pageCheckHelper: PageCheckHelper,
+  summaryListHelper: CheckYourAnswersSummaryListHelper,
   val controllerComponents: MessagesControllerComponents,
   view: CorrespondenceAddressView
 ) extends FrontendBaseController
@@ -42,7 +43,7 @@ class CorrespondenceAddressController @Inject() (
     with Logging {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    helper.checkDetailsForCorrespondenceAddressPage(request.userAnswers) match {
+    pageCheckHelper.checkDetailsForCorrespondenceAddressPage(request.userAnswers) match {
       case Right(_)    =>
         val addressSummaryList = getCorrespondenceAddressSummaryList(request.userAnswers)
         Ok(view(addressSummaryList))
@@ -52,14 +53,17 @@ class CorrespondenceAddressController @Inject() (
     }
   }
 
-  private def getCorrespondenceAddressSummaryList(userAnswers: UserAnswers)(implicit messages: Messages): SummaryList =
+  private def getCorrespondenceAddressSummaryList(
+    userAnswers: UserAnswers
+  )(implicit messages: Messages): SummaryList = {
+    val fullCorrespondenceAddress = summaryListHelper.getFullCorrespondenceAddress(userAnswers.subscriptionSummary)
     SummaryListViewModel(rows =
       Seq(
         SummaryListRowViewModel(
           key = KeyViewModel(HtmlContent(messages("checkYourAnswers.correspondenceAddress.key"))),
-          value =
-            ValueViewModel(HtmlContent(userAnswers.subscriptionSummary.correspondenceAddress.replace("\n", "<br>")))
+          value = ValueViewModel(HtmlContent(fullCorrespondenceAddress.replace("\n", "<br>")))
         )
       )
     )
+  }
 }
