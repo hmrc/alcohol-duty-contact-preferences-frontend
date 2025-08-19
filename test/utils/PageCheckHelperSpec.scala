@@ -317,7 +317,7 @@ class PageCheckHelperSpec extends SpecBase {
       )
     }
     "checkDetailsForSameEmailSubmittedPage" - {
-      "must return Right with email when user is already on email, has selected email, and the emails match" in {
+      "must return a Right with email when user is already on email, has selected email, and the emails match" in {
         val subscriptionEmail            = "existing@example.com"
         val userAnswersWithMatchingEmail = userAnswersPostWithEmail.copy(
           subscriptionSummary = userAnswersPostWithEmail.subscriptionSummary.copy(
@@ -331,6 +331,42 @@ class PageCheckHelperSpec extends SpecBase {
 
         result mustBe Right(subscriptionEmail)
       }
+    }
+    "must return a Left when user is not on email" in {
+      val userAnswers = emptyUserAnswers
+        .set(ContactPreferencePage, true)
+        .success
+        .value
+        .copy(subscriptionSummary = emptyUserAnswers.subscriptionSummary.copy(paperlessReference = false))
+
+      testHelper.checkDetailsForSameEmailSubmittedPage(userAnswers) mustBe
+        Left(ErrorModel(BAD_REQUEST, "User is not currently on email"))
+    }
+
+    "must return a Left when user has not selected email" in {
+      val userAnswers = emptyUserAnswers
+        .set(ContactPreferencePage, false)
+        .success
+        .value
+
+      testHelper.checkDetailsForSameEmailSubmittedPage(userAnswers) mustBe
+        Left(ErrorModel(BAD_REQUEST, "User has not selected email as contact preference"))
+    }
+    "must return a Left when emails don't match" in {
+      val userAnswers = emptyUserAnswers
+        .set(ContactPreferencePage, true)
+        .success
+        .value
+        .copy(
+          subscriptionSummary = emptyUserAnswers.subscriptionSummary.copy(
+            emailAddress = Some("john.doe@example.com"),
+            paperlessReference = true
+          ),
+          emailAddress = Some("jane.doe2@example.com")
+        )
+
+      testHelper.checkDetailsForSameEmailSubmittedPage(userAnswers) mustBe
+        Left(ErrorModel(BAD_REQUEST, "Entered email and existing email do not match"))
     }
   }
 }
