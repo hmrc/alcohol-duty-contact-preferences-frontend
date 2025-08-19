@@ -92,6 +92,7 @@ class CheckYourAnswersSummaryListHelperSpec extends SpecBase {
       val summaryList = summaryListHelper.createSummaryList(userAnswers)
 
       summaryList mustBe SummaryListViewModel(rows = Seq(contactPreferenceRowPost, correspondenceAddressRow))
+      verify(mockCountryService, times(1)).tryLookupCountryName(countryCode)
     }
 
     "must throw an exception if no contact preference is selected" in {
