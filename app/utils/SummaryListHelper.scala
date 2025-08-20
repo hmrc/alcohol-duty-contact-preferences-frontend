@@ -25,9 +25,9 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryList, SummaryListRow}
 import viewmodels.govuk.summarylist._
 
-class CheckYourAnswersSummaryListHelper @Inject() (countryService: CountryService) {
+class SummaryListHelper @Inject() (countryService: CountryService) {
 
-  def createSummaryList(userAnswers: UserAnswers)(implicit messages: Messages): SummaryList = {
+  def checkYourAnswersSummaryList(userAnswers: UserAnswers)(implicit messages: Messages): SummaryList = {
     val contactPreferenceOption = userAnswers.get(ContactPreferencePage)
     val enteredEmailAddress     = userAnswers.emailAddress
 
@@ -52,6 +52,11 @@ class CheckYourAnswersSummaryListHelper @Inject() (countryService: CountryServic
         )
     }
   }
+
+  def correspondenceAddressSummaryList(userAnswers: UserAnswers)(implicit messages: Messages): SummaryList =
+    SummaryListViewModel(rows =
+      Seq(correspondenceAddressRow(getFullCorrespondenceAddress(userAnswers.subscriptionSummary)))
+    )
 
   def getFullCorrespondenceAddress(subscriptionSummary: SubscriptionSummary): String =
     subscriptionSummary.countryCode.flatMap(countryService.tryLookupCountryName) match {

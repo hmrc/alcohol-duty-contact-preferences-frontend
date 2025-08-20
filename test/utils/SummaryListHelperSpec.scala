@@ -25,13 +25,13 @@ import services.CountryService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import viewmodels.govuk.summarylist._
 
-class CheckYourAnswersSummaryListHelperSpec extends SpecBase {
+class SummaryListHelperSpec extends SpecBase {
 
   implicit val messages: Messages = getMessages(app)
 
   val mockCountryService = mock[CountryService]
 
-  val summaryListHelper = new CheckYourAnswersSummaryListHelper(mockCountryService)
+  val summaryListHelper = new SummaryListHelper(mockCountryService)
 
   val contactPreferenceRowEmail = SummaryListRowViewModel(
     key = KeyViewModel(HtmlContent(messages("checkYourAnswers.contactPreference.key"))),
@@ -78,9 +78,9 @@ class CheckYourAnswersSummaryListHelperSpec extends SpecBase {
     reset(mockCountryService)
   }
 
-  "createSummaryList" - {
+  "checkYourAnswersSummaryList" - {
     "must return a summary list with the correct rows if email is selected" in {
-      val summaryList = summaryListHelper.createSummaryList(userAnswersPostNoEmail)
+      val summaryList = summaryListHelper.checkYourAnswersSummaryList(userAnswersPostNoEmail)
 
       summaryList mustBe SummaryListViewModel(rows = Seq(contactPreferenceRowEmail, emailAddressRow))
       verify(mockCountryService, times(0)).tryLookupCountryName(any())
@@ -89,7 +89,7 @@ class CheckYourAnswersSummaryListHelperSpec extends SpecBase {
     "must return a summary list with the correct rows if post is selected" in {
       when(mockCountryService.tryLookupCountryName(any())) thenReturn Some("United Kingdom")
 
-      val summaryList = summaryListHelper.createSummaryList(userAnswers)
+      val summaryList = summaryListHelper.checkYourAnswersSummaryList(userAnswers)
 
       summaryList mustBe SummaryListViewModel(rows = Seq(contactPreferenceRowPost, correspondenceAddressRow))
       verify(mockCountryService, times(1)).tryLookupCountryName(countryCode)
@@ -97,16 +97,27 @@ class CheckYourAnswersSummaryListHelperSpec extends SpecBase {
 
     "must throw an exception if no contact preference is selected" in {
       val exception = intercept[IllegalStateException] {
-        summaryListHelper.createSummaryList(emptyUserAnswers)
+        summaryListHelper.checkYourAnswersSummaryList(emptyUserAnswers)
       }
       exception.getMessage mustBe "User answers do not contain the required data but not picked up by PageCheckHelper"
     }
 
     "must throw an exception if email is selected but no email address is provided" in {
       val exception = intercept[IllegalStateException] {
-        summaryListHelper.createSummaryList(userAnswersPostWithEmail.copy(emailAddress = None))
+        summaryListHelper.checkYourAnswersSummaryList(userAnswersPostWithEmail.copy(emailAddress = None))
       }
       exception.getMessage mustBe "User answers do not contain the required data but not picked up by PageCheckHelper"
+    }
+  }
+
+  "correspondenceAddressSummaryList" - {
+    "must return a summary list with the correspondence address row" in {
+      when(mockCountryService.tryLookupCountryName(any())) thenReturn Some("United Kingdom")
+
+      val summaryList = summaryListHelper.correspondenceAddressSummaryList(userAnswers)
+
+      summaryList mustBe SummaryListViewModel(rows = Seq(correspondenceAddressRow))
+      verify(mockCountryService, times(1)).tryLookupCountryName(countryCode)
     }
   }
 
