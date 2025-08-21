@@ -10,7 +10,7 @@ site.submit = Cyflwyno
 site.start = NOT_FOUND
 site.startAgain = NOT_FOUND
 site.signIn = NOT_FOUND
-site.govuk = NOT_FOUND
+site.govuk = GOV.UK
 site.returnToBusinessAccount = Ewch yn ôl i’ch cyfrif treth busnes
 
 date.day = NOT_FOUND
@@ -107,5 +107,8 @@ preferenceUpdated.heading = Mae’ch dewis o ran cysylltu wedi’i ddiweddaru
 preferenceUpdated.email.guidance1 = Byddwn ni’n anfon e-bost atoch yn {0} pan fo neges newydd yn eich cyfrif.
 preferenceUpdated.email.guidance2 = Efallai y caiff rhai negeseuon eu hanfon drwy’r post o hyd, os yw’r gyfraith yn gofyn am hynny.
 preferenceUpdated.post.guidance = Byddwn ni’n anfon llythyrau atoch ynglŷn â’ch Datganiadau Toll Alcohol drwy’r post.
+
+emailFound.title = Byddwn ni’n anfon e-bost atoch pan fo gennych neges ddigidol
+emailFound.heading = Byddwn ni’n anfon e-bost atoch yn {0} pan fo gennych neges ddigidol
 
 emailVerificationJourney.signature = Rheoli’ch Gwasanaeth Toll Alcohol

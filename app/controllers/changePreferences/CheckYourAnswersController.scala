@@ -95,15 +95,18 @@ class CheckYourAnswersController @Inject() (
             _ => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())),
             submissionResponse => {
               logger.info("Successfully submitted contact preferences")
-              val session =
-                request.session + (submissionDetailsKey -> Json.toJson(submissionResponse).toString)
+              val session = request.session + (submissionDetailsKey -> Json.toJson(submissionResponse).toString)
               Future.successful(
                 Redirect(controllers.changePreferences.routes.PreferenceUpdatedController.onPageLoad())
                   .withSession(session)
               )
             }
           )
-      case Left(error)                        =>
+
+      case Left(ErrorModel(CONFLICT, _)) =>
+        Future.successful(Redirect(controllers.changePreferences.routes.SameEmailSubmittedController.onPageLoad()))
+
+      case Left(error) =>
         logger.warn(error.message)
         Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }

@@ -202,8 +202,40 @@ class CheckYourAnswersControllerSpec extends SpecBase {
     }
 
     "onSubmit" - {
+      "must redirect to the Same Email Submitted page if user is updating their email and has submitted the same email" in new SetUp {
+        when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Left(
+          ErrorModel(CONFLICT, "Email matches existing subscription")
+        )
+
+        val completeUserAnswers = userAnswers.copy(
+          emailAddress = Some(emailAddress),
+          subscriptionSummary = userAnswers.subscriptionSummary.copy(
+            emailAddress = Some(emailAddress),
+            paperlessReference = true
+          )
+        )
+
+        val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
+          .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(POST, checkYourAnswersPostRoute)
+          val result  = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual
+            controllers.changePreferences.routes.SameEmailSubmittedController.onPageLoad().url
+
+          verify(pageCheckHelper, times(1)).checkDetailsToCreateSubmission(eqTo(completeUserAnswers))
+          verify(submitPreferencesConnector, never).submitContactPreferences(any(), any())(any())
+        }
+      }
+
       "must redirect to the Contact Preference Updated page if submission is successful" in new SetUp {
-        when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Right(contactPreferenceSubmissionEmail)
+        when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Right(
+          contactPreferenceSubmissionEmail
+        )
         when(submitPreferencesConnector.submitContactPreferences(any(), any())(any())) thenReturn
           EitherT.rightT(testSubmissionResponse)
 
@@ -231,7 +263,9 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       }
 
       "must redirect to Journey Recovery if submission is not successful" in new SetUp {
-        when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Right(contactPreferenceSubmissionEmail)
+        when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Right(
+          contactPreferenceSubmissionEmail
+        )
         when(submitPreferencesConnector.submitContactPreferences(any(), any())(any())) thenReturn
           EitherT.leftT(ErrorModel(INTERNAL_SERVER_ERROR, "Unexpected response"))
 

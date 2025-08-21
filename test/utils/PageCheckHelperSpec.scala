@@ -17,9 +17,9 @@
 package utils
 
 import base.SpecBase
-import models.ErrorModel
+import models.{ErrorModel, PaperlessPreferenceSubmission}
 import pages.changePreferences.ContactPreferencePage
-import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR}
+import play.api.http.Status.{BAD_REQUEST, CONFLICT, INTERNAL_SERVER_ERROR}
 
 class PageCheckHelperSpec extends SpecBase {
 
@@ -196,8 +196,7 @@ class PageCheckHelperSpec extends SpecBase {
     }
 
     "must return a Right containing the correct submission details if the user has selected email and the email is verified" in {
-      val result =
-        testHelper.checkDetailsToCreateSubmission(userAnswersPostWithEmail)
+      val result = testHelper.checkDetailsToCreateSubmission(userAnswersPostWithEmail)
 
       result mustBe Right(contactPreferenceSubmissionEmail)
     }
@@ -221,6 +220,70 @@ class PageCheckHelperSpec extends SpecBase {
 
       result mustBe Left(
         ErrorModel(BAD_REQUEST, "Error creating submission: User answers do not contain the required data.")
+      )
+    }
+
+    "must return a Left with CONFLICT when user submits the same email as their existing email" in {
+      val subscriptionEmail        = "existing@example.com"
+      val userAnswersWithSameEmail = userAnswersPostWithEmail.copy(
+        subscriptionSummary = userAnswersPostWithEmail.subscriptionSummary.copy(
+          emailAddress = Some(subscriptionEmail),
+          paperlessReference = true
+        ),
+        emailAddress = Some(subscriptionEmail)
+      )
+
+      val result = testHelper.checkDetailsToCreateSubmission(userAnswersWithSameEmail)
+
+      result mustBe Left(ErrorModel(CONFLICT, "Email matches existing subscription"))
+    }
+
+    "must return Right with submission when user submits different email from subscribed email" in {
+      val subscriptionEmail = "existing@example.com"
+      val newEmail          = "new@example.com"
+
+      val userAnswersWithNewEmail = userAnswersPostWithEmail.copy(
+        subscriptionSummary = userAnswersPostWithEmail.subscriptionSummary.copy(
+          emailAddress = Some(subscriptionEmail),
+          paperlessReference = true
+        ),
+        emailAddress = Some(newEmail),
+        verifiedEmailAddresses = Set(newEmail)
+      )
+
+      val result = testHelper.checkDetailsToCreateSubmission(userAnswersWithNewEmail)
+
+      result mustBe Right(
+        PaperlessPreferenceSubmission(
+          paperlessPreference = true,
+          emailAddress = Some(newEmail),
+          emailVerification = Some(true),
+          bouncedEmail = Some(false)
+        )
+      )
+    }
+
+    "must return Right with submission when user has no existing subscription email" in {
+      val newEmail = "new@example.com"
+
+      val userAnswersNoSubscriptionEmail = userAnswersPostWithEmail.copy(
+        subscriptionSummary = userAnswersPostWithEmail.subscriptionSummary.copy(
+          emailAddress = None,
+          paperlessReference = false
+        ),
+        emailAddress = Some(newEmail),
+        verifiedEmailAddresses = Set(newEmail)
+      )
+
+      val result = testHelper.checkDetailsToCreateSubmission(userAnswersNoSubscriptionEmail)
+
+      result mustBe Right(
+        PaperlessPreferenceSubmission(
+          paperlessPreference = true,
+          emailAddress = Some(newEmail),
+          emailVerification = Some(true),
+          bouncedEmail = Some(false)
+        )
       )
     }
   }
@@ -252,6 +315,61 @@ class PageCheckHelperSpec extends SpecBase {
       result mustBe Left(
         ErrorModel(INTERNAL_SERVER_ERROR, "Contact preference updated to email but email not found in user answers")
       )
+    }
+  }
+
+  "checkDetailsForSameEmailSubmittedPage" - {
+    "must return a Right with email when user is already on email, has selected email, and the emails match" in {
+      val subscriptionEmail            = "existing@example.com"
+      val userAnswersWithMatchingEmail = userAnswersPostWithEmail.copy(
+        subscriptionSummary = userAnswersPostWithEmail.subscriptionSummary.copy(
+          emailAddress = Some(subscriptionEmail),
+          paperlessReference = true
+        ),
+        emailAddress = Some(subscriptionEmail)
+      )
+
+      val result = testHelper.checkDetailsForSameEmailSubmittedPage(userAnswersWithMatchingEmail)
+
+      result mustBe Right(subscriptionEmail)
+    }
+
+    "must return a Left when user is not on email" in {
+      val userAnswers = emptyUserAnswers
+        .set(ContactPreferencePage, true)
+        .success
+        .value
+        .copy(subscriptionSummary = emptyUserAnswers.subscriptionSummary.copy(paperlessReference = false))
+
+      testHelper.checkDetailsForSameEmailSubmittedPage(userAnswers) mustBe
+        Left(ErrorModel(BAD_REQUEST, "User is not currently on email"))
+    }
+
+    "must return a Left when user has not selected email" in {
+      val userAnswers = emptyUserAnswers
+        .set(ContactPreferencePage, false)
+        .success
+        .value
+
+      testHelper.checkDetailsForSameEmailSubmittedPage(userAnswers) mustBe
+        Left(ErrorModel(BAD_REQUEST, "User has not selected email as contact preference"))
+    }
+
+    "must return a Left when emails don't match" in {
+      val userAnswers = emptyUserAnswers
+        .set(ContactPreferencePage, true)
+        .success
+        .value
+        .copy(
+          subscriptionSummary = emptyUserAnswers.subscriptionSummary.copy(
+            emailAddress = Some("john.doe@example.com"),
+            paperlessReference = true
+          ),
+          emailAddress = Some("jane.doe2@example.com")
+        )
+
+      testHelper.checkDetailsForSameEmailSubmittedPage(userAnswers) mustBe
+        Left(ErrorModel(BAD_REQUEST, "Entered email and existing email do not match"))
     }
   }
 }
