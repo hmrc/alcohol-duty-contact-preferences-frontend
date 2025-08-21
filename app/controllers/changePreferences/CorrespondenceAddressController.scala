@@ -17,15 +17,11 @@
 package controllers.changePreferences
 
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
-import models.UserAnswers
 import play.api.Logging
-import play.api.i18n.{I18nSupport, Messages}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.PageCheckHelper
-import viewmodels.govuk.summarylist._
+import utils.{PageCheckHelper, SummaryListHelper}
 import views.html.changePreferences.CorrespondenceAddressView
 
 import javax.inject.Inject
@@ -34,7 +30,8 @@ class CorrespondenceAddressController @Inject() (
   identify: IdentifierAction,
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
-  helper: PageCheckHelper,
+  pageCheckHelper: PageCheckHelper,
+  summaryListHelper: SummaryListHelper,
   val controllerComponents: MessagesControllerComponents,
   view: CorrespondenceAddressView
 ) extends FrontendBaseController
@@ -42,24 +39,13 @@ class CorrespondenceAddressController @Inject() (
     with Logging {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
-    helper.checkDetailsForCorrespondenceAddressPage(request.userAnswers) match {
+    pageCheckHelper.checkDetailsForCorrespondenceAddressPage(request.userAnswers) match {
       case Right(_)    =>
-        val addressSummaryList = getCorrespondenceAddressSummaryList(request.userAnswers)
+        val addressSummaryList = summaryListHelper.correspondenceAddressSummaryList(request.userAnswers)
         Ok(view(addressSummaryList))
       case Left(error) =>
         logger.warn(error.message)
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
-
-  private def getCorrespondenceAddressSummaryList(userAnswers: UserAnswers)(implicit messages: Messages): SummaryList =
-    SummaryListViewModel(rows =
-      Seq(
-        SummaryListRowViewModel(
-          key = KeyViewModel(HtmlContent(messages("checkYourAnswers.correspondenceAddress.key"))),
-          value =
-            ValueViewModel(HtmlContent(userAnswers.subscriptionSummary.correspondenceAddress.replace("\n", "<br>")))
-        )
-      )
-    )
 }

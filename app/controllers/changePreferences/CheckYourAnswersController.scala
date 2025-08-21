@@ -28,7 +28,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.EmailVerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import utils.{CheckYourAnswersSummaryListHelper, PageCheckHelper}
+import utils.{PageCheckHelper, SummaryListHelper}
 import views.html.changePreferences.CheckYourAnswersView
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -39,7 +39,7 @@ class CheckYourAnswersController @Inject() (
   getData: DataRetrievalAction,
   requireData: DataRequiredAction,
   pageCheckHelper: PageCheckHelper,
-  summaryListHelper: CheckYourAnswersSummaryListHelper,
+  summaryListHelper: SummaryListHelper,
   emailVerificationService: EmailVerificationService,
   submitPreferencesConnector: SubmitPreferencesConnector,
   val controllerComponents: MessagesControllerComponents,
@@ -64,7 +64,7 @@ class CheckYourAnswersController @Inject() (
             .map {
               case Right(EmailVerificationDetails(_, isVerified, isLocked)) =>
                 if (isVerified) {
-                  val summaryList = summaryListHelper.createSummaryList(request.userAnswers)
+                  val summaryList = summaryListHelper.checkYourAnswersSummaryList(request.userAnswers)
                   Ok(view(summaryList))
                 } else if (isLocked) {
                   Redirect(controllers.changePreferences.routes.EmailLockedController.onPageLoad())
@@ -77,7 +77,7 @@ class CheckYourAnswersController @Inject() (
                 Redirect(routes.JourneyRecoveryController.onPageLoad())
             }
         } else {
-          val summaryList = summaryListHelper.createSummaryList(request.userAnswers)
+          val summaryList = summaryListHelper.checkYourAnswersSummaryList(request.userAnswers)
           Future.successful(Ok(view(summaryList)))
         }
       case Left(error)                        =>

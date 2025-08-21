@@ -39,14 +39,16 @@ trait TestData extends ModelGenerators {
 
   val verifiedEmailAddresses: Set[String] = Set(emailAddress2, emailAddress3)
 
-  val correspondenceAddress = "Flat 123\n1 Example Road\nLondon\nAB1 2CD\nUnited Kingdom"
+  val correspondenceAddress = "Flat 123\n1 Example Road\nLondon\nAB1 2CD"
+  val countryCode           = "GB"
 
   val subscriptionSummaryEmail: SubscriptionSummary = SubscriptionSummary(
     paperlessReference = true,
     emailAddress = Some(emailAddress),
     emailVerification = Some(true),
     bouncedEmail = Some(false),
-    correspondenceAddress = correspondenceAddress
+    correspondenceAddress = correspondenceAddress,
+    countryCode = Some(countryCode)
   )
 
   val subscriptionSummaryPostWithEmail: SubscriptionSummary = subscriptionSummaryEmail.copy(paperlessReference = false)
@@ -56,7 +58,8 @@ trait TestData extends ModelGenerators {
     emailAddress = None,
     emailVerification = None,
     bouncedEmail = None,
-    correspondenceAddress = correspondenceAddress
+    correspondenceAddress = correspondenceAddress,
+    countryCode = Some(countryCode)
   )
 
   val userAnswers: UserAnswers = UserAnswers(

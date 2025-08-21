@@ -26,7 +26,7 @@ import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
-import utils.PageCheckHelper
+import utils.{PageCheckHelper, SummaryListHelper}
 import viewmodels.govuk.summarylist._
 import views.html.changePreferences.CorrespondenceAddressView
 
@@ -40,21 +40,25 @@ class CorrespondenceAddressControllerSpec extends SpecBase {
   "CorrespondenceAddressController" - {
 
     "must return OK and the correct view for a GET" in {
-      val mockHelper = mock[PageCheckHelper]
+      val mockPageCheckHelper   = mock[PageCheckHelper]
+      val mockSummaryListHelper = mock[SummaryListHelper]
 
-      when(mockHelper.checkDetailsForCorrespondenceAddressPage(any())) thenReturn Right(())
-
-      val expectedSummaryList = SummaryListViewModel(rows =
+      val fullCorrespondenceAddress = correspondenceAddress + "\nUnited Kingdom"
+      val expectedSummaryList       = SummaryListViewModel(rows =
         Seq(
           SummaryListRowViewModel(
             key = KeyViewModel(HtmlContent(messages("checkYourAnswers.correspondenceAddress.key"))),
-            value = ValueViewModel(HtmlContent(correspondenceAddress.replace("\n", "<br>")))
+            value = ValueViewModel(HtmlContent(fullCorrespondenceAddress.replace("\n", "<br>")))
           )
         )
       )
 
+      when(mockPageCheckHelper.checkDetailsForCorrespondenceAddressPage(any())) thenReturn Right(())
+      when(mockSummaryListHelper.correspondenceAddressSummaryList(any())(any())) thenReturn expectedSummaryList
+
       val application = applicationBuilder(userAnswers = Some(userAnswers))
-        .overrides(bind[PageCheckHelper].toInstance(mockHelper))
+        .overrides(bind[PageCheckHelper].toInstance(mockPageCheckHelper))
+        .overrides(bind[SummaryListHelper].toInstance(mockSummaryListHelper))
         .build()
 
       running(application) {
@@ -70,19 +74,18 @@ class CorrespondenceAddressControllerSpec extends SpecBase {
           getMessages(application)
         ).toString
 
-        verify(mockHelper, times(1)).checkDetailsForCorrespondenceAddressPage(eqTo(userAnswers))
+        verify(mockPageCheckHelper, times(1)).checkDetailsForCorrespondenceAddressPage(eqTo(userAnswers))
+        verify(mockSummaryListHelper, times(1)).correspondenceAddressSummaryList(eqTo(userAnswers))(any())
       }
     }
 
     "must redirect to Journey Recovery for a GET if user answers do not exist" in {
-      val mockHelper = mock[PageCheckHelper]
-
-      when(mockHelper.checkDetailsForEnrolledLettersPage(any())) thenReturn Left(
-        ErrorModel(BAD_REQUEST, "Error from helper")
-      )
+      val mockPageCheckHelper   = mock[PageCheckHelper]
+      val mockSummaryListHelper = mock[SummaryListHelper]
 
       val application = applicationBuilder(userAnswers = None)
-        .overrides(bind[PageCheckHelper].toInstance(mockHelper))
+        .overrides(bind[PageCheckHelper].toInstance(mockPageCheckHelper))
+        .overrides(bind[SummaryListHelper].toInstance(mockSummaryListHelper))
         .build()
 
       running(application) {
@@ -93,19 +96,22 @@ class CorrespondenceAddressControllerSpec extends SpecBase {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
 
-        verify(mockHelper, times(0)).checkDetailsForCorrespondenceAddressPage(any())
+        verify(mockPageCheckHelper, times(0)).checkDetailsForCorrespondenceAddressPage(any())
+        verify(mockSummaryListHelper, times(0)).correspondenceAddressSummaryList(any())(any())
       }
     }
 
     "must redirect to Journey Recovery for a GET if the helper returns an error when checking the user's details" in {
-      val mockHelper = mock[PageCheckHelper]
+      val mockPageCheckHelper   = mock[PageCheckHelper]
+      val mockSummaryListHelper = mock[SummaryListHelper]
 
-      when(mockHelper.checkDetailsForCorrespondenceAddressPage(any())) thenReturn Left(
+      when(mockPageCheckHelper.checkDetailsForCorrespondenceAddressPage(any())) thenReturn Left(
         ErrorModel(BAD_REQUEST, "Error from helper")
       )
 
       val application = applicationBuilder(userAnswers = Some(userAnswersPostWithEmail))
-        .overrides(bind[PageCheckHelper].toInstance(mockHelper))
+        .overrides(bind[PageCheckHelper].toInstance(mockPageCheckHelper))
+        .overrides(bind[SummaryListHelper].toInstance(mockSummaryListHelper))
         .build()
 
       running(application) {
@@ -116,7 +122,8 @@ class CorrespondenceAddressControllerSpec extends SpecBase {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
-        verify(mockHelper, times(1)).checkDetailsForCorrespondenceAddressPage(eqTo(userAnswersPostWithEmail))
+        verify(mockPageCheckHelper, times(1)).checkDetailsForCorrespondenceAddressPage(eqTo(userAnswersPostWithEmail))
+        verify(mockSummaryListHelper, times(0)).correspondenceAddressSummaryList(any())(any())
       }
     }
   }

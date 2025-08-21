@@ -17,16 +17,17 @@
 package utils
 
 import com.google.inject.Inject
-import models.{CheckMode, UserAnswers}
+import models.{CheckMode, SubscriptionSummary, UserAnswers}
 import pages.changePreferences.ContactPreferencePage
 import play.api.i18n.Messages
+import services.CountryService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryList, SummaryListRow}
 import viewmodels.govuk.summarylist._
 
-class CheckYourAnswersSummaryListHelper @Inject() {
+class SummaryListHelper @Inject() (countryService: CountryService) {
 
-  def createSummaryList(userAnswers: UserAnswers)(implicit messages: Messages): SummaryList = {
+  def checkYourAnswersSummaryList(userAnswers: UserAnswers)(implicit messages: Messages): SummaryList = {
     val contactPreferenceOption = userAnswers.get(ContactPreferencePage)
     val enteredEmailAddress     = userAnswers.emailAddress
 
@@ -35,7 +36,7 @@ class CheckYourAnswersSummaryListHelper @Inject() {
         SummaryListViewModel(rows =
           Seq(
             contactPreferenceRow(emailSelected = false),
-            correspondenceAddressRow(userAnswers.subscriptionSummary.correspondenceAddress)
+            correspondenceAddressRow(getFullCorrespondenceAddress(userAnswers.subscriptionSummary))
           )
         )
       case (Some(true), Some(email)) =>
@@ -51,6 +52,17 @@ class CheckYourAnswersSummaryListHelper @Inject() {
         )
     }
   }
+
+  def correspondenceAddressSummaryList(userAnswers: UserAnswers)(implicit messages: Messages): SummaryList =
+    SummaryListViewModel(rows =
+      Seq(correspondenceAddressRow(getFullCorrespondenceAddress(userAnswers.subscriptionSummary)))
+    )
+
+  def getFullCorrespondenceAddress(subscriptionSummary: SubscriptionSummary): String =
+    subscriptionSummary.countryCode.flatMap(countryService.tryLookupCountryName) match {
+      case Some(country) => Seq(subscriptionSummary.correspondenceAddress, country).mkString("\n")
+      case None          => subscriptionSummary.correspondenceAddress
+    }
 
   private def contactPreferenceRow(emailSelected: Boolean)(implicit messages: Messages): SummaryListRow =
     SummaryListRowViewModel(

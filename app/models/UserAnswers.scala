@@ -91,7 +91,8 @@ case class SubscriptionSummary(
   emailAddress: Option[String],
   emailVerification: Option[Boolean],
   bouncedEmail: Option[Boolean],
-  correspondenceAddress: String
+  correspondenceAddress: String,
+  countryCode: Option[String]
 )
 
 object SubscriptionSummary {
