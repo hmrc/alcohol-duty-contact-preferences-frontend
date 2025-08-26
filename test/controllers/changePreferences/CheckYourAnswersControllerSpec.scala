@@ -29,7 +29,7 @@ import play.api.test.Helpers._
 import services.EmailVerificationService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
-import utils.{CheckYourAnswersSummaryListHelper, PageCheckHelper}
+import utils.{PageCheckHelper, SummaryListHelper}
 import views.html.changePreferences.CheckYourAnswersView
 
 class CheckYourAnswersControllerSpec extends SpecBase {
@@ -47,7 +47,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
         val application = applicationBuilder(userAnswers = Some(userAnswers))
           .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
-          .overrides(bind[CheckYourAnswersSummaryListHelper].toInstance(summaryListHelper))
+          .overrides(bind[SummaryListHelper].toInstance(summaryListHelper))
           .overrides(bind[EmailVerificationService].toInstance(emailVerificationService))
           .build()
 
@@ -65,7 +65,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           ).toString
 
           verify(pageCheckHelper, times(1)).checkDetailsForCheckYourAnswers(eqTo(userAnswers))
-          verify(summaryListHelper, times(1)).createSummaryList(eqTo(userAnswers))(any())
+          verify(summaryListHelper, times(1)).checkYourAnswersSummaryList(eqTo(userAnswers))(any())
           verify(emailVerificationService, times(0)).retrieveAddressStatusAndAddToCache(any(), any(), any())(any())
         }
       }
@@ -77,7 +77,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
         val application = applicationBuilder(userAnswers = Some(userAnswersPostNoEmail))
           .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
-          .overrides(bind[CheckYourAnswersSummaryListHelper].toInstance(summaryListHelper))
+          .overrides(bind[SummaryListHelper].toInstance(summaryListHelper))
           .overrides(bind[EmailVerificationService].toInstance(emailVerificationService))
           .build()
 
@@ -95,7 +95,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           ).toString
 
           verify(pageCheckHelper, times(1)).checkDetailsForCheckYourAnswers(eqTo(userAnswersPostNoEmail))
-          verify(summaryListHelper, times(1)).createSummaryList(eqTo(userAnswersPostNoEmail))(any())
+          verify(summaryListHelper, times(1)).checkYourAnswersSummaryList(eqTo(userAnswersPostNoEmail))(any())
           verify(emailVerificationService, times(1))
             .retrieveAddressStatusAndAddToCache(any(), eqTo(emailAddress), eqTo(userAnswersPostNoEmail))(any())
         }
@@ -108,7 +108,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
         val application = applicationBuilder(userAnswers = Some(userAnswersPostNoEmail))
           .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
-          .overrides(bind[CheckYourAnswersSummaryListHelper].toInstance(summaryListHelper))
+          .overrides(bind[SummaryListHelper].toInstance(summaryListHelper))
           .overrides(bind[EmailVerificationService].toInstance(emailVerificationService))
           .build()
 
@@ -122,7 +122,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
             controllers.changePreferences.routes.EmailLockedController.onPageLoad().url
 
           verify(pageCheckHelper, times(1)).checkDetailsForCheckYourAnswers(eqTo(userAnswersPostNoEmail))
-          verify(summaryListHelper, times(0)).createSummaryList(any())(any())
+          verify(summaryListHelper, times(0)).checkYourAnswersSummaryList(any())(any())
           verify(emailVerificationService, times(1))
             .retrieveAddressStatusAndAddToCache(any(), eqTo(emailAddress), eqTo(userAnswersPostNoEmail))(any())
         }
@@ -135,7 +135,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
         val application = applicationBuilder(userAnswers = Some(userAnswersPostNoEmail))
           .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
-          .overrides(bind[CheckYourAnswersSummaryListHelper].toInstance(summaryListHelper))
+          .overrides(bind[SummaryListHelper].toInstance(summaryListHelper))
           .overrides(bind[EmailVerificationService].toInstance(emailVerificationService))
           .build()
 
@@ -148,7 +148,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(pageCheckHelper, times(1)).checkDetailsForCheckYourAnswers(eqTo(userAnswersPostNoEmail))
-          verify(summaryListHelper, times(0)).createSummaryList(any())(any())
+          verify(summaryListHelper, times(0)).checkYourAnswersSummaryList(any())(any())
           verify(emailVerificationService, times(1))
             .retrieveAddressStatusAndAddToCache(any(), eqTo(emailAddress), eqTo(userAnswersPostNoEmail))(any())
         }
@@ -157,7 +157,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       "must redirect to Journey Recovery if user answers do not exist" in new SetUp {
         val application = applicationBuilder(userAnswers = None)
           .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
-          .overrides(bind[CheckYourAnswersSummaryListHelper].toInstance(summaryListHelper))
+          .overrides(bind[SummaryListHelper].toInstance(summaryListHelper))
           .overrides(bind[EmailVerificationService].toInstance(emailVerificationService))
           .build()
 
@@ -170,7 +170,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(pageCheckHelper, times(0)).checkDetailsForCheckYourAnswers(any())
-          verify(summaryListHelper, times(0)).createSummaryList(any())(any())
+          verify(summaryListHelper, times(0)).checkYourAnswersSummaryList(any())(any())
           verify(emailVerificationService, times(0)).retrieveAddressStatusAndAddToCache(any(), any(), any())(any())
         }
       }
@@ -182,7 +182,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
         val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
           .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
-          .overrides(bind[CheckYourAnswersSummaryListHelper].toInstance(summaryListHelper))
+          .overrides(bind[SummaryListHelper].toInstance(summaryListHelper))
           .overrides(bind[EmailVerificationService].toInstance(emailVerificationService))
           .build()
 
@@ -195,7 +195,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(pageCheckHelper, times(1)).checkDetailsForCheckYourAnswers(eqTo(emptyUserAnswers))
-          verify(summaryListHelper, times(0)).createSummaryList(any())(any())
+          verify(summaryListHelper, times(0)).checkYourAnswersSummaryList(any())(any())
           verify(emailVerificationService, times(0)).retrieveAddressStatusAndAddToCache(any(), any(), any())(any())
         }
       }
@@ -337,7 +337,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
   class SetUp {
     val pageCheckHelper            = mock[PageCheckHelper]
-    val summaryListHelper          = mock[CheckYourAnswersSummaryListHelper]
+    val summaryListHelper          = mock[SummaryListHelper]
     val emailVerificationService   = mock[EmailVerificationService]
     val submitPreferencesConnector = mock[SubmitPreferencesConnector]
 
@@ -345,6 +345,6 @@ class CheckYourAnswersControllerSpec extends SpecBase {
     val row2             = SummaryListRow(key = Key(Text("Row2Key")), value = Value(Text("Row2Value")))
     val dummySummaryList = SummaryList(rows = Seq(row1, row2))
 
-    when(summaryListHelper.createSummaryList(any())(any())) thenReturn dummySummaryList
+    when(summaryListHelper.checkYourAnswersSummaryList(any())(any())) thenReturn dummySummaryList
   }
 }
