@@ -17,6 +17,7 @@
 package controllers
 
 import controllers.actions.IdentifierAction
+import config.FrontendAppConfig
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -31,7 +32,8 @@ class JourneyRecoveryController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   identify: IdentifierAction,
   continueView: JourneyRecoveryContinueView,
-  startAgainView: JourneyRecoveryStartAgainView
+  startAgainView: JourneyRecoveryStartAgainView,
+  appConfig: FrontendAppConfig
 ) extends FrontendBaseController
     with I18nSupport
     with Logging {
@@ -49,6 +51,6 @@ class JourneyRecoveryController @Inject() (
 
     safeUrl
       .map(url => Ok(continueView(url)))
-      .getOrElse(Ok(startAgainView()))
+      .getOrElse(Ok(startAgainView(appConfig.businessTaxAccountUrl)))
   }
 }

@@ -8,7 +8,7 @@ site.yes = Iawn
 site.continue = Parhau
 site.submit = Cyflwyno
 site.start = NOT_FOUND
-site.startAgain = NOT_FOUND
+site.startAgain = Dechrau eto
 site.signIn = NOT_FOUND
 site.govuk = GOV.UK
 site.returnToBusinessAccount = Ewch yn ôl i’ch cyfrif treth busnes
@@ -33,20 +33,25 @@ index.title = NOT_FOUND
 index.heading = NOT_FOUND
 index.guidance = NOT_FOUND
 
-journeyRecovery.continue.title = NOT_FOUND
-journeyRecovery.continue.heading = NOT_FOUND
-journeyRecovery.continue.guidance = NOT_FOUND
-journeyRecovery.startAgain.title = NOT_FOUND
-journeyRecovery.startAgain.heading = NOT_FOUND
-journeyRecovery.startAgain.guidance = NOT_FOUND
+journeyRecovery.continue.title = Mae’n ddrwg gennym – mae problem gyda’r gwasanaeth
+journeyRecovery.continue.heading = Mae’n ddrwg gennym – mae problem gyda’r gwasanaeth
+journeyRecovery.continue.guidance = Rhowch gynnig arall arni yn nes ymlaen.
+journeyRecovery.startAgain.title = Mae’n ddrwg gennym – mae problem gyda’r gwasanaeth
+journeyRecovery.startAgain.heading = Mae’n ddrwg gennym – mae problem gyda’r gwasanaeth
+journeyRecovery.startAgain.guidance = Rhowch gynnig arall arni yn nes ymlaen.
 
 signedOut.title = NOT_FOUND
 signedOut.heading = NOT_FOUND
 signedOut.guidance = NOT_FOUND
 
-unauthorised.title = NOT_FOUND
-unauthorised.heading = NOT_FOUND
-unauthorised.guidance = NOT_FOUND
+unauthorised.title = Mae’n ddrwg gennym – ni allwch gael mynediad at y gwasanaeth hwn gyda’r cyfrif hwn
+unauthorised.heading = Mae’n ddrwg gennym – ni allwch gael mynediad at y gwasanaeth hwn gyda’r cyfrif hwn
+unauthorised.p1 = Mae’r gwasanaeth Rheoli’ch Toll Alcohol yn wasanaeth ar gyfer busnesau cymeradwy, megis cwmnïau cyfyngedig, partneriaethau ac unig fasnachwyr sy’n cynhyrchu cynhyrchion alcoholaidd.
+unauthorised.link.url = https://www.gov.uk/mewngofnodi-cofrestru-gwasanaethau-ar-lein-cthef/cofrestru
+unauthorised.p2.first = Er mwyn defnyddio’r gwasanaeth hwn,
+unauthorised.p2.link.text = bydd angen i chi fewngofnodi gan ddefnyddio cyfrif sefydliad ar gyfer Porth y Llywodraeth
+unauthorised.p2.commaForWelsh = ,
+unauthorised.p2.second = a bydd angen i chi fod wedi’ch ymrestru â’r gwasanaeth.
 
 contactPreference.title = Sut yr hoffech i ni gysylltu â chi?
 contactPreference.heading = Sut yr hoffech i ni gysylltu â chi?
