@@ -18,7 +18,6 @@ package controllers
 
 import com.google.inject.Inject
 import config.FrontendAppConfig
-import models.ChangePreference
 import play.api.i18n.Lang
 import play.api.mvc._
 import uk.gov.hmrc.play.language.{LanguageController, LanguageUtils}
@@ -29,7 +28,7 @@ class LanguageSwitchController @Inject() (
   cc: ControllerComponents
 ) extends LanguageController(languageUtils, cc) {
 
-  override def fallbackURL: String = routes.ServiceEntryController.createUserAnswersAndRedirect(ChangePreference).url
+  override def fallbackURL: String = appConfig.businessTaxAccountUrl
 
   override def languageMap: Map[String, Lang] = appConfig.languageMap
 }

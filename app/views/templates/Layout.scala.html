@@ -102,6 +102,7 @@
     pageTitle = Some(pageTitle),
     headBlock = Some(head),
     headerBlock = Some(hmrcStandardHeader(
+        serviceUrl = Some(appConfig.businessTaxAccountUrl),
         signOutUrl = if(showSignOut) Some(controllers.auth.routes.SignOutController.signOut().url) else None,
         phaseBanner = Some(alphaBanner(appConfig.feedbackUrl))
     )),
