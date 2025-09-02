@@ -1,22 +1,16 @@
 service.name = Manage your Alcohol Duty
 
 site.back = Back
-site.remove = Remove
 site.change = Change
 site.no = No
 site.yes = Yes
 site.continue = Continue
 site.submit = Submit
-site.start = Start now
 site.startAgain = Start again
-site.signIn = Sign in
 site.govuk = GOV.UK
 site.returnToBusinessAccount = Go back to your business tax account
 
-date.day = Day
 date.month = Month
-date.year = Year
-date.error.day = day
 date.error.month = month
 date.error.year = year
 
@@ -29,20 +23,9 @@ error.title.prefix = Error:
 error.prefix = Error
 error.summary.title = There is a problem
 
-index.title = alcohol-duty-contact-preferences-frontend
-index.heading = alcohol-duty-contact-preferences-frontend
-index.guidance = Welcome to your new frontend. Please see the README file for a guide to getting started.
-
-journeyRecovery.continue.title = Sorry, there is a problem with the service
-journeyRecovery.continue.heading = Sorry, there is a problem with the service
-journeyRecovery.continue.guidance = Try again later.
 journeyRecovery.startAgain.title = Sorry, there is a problem with the service
 journeyRecovery.startAgain.heading = Sorry, there is a problem with the service
 journeyRecovery.startAgain.guidance = Try again later.
-
-signedOut.title = For your security, we signed you out
-signedOut.heading = For your security, we signed you out
-signedOut.guidance = We did not save your answers.
 
 unauthorised.title = Sorry, you cannot access this service with this account
 unauthorised.heading = Sorry, you cannot access this service with this account

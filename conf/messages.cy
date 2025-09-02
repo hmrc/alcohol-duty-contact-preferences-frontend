@@ -1,24 +1,18 @@
 service.name = Rheoli’ch Toll Alcohol
 
 site.back = Yn ôl
-site.remove = NOT_FOUND
 site.change = Newid
 site.no = Na
 site.yes = Iawn
 site.continue = Parhau
 site.submit = Cyflwyno
-site.start = NOT_FOUND
 site.startAgain = Dechrau eto
-site.signIn = NOT_FOUND
 site.govuk = GOV.UK
 site.returnToBusinessAccount = Ewch yn ôl i’ch cyfrif treth busnes
 
-date.day = NOT_FOUND
-date.month = NOT_FOUND
-date.year = NOT_FOUND
-date.error.day = NOT_FOUND
-date.error.month = NOT_FOUND
-date.error.year = NOT_FOUND
+date.month = Mis
+date.error.month = mis
+date.error.year = blwyddyn
 
 timeout.title = Rydych ar fin cael eich allgofnodi
 timeout.message = Am resymau diogelwch, cewch eich allgofnodi o’r gwasanaeth hwn ymhen
@@ -29,20 +23,9 @@ error.prefix = Gwall
 error.title.prefix = Gwall:
 error.summary.title = Mae problem.
 
-index.title = NOT_FOUND
-index.heading = NOT_FOUND
-index.guidance = NOT_FOUND
-
-journeyRecovery.continue.title = Mae’n ddrwg gennym – mae problem gyda’r gwasanaeth
-journeyRecovery.continue.heading = Mae’n ddrwg gennym – mae problem gyda’r gwasanaeth
-journeyRecovery.continue.guidance = Rhowch gynnig arall arni yn nes ymlaen.
 journeyRecovery.startAgain.title = Mae’n ddrwg gennym – mae problem gyda’r gwasanaeth
 journeyRecovery.startAgain.heading = Mae’n ddrwg gennym – mae problem gyda’r gwasanaeth
 journeyRecovery.startAgain.guidance = Rhowch gynnig arall arni yn nes ymlaen.
-
-signedOut.title = NOT_FOUND
-signedOut.heading = NOT_FOUND
-signedOut.guidance = NOT_FOUND
 
 unauthorised.title = Mae’n ddrwg gennym – ni allwch gael mynediad at y gwasanaeth hwn gyda’r cyfrif hwn
 unauthorised.heading = Mae’n ddrwg gennym – ni allwch gael mynediad at y gwasanaeth hwn gyda’r cyfrif hwn

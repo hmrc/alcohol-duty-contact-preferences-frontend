@@ -15,21 +15,24 @@
  *@
 
 @import config.Constants.Css
+@import components.{PageHeading, Paragraph}
 
 @this(
-layout: templates.Layout,
-govukButton: GovukButton
+    layout: templates.Layout,
+    govukButton: GovukButton,
+    pageHeading: PageHeading,
+    paragraph: Paragraph
 )
 
 @(businessTaxAccountUrl: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("journeyRecovery.startAgain.title"))) {
 
-<h1 class="@Css.headingXLCssClass">@messages("journeyRecovery.startAgain.heading")</h1>
+@pageHeading(messages("journeyRecovery.startAgain.heading"))
 
-<p class="@Css.bodyCssClass">@messages("journeyRecovery.startAgain.guidance")</p>
+@paragraph(content = Text(messages("journeyRecovery.startAgain.guidance")))
 
-<p class="@Css.bodyCssClass">
+<p class="govuk-body">
     @govukButton(
     ButtonViewModel("startAgainButton", messages("site.startAgain"))
     .asLink(businessTaxAccountUrl)
