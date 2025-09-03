@@ -14,23 +14,28 @@
  * limitations under the License.
  *@
 
+@import config.Constants.Css
+@import components.{PageHeading, Paragraph}
+
 @this(
     layout: templates.Layout,
-    govukButton: GovukButton
+    govukButton: GovukButton,
+    pageHeading: PageHeading,
+    paragraph: Paragraph
 )
 
-@()(implicit request: Request[_], messages: Messages)
+@(businessTaxAccountUrl: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("journeyRecovery.startAgain.title"))) {
 
-    <h1 class="govuk-heading-xl">@messages("journeyRecovery.startAgain.heading")</h1>
+@pageHeading(messages("journeyRecovery.startAgain.heading"))
 
-    <p class="govuk-body">@messages("journeyRecovery.startAgain.guidance")</p>
+@paragraph(content = Text(messages("journeyRecovery.startAgain.guidance")))
 
-    <p class="govuk-body">
-        @govukButton(
-            ButtonViewModel("startAgainButton", messages("site.startAgain"))
-                .asLink(routes.IndexController.onPageLoad().url)
-        )
-    </p>
+<p class="govuk-body">
+    @govukButton(
+    ButtonViewModel("startAgainButton", messages("site.startAgain"))
+    .asLink(businessTaxAccountUrl)
+    )
+</p>
 }

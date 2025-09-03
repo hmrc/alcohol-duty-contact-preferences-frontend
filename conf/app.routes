@@ -8,7 +8,7 @@ GET         /language/:lang                              controllers.LanguageSwi
 
 GET         /refresh-session                             controllers.KeepAliveController.keepAlive()
 
-GET         /there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad(continueUrl: Option[RedirectUrl] ?= None)
+GET         /there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad()
 
 GET         /start/change-preference                     controllers.ServiceEntryController.createUserAnswersAndRedirect(mode: EntryMode = ChangePreference)
 GET         /start/update-email                          controllers.ServiceEntryController.createUserAnswersAndRedirect(mode: EntryMode = UpdateEmail)
@@ -47,5 +47,3 @@ GET         /email-error                                      controllers.change
 GET         /account/sign-out-survey                     controllers.auth.SignOutController.signOut()
 
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad()
-
-GET         /                                            controllers.IndexController.onPageLoad()
