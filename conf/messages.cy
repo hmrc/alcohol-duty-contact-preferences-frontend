@@ -69,8 +69,8 @@ changePreferences.enter-email-address.format-error = Nodwch gyfeiriad e-bost yn 
 correspondenceAddress.title = Eich cyfeiriad gohebu
 correspondenceAddress.heading = Eich cyfeiriad gohebu
 correspondenceAddress.guidance = Byddwn ni’n defnyddio’r cyfeiriad hwn i anfon negeseuon atoch chi ynglŷn â’ch Datganiadau Toll Alcohol.
-correspondenceAddress.contact.text1 =
-correspondenceAddress.contact.linkText = Gallwch gysylltu â ni
+correspondenceAddress.contact.text1 = Gallwch
+correspondenceAddress.contact.linkText =  gysylltu â ni
 correspondenceAddress.contact.url = https://www.gov.uk/find-hmrc-contacts/ymholiadau-taw-tollau-ac-ecseis
 correspondenceAddress.contact.text2 = os oes angen i chi ddiweddaru’ch cyfeiriad.
 
