@@ -38,7 +38,7 @@ unauthorised.p2.second = a bydd angen i chi fod wedi’ch ymrestru â’r gwasan
 
 contactPreference.title = Sut yr hoffech i ni gysylltu â chi?
 contactPreference.heading = Sut yr hoffech i ni gysylltu â chi?
-contactPreference.email = E-bostiwch fi pan fo gennyf neges digidol
+contactPreference.email = E-bostiwch fi pan fo gennyf neges ddigidol
 contactPreference.post = Anfonwch lythyrau ataf drwy’r post
 contactPreference.error.required = Dewiswch sut yr hoffech i ni gysylltu â chi
 
@@ -54,7 +54,7 @@ existingEmail.title = Ai hwn yw eich e-bost?
 existingEmail.heading = Ai {0} yw’ch cyfeiriad e-bost chi?
 existingEmail.hint = Byddwn ni’n anfon e-bost atoch pan fo neges newydd yn eich cyfrif.
 existingEmail.no = Na, hoffwn ddefnyddio cyfeiriad e-bost gwahanol
-existingEmail.error.required = Dewiswch ‘Iawn’ os {0} yw’ch e-bost
+existingEmail.error.required = Dewiswch ‘Iawn’ os mai {0} yw’ch e-bost
 
 emailError.title = Mae angen i chi ddiweddaru’ch cyfeiriad e-bost
 emailError.heading = Mae angen i chi ddiweddaru’ch cyfeiriad e-bost
@@ -69,8 +69,8 @@ changePreferences.enter-email-address.format-error = Nodwch gyfeiriad e-bost yn 
 correspondenceAddress.title = Eich cyfeiriad gohebu
 correspondenceAddress.heading = Eich cyfeiriad gohebu
 correspondenceAddress.guidance = Byddwn ni’n defnyddio’r cyfeiriad hwn i anfon negeseuon atoch chi ynglŷn â’ch Datganiadau Toll Alcohol.
-correspondenceAddress.contact.text1 =
-correspondenceAddress.contact.linkText = Gallwch gysylltu â ni
+correspondenceAddress.contact.text1 = Gallwch
+correspondenceAddress.contact.linkText =  gysylltu â ni
 correspondenceAddress.contact.url = https://www.gov.uk/find-hmrc-contacts/ymholiadau-taw-tollau-ac-ecseis
 correspondenceAddress.contact.text2 = os oes angen i chi ddiweddaru’ch cyfeiriad.
 
@@ -83,7 +83,7 @@ checkYourAnswers.title = Gwiriwch eich atebion
 checkYourAnswers.heading = Gwiriwch eich atebion
 checkYourAnswers.h2 = Dewis o ran cysylltu
 checkYourAnswers.contactPreference.key = Sut yr hoffech i ni gysylltu â chi?
-checkYourAnswers.contactPreference.email = E-bostiwch fi pan fo gennyf neges digidol
+checkYourAnswers.contactPreference.email = E-bostiwch fi pan fo gennyf neges ddigidol
 checkYourAnswers.contactPreference.post = Anfonwch lythyrau ataf drwy’r post
 checkYourAnswers.contactPreference.change.hidden = sut yr hoffech i ni gysylltu â chi
 checkYourAnswers.emailAddress.key = Cyfeiriad e-bost
