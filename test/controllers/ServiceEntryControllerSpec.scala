@@ -18,6 +18,7 @@ package controllers
 
 import base.SpecBase
 import connectors.UserAnswersConnector
+import models.audit.{ContactPreference, JourneyStart}
 import models.{BouncedEmail, ChangePreference, NormalMode, UpdateEmail}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchersSugar.eqTo
@@ -25,6 +26,7 @@ import pages.changePreferences.ContactPreferencePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import services.AuditService
 import uk.gov.hmrc.http.{HttpResponse, UpstreamErrorResponse}
 
 import scala.concurrent.Future
@@ -38,17 +40,26 @@ class ServiceEntryControllerSpec extends SpecBase {
   lazy val serviceEntryBouncedEmailRoute: String     =
     controllers.routes.ServiceEntryController.createUserAnswersAndRedirect(BouncedEmail).url
 
+  val mockAuditService: AuditService = mock[AuditService]
+
   "ServiceEntryController" - {
 
     "createUserAnswersAndRedirect" - {
       "must create user answers and redirect to the Contact Preference page if EntryMode is ContactPreference" in new SetUp {
+        val journeyStart: JourneyStart = JourneyStart(
+          appaId,
+          ContactPreference.Email.toString,
+          ChangePreference.toString
+        )
+
         when(mockUserAnswersConnector.createUserAnswers(any())(any())) thenReturn Future.successful(
           Right(emptyUserAnswers)
         )
 
         val application = applicationBuilder()
           .overrides(
-            bind[UserAnswersConnector].toInstance(mockUserAnswersConnector)
+            bind[UserAnswersConnector].toInstance(mockUserAnswersConnector),
+            bind[AuditService].toInstance(mockAuditService)
           )
           .build()
 
@@ -63,10 +74,17 @@ class ServiceEntryControllerSpec extends SpecBase {
 
           verify(mockUserAnswersConnector, times(1)).createUserAnswers(any())(any())
           verify(mockUserAnswersConnector, times(0)).set(any())(any())
+          verify(mockAuditService).audit(eqTo(journeyStart))(any(), any())
         }
       }
 
       "must create user answers and redirect to the Existing Email page if EntryMode is UpdateEmail and user is on email" in new SetUp {
+        val journeyStart: JourneyStart = JourneyStart(
+          appaId,
+          ContactPreference.Email.toString,
+          UpdateEmail.toString
+        )
+
         when(mockUserAnswersConnector.createUserAnswers(any())(any())) thenReturn Future.successful(
           Right(emptyUserAnswers)
         )
@@ -75,7 +93,8 @@ class ServiceEntryControllerSpec extends SpecBase {
 
         val application = applicationBuilder()
           .overrides(
-            bind[UserAnswersConnector].toInstance(mockUserAnswersConnector)
+            bind[UserAnswersConnector].toInstance(mockUserAnswersConnector),
+            bind[AuditService].toInstance(mockAuditService)
           )
           .build()
 
@@ -90,6 +109,7 @@ class ServiceEntryControllerSpec extends SpecBase {
 
           verify(mockUserAnswersConnector, times(1)).createUserAnswers(any())(any())
           verify(mockUserAnswersConnector, times(1)).set(eqTo(userAnswersWithContactPreference))(any())
+          verify(mockAuditService).audit(eqTo(journeyStart))(any(), any())
         }
       }
 
@@ -118,6 +138,12 @@ class ServiceEntryControllerSpec extends SpecBase {
       }
 
       "must create user answers and redirect to the Bounced Email page if EntryMode is BouncedEmail and user has a bounced email" in new SetUp {
+        val journeyStart: JourneyStart = JourneyStart(
+          appaId,
+          ContactPreference.Post.toString,
+          BouncedEmail.toString
+        )
+
         val emptyUserAnswersWithBouncedEmail =
           emptyUserAnswers.copy(subscriptionSummary = subscriptionSummaryPostWithEmail.copy(bouncedEmail = Some(true)))
 
@@ -130,7 +156,8 @@ class ServiceEntryControllerSpec extends SpecBase {
 
         val application = applicationBuilder()
           .overrides(
-            bind[UserAnswersConnector].toInstance(mockUserAnswersConnector)
+            bind[UserAnswersConnector].toInstance(mockUserAnswersConnector),
+            bind[AuditService].toInstance(mockAuditService)
           )
           .build()
 
@@ -145,6 +172,7 @@ class ServiceEntryControllerSpec extends SpecBase {
 
           verify(mockUserAnswersConnector, times(1)).createUserAnswers(any())(any())
           verify(mockUserAnswersConnector, times(1)).set(eqTo(userAnswersWithContactPreference))(any())
+          verify(mockAuditService).audit(eqTo(journeyStart))(any(), any())
         }
       }
 

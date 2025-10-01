@@ -22,12 +22,14 @@ import connectors.SubmitPreferencesConnector
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import controllers.routes
 import models._
+import models.audit.Actions
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.EmailVerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.audit.AuditUtil
 import utils.{PageCheckHelper, SummaryListHelper}
 import views.html.changePreferences.CheckYourAnswersView
 
@@ -42,6 +44,7 @@ class CheckYourAnswersController @Inject() (
   summaryListHelper: SummaryListHelper,
   emailVerificationService: EmailVerificationService,
   submitPreferencesConnector: SubmitPreferencesConnector,
+  auditUtil: AuditUtil,
   val controllerComponents: MessagesControllerComponents,
   view: CheckYourAnswersView
 )(implicit ec: ExecutionContext)
@@ -86,15 +89,60 @@ class CheckYourAnswersController @Inject() (
     }
   }
 
+  // TODO move into the audit helper
+  def contactPreferenceChange(
+    userAnswers: UserAnswers,
+    contactPreferenceSubmission: PaperlessPreferenceSubmission
+  ): String =
+    if (userAnswers.subscriptionSummary.paperlessReference && !contactPreferenceSubmission.paperlessPreference) {
+      Actions.ChangeToPost.toString
+    } else if (!userAnswers.subscriptionSummary.paperlessReference && contactPreferenceSubmission.paperlessPreference) {
+      Actions.ChangeToEmail.toString
+    } else {
+      val existingEmailPresent = userAnswers.emailAddress.isDefined
+      val updatedEmailPresent  = contactPreferenceSubmission.emailAddress.isDefined
+
+      if (
+        existingEmailPresent && updatedEmailPresent && userAnswers.emailAddress.get != contactPreferenceSubmission.emailAddress.get
+      ) {
+        Actions.AmendEmailAddress.toString
+      } else {
+        throw new IllegalStateException("Could not identify a change in contact preferences")
+      }
+    }
+
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
     pageCheckHelper.checkDetailsToCreateSubmission(request.userAnswers) match {
       case Right(contactPreferenceSubmission) =>
         submitPreferencesConnector
           .submitContactPreferences(contactPreferenceSubmission, request.appaId)
           .foldF(
-            _ => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())),
+            _ => {
+              logger.info("Failed to submit contact preferences")
+
+              // TODO pass in only user answers and contactPreferenceSubmission and let the audit util do the rest
+              auditUtil.auditJourneyOutcomeEvent(
+                request.appaId,
+                contactPreferenceSubmission.paperlessPreference,
+                contactPreferenceChange(request.userAnswers, contactPreferenceSubmission),
+                contactPreferenceSubmission.emailVerification,
+                apiSuccess = false
+              )
+
+              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+            },
             submissionResponse => {
               logger.info("Successfully submitted contact preferences")
+
+              // TODO pass in only user answers and contactPreferenceSubmission and let the audit util do the rest
+              auditUtil.auditJourneyOutcomeEvent(
+                request.appaId,
+                contactPreferenceSubmission.paperlessPreference,
+                contactPreferenceChange(request.userAnswers, contactPreferenceSubmission),
+                contactPreferenceSubmission.emailVerification,
+                apiSuccess = true
+              )
+
               val session = request.session + (submissionDetailsKey -> Json.toJson(submissionResponse).toString)
               Future.successful(
                 Redirect(controllers.changePreferences.routes.PreferenceUpdatedController.onPageLoad())
