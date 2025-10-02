@@ -42,6 +42,11 @@ class ServiceEntryControllerSpec extends SpecBase {
 
   val mockAuditService: AuditService = mock[AuditService]
 
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    reset(mockAuditService)
+  }
+
   "ServiceEntryController" - {
 
     "createUserAnswersAndRedirect" - {
