@@ -16,14 +16,15 @@
 
 package utils.audit
 
-import models.UserAnswers
-import models.audit.{ContactPreference, EmailVerificationOutcome, JourneyOutcome, JourneyStart}
+import models.audit._
+import models.{PaperlessPreferenceSubmission, UserAnswers}
+import play.api.Logging
 import services.AuditService
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
 
-class AuditUtil @Inject() (auditService: AuditService) {
+class AuditUtil @Inject() (auditService: AuditService) extends Logging {
 
   def auditJourneyStartEvent(appaId: String, userAnswers: UserAnswers, action: String)(implicit
     hc: HeaderCarrier
@@ -46,15 +47,14 @@ class AuditUtil @Inject() (auditService: AuditService) {
 
   def auditJourneyOutcomeEvent(
     appaId: String,
-    paperlessPreference: Boolean,
-    contactPreferenceChange: String,
-    isVerified: Option[Boolean],
+    userAnswers: UserAnswers,
+    contactPreferenceSubmission: PaperlessPreferenceSubmission,
     apiSuccess: Boolean
   )(implicit
     hc: HeaderCarrier
   ): Unit = {
     val newContactPreference =
-      if (paperlessPreference) {
+      if (contactPreferenceSubmission.paperlessPreference) {
         ContactPreference.Email.toString
       } else {
         ContactPreference.Post.toString
@@ -64,11 +64,52 @@ class AuditUtil @Inject() (auditService: AuditService) {
       alcoholDutyApprovalId = appaId,
       isSuccessful = apiSuccess,
       newContactPreference = newContactPreference,
-      contactPreferenceChange = contactPreferenceChange,
-      emailVerificationOutcome = isVerified.map(x => EmailVerificationOutcome(x))
+      contactPreferenceChange = contactPreferenceChange(userAnswers, contactPreferenceSubmission),
+      emailVerificationOutcome = contactPreferenceSubmission.emailVerification.map(x => EmailVerificationOutcome(x))
     )
 
     auditService.audit(journeyOutcome)
   }
 
+  private def switchingToPost(
+    userAnswers: UserAnswers,
+    contactPreferenceSubmission: PaperlessPreferenceSubmission
+  ): Boolean =
+    userAnswers.subscriptionSummary.paperlessReference &&
+      !contactPreferenceSubmission.paperlessPreference &&
+      !userAnswers.subscriptionSummary.bouncedEmail.contains(true)
+
+  private def switchingToEmail(
+    userAnswers: UserAnswers,
+    contactPreferenceSubmission: PaperlessPreferenceSubmission
+  ): Boolean =
+    !userAnswers.subscriptionSummary.paperlessReference &&
+      contactPreferenceSubmission.paperlessPreference &&
+      !userAnswers.subscriptionSummary.bouncedEmail.contains(true)
+
+  private def amendingEmail(
+    userAnswers: UserAnswers,
+    contactPreferenceSubmission: PaperlessPreferenceSubmission
+  ): Boolean = {
+    val existingEmailPresent = userAnswers.subscriptionSummary.emailAddress.isDefined
+    val updatedEmailPresent  = contactPreferenceSubmission.emailAddress.isDefined
+    existingEmailPresent &&
+    updatedEmailPresent &&
+    userAnswers.subscriptionSummary.emailAddress.get != contactPreferenceSubmission.emailAddress.get
+  }
+
+  private def contactPreferenceChange(
+    userAnswers: UserAnswers,
+    contactPreferenceSubmission: PaperlessPreferenceSubmission
+  ): String =
+    if (switchingToPost(userAnswers, contactPreferenceSubmission)) {
+      Actions.ChangeToPost.toString
+    } else if (switchingToEmail(userAnswers, contactPreferenceSubmission)) {
+      Actions.ChangeToEmail.toString
+    } else if (amendingEmail(userAnswers, contactPreferenceSubmission)) {
+      Actions.AmendEmailAddress.toString
+    } else {
+      logger.warn("Unknown user journey on contact preference submission")
+      Actions.Unknown.toString
+    }
 }

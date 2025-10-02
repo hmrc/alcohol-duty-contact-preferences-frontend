@@ -25,5 +25,4 @@ object AuditType extends Enum[AuditType] {
 
   case object EmailContactPreferenceStart extends AuditType
   case object EmailContactPreferenceOutcome extends AuditType
-  case object EmailContactPreferenceEmailBounced extends AuditType
 }

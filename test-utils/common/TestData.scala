@@ -73,6 +73,17 @@ trait TestData extends ModelGenerators {
     lastUpdated = Instant.now(clock)
   )
 
+  val userAnswersEmailUpdate: UserAnswers = UserAnswers(
+    appaId = appaId,
+    userId = userId,
+    subscriptionSummary = subscriptionSummaryEmail,
+    emailAddress = None,
+    verifiedEmailAddresses = Set(emailAddress2),
+    data = JsObject(Seq()),
+    startedTime = Instant.now(clock),
+    lastUpdated = Instant.now(clock)
+  )
+
   val userAnswersPostWithEmail: UserAnswers = UserAnswers(
     appaId = appaId,
     userId = userId,
@@ -89,6 +100,10 @@ trait TestData extends ModelGenerators {
   )
 
   val userAnswersPostWithBouncedEmail: UserAnswers = userAnswersPostWithEmail.copy(
+    subscriptionSummary = subscriptionSummaryPostWithEmail.copy(bouncedEmail = Some(true))
+  )
+
+  val userAnswersPostWithBouncedEmailUpdate: UserAnswers = userAnswersPostWithEmail.copy(
     subscriptionSummary = subscriptionSummaryPostWithEmail.copy(bouncedEmail = Some(true))
   )
 
@@ -155,6 +170,13 @@ trait TestData extends ModelGenerators {
   val contactPreferenceSubmissionEmail = PaperlessPreferenceSubmission(
     paperlessPreference = true,
     emailAddress = Some(emailAddress),
+    emailVerification = Some(true),
+    bouncedEmail = Some(false)
+  )
+
+  val contactPreferenceSubmissionNewEmail = PaperlessPreferenceSubmission(
+    paperlessPreference = true,
+    emailAddress = Some(emailAddress2),
     emailVerification = Some(true),
     bouncedEmail = Some(false)
   )

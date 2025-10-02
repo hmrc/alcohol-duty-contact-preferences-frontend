@@ -28,8 +28,7 @@ import java.time.Instant
 class AuditServiceSpec extends SpecBase {
 
   private val mockAuditConnector = mock[AuditConnector]
-
-  private val auditService = new AuditService(mockAuditConnector)
+  private val auditService       = new AuditService(mockAuditConnector)
 
   "AuditService" - {
 
@@ -41,31 +40,22 @@ class AuditServiceSpec extends SpecBase {
       )
       auditService.audit(testDetail)
 
-      verify(mockAuditConnector).sendExplicitAudit(eqTo("EmailContactPreferenceStart"), eqTo(testDetail))(any(), any(), any())
+      verify(mockAuditConnector)
+        .sendExplicitAudit(eqTo("EmailContactPreferenceStart"), eqTo(testDetail))(any(), any(), any())
     }
 
     "send JourneyOutcome correctly" in {
       val testDetail = JourneyOutcome(
-        "someappaid", isSuccessful = true,
+        "someappaid",
+        isSuccessful = true,
         ContactPreference.Email.toString,
         Actions.ChangeToPost.toString,
-        Some(EmailVerificationOutcome(isVerified = true, isLocked = false))
+        Some(EmailVerificationOutcome(isVerified = true))
       )
       auditService.audit(testDetail)
 
-      verify(mockAuditConnector).sendExplicitAudit(eqTo("EmailContactPreferenceOutcome"), eqTo(testDetail))(any(), any(), any())
-    }
-
-    "send EmailBounced correctly" in {
-      val testDetail = EmailBounced(
-        "someappaid",
-        "test@test.com",
-        "test bounce",
-        Instant.now(clock)
-      )
-      auditService.audit(testDetail)
-
-      verify(mockAuditConnector).sendExplicitAudit(eqTo("EmailContactPreferenceEmailBounced"), eqTo(testDetail))(any(), any(), any())
+      verify(mockAuditConnector)
+        .sendExplicitAudit(eqTo("EmailContactPreferenceOutcome"), eqTo(testDetail))(any(), any(), any())
     }
   }
 }

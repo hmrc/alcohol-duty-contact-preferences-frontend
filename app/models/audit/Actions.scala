@@ -27,4 +27,5 @@ object Actions extends Enum[Actions] {
   case object ChangeToPost extends Actions
   case object ChangeToEmail extends Actions
   case object AmendEmailAddress extends Actions
+  case object Unknown extends Actions
 }
