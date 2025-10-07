@@ -319,38 +319,6 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         }
       }
 
-      "must audit unknown for an unknown scenario" in new SetUp {
-        val journeyOutcome: JourneyOutcome = JourneyOutcome(
-          appaId,
-          isSuccessful = true,
-          ContactPreference.Email.toString,
-          Actions.Unknown.toString,
-          Some(EmailVerificationOutcome(isVerified = true))
-        )
-
-        when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Right(
-          contactPreferenceSubmissionEmail.copy(emailAddress = None)
-        )
-        when(submitPreferencesConnector.submitContactPreferences(any(), any())(any())) thenReturn
-          EitherT.rightT(testSubmissionResponse)
-
-        val completeUserAnswers = userAnswersPostWithBouncedEmail.copy(verifiedEmailAddresses = Set())
-
-        val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
-          .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper), bind[AuditService].toInstance(mockAuditService))
-          .overrides(bind[SubmitPreferencesConnector].toInstance(submitPreferencesConnector))
-          .build()
-
-        running(application) {
-          val request = FakeRequest(POST, checkYourAnswersPostRoute)
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          verify(mockAuditService).audit(eqTo(journeyOutcome))(any(), any())
-        }
-      }
-
       "must redirect to the Contact Preference Updated page and audit ChangeToPost if submission is successful for email to post" in new SetUp {
         val journeyOutcome: JourneyOutcome = JourneyOutcome(
           appaId,
@@ -463,6 +431,38 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           verify(pageCheckHelper, times(1)).checkDetailsToCreateSubmission(eqTo(completeUserAnswers))
           verify(submitPreferencesConnector, times(1))
             .submitContactPreferences(eqTo(contactPreferenceSubmissionEmail), eqTo(appaId))(any())
+          verify(mockAuditService).audit(eqTo(journeyOutcome))(any(), any())
+        }
+      }
+
+      "must audit unknown for an unknown scenario" in new SetUp {
+        val journeyOutcome: JourneyOutcome = JourneyOutcome(
+          appaId,
+          isSuccessful = true,
+          ContactPreference.Email.toString,
+          Actions.Unknown.toString,
+          Some(EmailVerificationOutcome(isVerified = true))
+        )
+
+        when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Right(
+          contactPreferenceSubmissionEmail.copy(emailAddress = None)
+        )
+        when(submitPreferencesConnector.submitContactPreferences(any(), any())(any())) thenReturn
+          EitherT.rightT(testSubmissionResponse)
+
+        val completeUserAnswers = userAnswersPostWithBouncedEmail.copy(verifiedEmailAddresses = Set())
+
+        val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
+          .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper), bind[AuditService].toInstance(mockAuditService))
+          .overrides(bind[SubmitPreferencesConnector].toInstance(submitPreferencesConnector))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(POST, checkYourAnswersPostRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
           verify(mockAuditService).audit(eqTo(journeyOutcome))(any(), any())
         }
       }
