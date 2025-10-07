@@ -435,22 +435,22 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         }
       }
 
-      "must audit unknown for an unknown scenario" in new SetUp {
+      "must audit unknown for an unknown scenario (post to post)" in new SetUp {
         val journeyOutcome: JourneyOutcome = JourneyOutcome(
           appaId,
           isSuccessful = true,
-          ContactPreference.Email.toString,
+          ContactPreference.Post.toString,
           Actions.Unknown.toString,
-          Some(EmailVerificationOutcome(isVerified = true))
+          None
         )
 
         when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Right(
-          contactPreferenceSubmissionEmail.copy(emailAddress = None)
+          contactPreferenceSubmissionPost
         )
         when(submitPreferencesConnector.submitContactPreferences(any(), any())(any())) thenReturn
           EitherT.rightT(testSubmissionResponse)
 
-        val completeUserAnswers = userAnswersPostWithBouncedEmail.copy(verifiedEmailAddresses = Set())
+        val completeUserAnswers = userAnswersPostNoEmail
 
         val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
           .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper), bind[AuditService].toInstance(mockAuditService))

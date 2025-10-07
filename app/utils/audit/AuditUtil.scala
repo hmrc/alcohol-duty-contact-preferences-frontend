@@ -75,41 +75,19 @@ class AuditUtil @Inject() (auditService: AuditService) extends Logging {
     userAnswers: UserAnswers,
     contactPreferenceSubmission: PaperlessPreferenceSubmission
   ): Boolean =
-    userAnswers.subscriptionSummary.paperlessReference &&
-      !contactPreferenceSubmission.paperlessPreference &&
-      !userAnswers.subscriptionSummary.bouncedEmail.contains(true)
+    userAnswers.subscriptionSummary.paperlessReference && !contactPreferenceSubmission.paperlessPreference
 
   private def switchingToEmail(
     userAnswers: UserAnswers,
     contactPreferenceSubmission: PaperlessPreferenceSubmission
   ): Boolean =
-    !userAnswers.subscriptionSummary.paperlessReference &&
-      contactPreferenceSubmission.paperlessPreference &&
-      !userAnswers.subscriptionSummary.bouncedEmail.contains(true)
+    !userAnswers.subscriptionSummary.paperlessReference && contactPreferenceSubmission.paperlessPreference
 
   private def amendingEmail(
     userAnswers: UserAnswers,
     contactPreferenceSubmission: PaperlessPreferenceSubmission
-  ): Boolean = {
-    val existingEmailPresent = userAnswers.subscriptionSummary.emailAddress.isDefined
-    val updatedEmailPresent  = contactPreferenceSubmission.emailAddress.isDefined
-
-    existingEmailPresent &&
-    updatedEmailPresent &&
-    !userAnswers.subscriptionSummary.bouncedEmail.contains(true) &&
-    userAnswers.subscriptionSummary.emailAddress.get != contactPreferenceSubmission.emailAddress.get
-  }
-
-  private def amendingBounce(
-    userAnswers: UserAnswers,
-    contactPreferenceSubmission: PaperlessPreferenceSubmission
-  ): Boolean = {
-    val existingEmailPresent = userAnswers.subscriptionSummary.emailAddress.isDefined
-    val updatedEmailPresent  = contactPreferenceSubmission.emailAddress.isDefined
-    existingEmailPresent &&
-    updatedEmailPresent &&
-    userAnswers.subscriptionSummary.bouncedEmail.contains(true)
-  }
+  ): Boolean =
+    userAnswers.subscriptionSummary.paperlessReference && contactPreferenceSubmission.paperlessPreference
 
   private def contactPreferenceChange(
     userAnswers: UserAnswers,
@@ -117,12 +95,7 @@ class AuditUtil @Inject() (auditService: AuditService) extends Logging {
   ): String =
     if (switchingToPost(userAnswers, contactPreferenceSubmission)) {
       Actions.ChangeToPost.toString
-    } else if (
-      switchingToEmail(userAnswers, contactPreferenceSubmission) || amendingBounce(
-        userAnswers,
-        contactPreferenceSubmission
-      )
-    ) {
+    } else if (switchingToEmail(userAnswers, contactPreferenceSubmission)) {
       Actions.ChangeToEmail.toString
     } else if (amendingEmail(userAnswers, contactPreferenceSubmission)) {
       Actions.AmendEmailAddress.toString
