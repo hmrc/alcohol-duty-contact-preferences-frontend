@@ -24,6 +24,7 @@ import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.audit.AuditUtil
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -32,6 +33,7 @@ class ServiceEntryController @Inject() (
   override val messagesApi: MessagesApi,
   identify: IdentifierAction,
   userAnswersConnector: UserAnswersConnector,
+  auditUtil: AuditUtil,
   val controllerComponents: MessagesControllerComponents
 )(implicit ec: ExecutionContext)
     extends FrontendBaseController
@@ -43,11 +45,13 @@ class ServiceEntryController @Inject() (
       case Right(ua)   =>
         mode match {
           case ChangePreference =>
+            auditUtil.auditJourneyStartEvent(request.appaId, ua, ChangePreference.toString)
             Future.successful(
               Redirect(controllers.changePreferences.routes.ContactPreferenceController.onPageLoad(NormalMode))
             )
           case UpdateEmail      =>
             if (ua.subscriptionSummary.paperlessReference) {
+              auditUtil.auditJourneyStartEvent(request.appaId, ua, UpdateEmail.toString)
               for {
                 updatedAnswers <- Future.fromTry(ua.set(ContactPreferencePage, true))
                 _              <- userAnswersConnector.set(updatedAnswers)
@@ -58,6 +62,7 @@ class ServiceEntryController @Inject() (
             }
           case BouncedEmail     =>
             if (ua.subscriptionSummary.bouncedEmail.contains(true)) {
+              auditUtil.auditJourneyStartEvent(request.appaId, ua, BouncedEmail.toString)
               for {
                 updatedAnswers <- Future.fromTry(ua.set(ContactPreferencePage, true))
                 _              <- userAnswersConnector.set(updatedAnswers)

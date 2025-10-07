@@ -28,6 +28,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import services.EmailVerificationService
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
+import utils.audit.AuditUtil
 import utils.{PageCheckHelper, SummaryListHelper}
 import views.html.changePreferences.CheckYourAnswersView
 
@@ -42,6 +43,7 @@ class CheckYourAnswersController @Inject() (
   summaryListHelper: SummaryListHelper,
   emailVerificationService: EmailVerificationService,
   submitPreferencesConnector: SubmitPreferencesConnector,
+  auditUtil: AuditUtil,
   val controllerComponents: MessagesControllerComponents,
   view: CheckYourAnswersView
 )(implicit ec: ExecutionContext)
@@ -92,9 +94,25 @@ class CheckYourAnswersController @Inject() (
         submitPreferencesConnector
           .submitContactPreferences(contactPreferenceSubmission, request.appaId)
           .foldF(
-            _ => Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())),
+            _ => {
+              logger.info("Failed to submit contact preferences")
+              auditUtil.auditJourneyOutcomeEvent(
+                request.appaId,
+                request.userAnswers,
+                contactPreferenceSubmission,
+                apiSuccess = false
+              )
+              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+            },
             submissionResponse => {
               logger.info("Successfully submitted contact preferences")
+              auditUtil.auditJourneyOutcomeEvent(
+                request.appaId,
+                request.userAnswers,
+                contactPreferenceSubmission,
+                apiSuccess = true
+              )
+
               val session = request.session + (submissionDetailsKey -> Json.toJson(submissionResponse).toString)
               Future.successful(
                 Redirect(controllers.changePreferences.routes.PreferenceUpdatedController.onPageLoad())
