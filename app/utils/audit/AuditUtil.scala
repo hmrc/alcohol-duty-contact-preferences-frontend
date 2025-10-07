@@ -93,9 +93,22 @@ class AuditUtil @Inject() (auditService: AuditService) extends Logging {
   ): Boolean = {
     val existingEmailPresent = userAnswers.subscriptionSummary.emailAddress.isDefined
     val updatedEmailPresent  = contactPreferenceSubmission.emailAddress.isDefined
+
     existingEmailPresent &&
     updatedEmailPresent &&
+    !userAnswers.subscriptionSummary.bouncedEmail.contains(true) &&
     userAnswers.subscriptionSummary.emailAddress.get != contactPreferenceSubmission.emailAddress.get
+  }
+
+  private def amendingBounce(
+    userAnswers: UserAnswers,
+    contactPreferenceSubmission: PaperlessPreferenceSubmission
+  ): Boolean = {
+    val existingEmailPresent = userAnswers.subscriptionSummary.emailAddress.isDefined
+    val updatedEmailPresent  = contactPreferenceSubmission.emailAddress.isDefined
+    existingEmailPresent &&
+    updatedEmailPresent &&
+    userAnswers.subscriptionSummary.bouncedEmail.contains(true)
   }
 
   private def contactPreferenceChange(
@@ -104,12 +117,16 @@ class AuditUtil @Inject() (auditService: AuditService) extends Logging {
   ): String =
     if (switchingToPost(userAnswers, contactPreferenceSubmission)) {
       Actions.ChangeToPost.toString
-    } else if (switchingToEmail(userAnswers, contactPreferenceSubmission)) {
+    } else if (
+      switchingToEmail(userAnswers, contactPreferenceSubmission) || amendingBounce(
+        userAnswers,
+        contactPreferenceSubmission
+      )
+    ) {
       Actions.ChangeToEmail.toString
     } else if (amendingEmail(userAnswers, contactPreferenceSubmission)) {
       Actions.AmendEmailAddress.toString
     } else {
-      logger.warn("Unknown user journey on contact preference submission")
       Actions.Unknown.toString
     }
 }

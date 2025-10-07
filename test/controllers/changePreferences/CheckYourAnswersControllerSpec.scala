@@ -241,7 +241,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         }
       }
 
-      "must redirect to the Contact Preference Updated page if submission is successful for post to email" in new SetUp {
+      "must redirect to the Contact Preference Updated page and audit ChangeToEmail if submission is successful for post to email" in new SetUp {
         val journeyOutcome: JourneyOutcome = JourneyOutcome(
           appaId,
           isSuccessful = true,
@@ -280,7 +280,78 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         }
       }
 
-      "must redirect to the Contact Preference Updated page if submission is successful for email to post" in new SetUp {
+      "must redirect to the Contact Preference Updated page and audit ChangeToEmail if submission is successful for bounced scenario" in new SetUp {
+        val journeyOutcome: JourneyOutcome = JourneyOutcome(
+          appaId,
+          isSuccessful = true,
+          ContactPreference.Email.toString,
+          Actions.ChangeToEmail.toString,
+          Some(EmailVerificationOutcome(isVerified = true))
+        )
+
+        when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Right(
+          contactPreferenceSubmissionEmail
+        )
+        when(submitPreferencesConnector.submitContactPreferences(any(), any())(any())) thenReturn
+          EitherT.rightT(testSubmissionResponse)
+
+        val completeUserAnswers = userAnswersPostWithBouncedEmail.copy(verifiedEmailAddresses = Set(emailAddress))
+
+        val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
+          .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper), bind[AuditService].toInstance(mockAuditService))
+          .overrides(bind[SubmitPreferencesConnector].toInstance(submitPreferencesConnector))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(POST, checkYourAnswersPostRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual controllers.changePreferences.routes.PreferenceUpdatedController
+            .onPageLoad()
+            .url
+
+          verify(pageCheckHelper, times(1)).checkDetailsToCreateSubmission(eqTo(completeUserAnswers))
+          verify(submitPreferencesConnector, times(1))
+            .submitContactPreferences(eqTo(contactPreferenceSubmissionEmail), eqTo(appaId))(any())
+          verify(mockAuditService).audit(eqTo(journeyOutcome))(any(), any())
+        }
+      }
+
+      "must audit unknown for an unknown scenario" in new SetUp {
+        val journeyOutcome: JourneyOutcome = JourneyOutcome(
+          appaId,
+          isSuccessful = true,
+          ContactPreference.Email.toString,
+          Actions.Unknown.toString,
+          Some(EmailVerificationOutcome(isVerified = true))
+        )
+
+        when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Right(
+          contactPreferenceSubmissionEmail.copy(emailAddress = None)
+        )
+        when(submitPreferencesConnector.submitContactPreferences(any(), any())(any())) thenReturn
+          EitherT.rightT(testSubmissionResponse)
+
+        val completeUserAnswers = userAnswersPostWithBouncedEmail.copy(verifiedEmailAddresses = Set())
+
+        val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
+          .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper), bind[AuditService].toInstance(mockAuditService))
+          .overrides(bind[SubmitPreferencesConnector].toInstance(submitPreferencesConnector))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(POST, checkYourAnswersPostRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          verify(mockAuditService).audit(eqTo(journeyOutcome))(any(), any())
+        }
+      }
+
+      "must redirect to the Contact Preference Updated page and audit ChangeToPost if submission is successful for email to post" in new SetUp {
         val journeyOutcome: JourneyOutcome = JourneyOutcome(
           appaId,
           isSuccessful = true,
@@ -319,7 +390,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         }
       }
 
-      "must redirect to the Contact Preference Updated page if submission is successful for amend email address" in new SetUp {
+      "must redirect to the Contact Preference Updated page and audit AmendEmailAddress if submission is successful for amend email address" in new SetUp {
         val journeyOutcome: JourneyOutcome = JourneyOutcome(
           appaId,
           isSuccessful = true,
@@ -358,46 +429,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         }
       }
 
-      "must redirect to the Contact Preference Updated page if submission is successful for amend email address for bounced scenario" in new SetUp {
-        val journeyOutcome: JourneyOutcome = JourneyOutcome(
-          appaId,
-          isSuccessful = true,
-          ContactPreference.Email.toString,
-          Actions.AmendEmailAddress.toString,
-          Some(EmailVerificationOutcome(isVerified = true))
-        )
-
-        when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Right(
-          contactPreferenceSubmissionNewEmail
-        )
-        when(submitPreferencesConnector.submitContactPreferences(any(), any())(any())) thenReturn
-          EitherT.rightT(testSubmissionResponse)
-
-        val completeUserAnswers = userAnswersPostWithBouncedEmail
-
-        val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
-          .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper), bind[AuditService].toInstance(mockAuditService))
-          .overrides(bind[SubmitPreferencesConnector].toInstance(submitPreferencesConnector))
-          .build()
-
-        running(application) {
-          val request = FakeRequest(POST, checkYourAnswersPostRoute)
-
-          val result = route(application, request).value
-
-          status(result) mustEqual SEE_OTHER
-          redirectLocation(result).value mustEqual controllers.changePreferences.routes.PreferenceUpdatedController
-            .onPageLoad()
-            .url
-
-          verify(pageCheckHelper, times(1)).checkDetailsToCreateSubmission(eqTo(completeUserAnswers))
-          verify(submitPreferencesConnector, times(1))
-            .submitContactPreferences(eqTo(contactPreferenceSubmissionNewEmail), eqTo(appaId))(any())
-          verify(mockAuditService).audit(eqTo(journeyOutcome))(any(), any())
-        }
-      }
-
-      "must redirect to Journey Recovery if submission is not successful" in new SetUp {
+      "must redirect to Journey Recovery and audit ChangeToEmail if submission is not successful for post to email" in new SetUp {
 
         val journeyOutcome: JourneyOutcome = JourneyOutcome(
           appaId,
