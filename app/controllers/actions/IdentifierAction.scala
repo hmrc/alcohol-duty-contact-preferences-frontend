@@ -59,21 +59,25 @@ class AuthenticatedIdentifierAction @Inject() (
 
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
-    authorised(predicate).retrieve(internalId and groupIdentifier and allEnrolments and credentials) {
-      case optInternalId ~ optGroupId ~ enrolments ~ optCredId =>
-        val internalId: String = getOrElseFailWithUnauthorised(optInternalId, "Unable to retrieve internalId")
-        val groupId: String    = getOrElseFailWithUnauthorised(optGroupId, "Unable to retrieve groupIdentifier")
-        val credId: String     =
-          getOrElseFailWithUnauthorised[String](optCredId.map(_.providerId), "Unable to retrieve credentials")
-        val appaId             = getAppaId(enrolments)
-        block(IdentifierRequest(request, appaId, groupId, internalId, credId))
-    } recover {
-      case e: AuthorisationException =>
-        logger.debug(s"Got AuthorisationException:", e)
-        handleAuthException(e)
-      case e: UnauthorizedException  =>
-        logger.debug(s"Got UnauthorizedException:", e)
-        Redirect(routes.UnauthorisedController.onPageLoad())
+    if (config.isClosed) {
+      Future.successful(Redirect(routes.ServiceUnavailableController.onPageLoad()))
+    } else {
+      authorised(predicate).retrieve(internalId and groupIdentifier and allEnrolments and credentials) {
+        case optInternalId ~ optGroupId ~ enrolments ~ optCredId =>
+          val internalId: String = getOrElseFailWithUnauthorised(optInternalId, "Unable to retrieve internalId")
+          val groupId: String    = getOrElseFailWithUnauthorised(optGroupId, "Unable to retrieve groupIdentifier")
+          val credId: String     =
+            getOrElseFailWithUnauthorised[String](optCredId.map(_.providerId), "Unable to retrieve credentials")
+          val appaId             = getAppaId(enrolments)
+          block(IdentifierRequest(request, appaId, groupId, internalId, credId))
+      } recover {
+        case e: AuthorisationException =>
+          logger.debug(s"Got AuthorisationException:", e)
+          handleAuthException(e)
+        case e: UnauthorizedException  =>
+          logger.debug(s"Got UnauthorizedException:", e)
+          Redirect(routes.UnauthorisedController.onPageLoad())
+      }
     }
   }
 

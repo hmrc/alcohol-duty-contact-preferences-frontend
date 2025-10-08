@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,27 @@
 
 package controllers
 
-import config.FrontendAppConfig
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
-import views.html.UnauthorisedView
+import views.html.NotFound
 
 import javax.inject.Inject
 
-class UnauthorisedController @Inject() (
+class ServiceUnavailableController @Inject() (
   val controllerComponents: MessagesControllerComponents,
-  view: UnauthorisedView,
-  appConfig: FrontendAppConfig
+  view: NotFound
 ) extends FrontendBaseController
     with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = Action { implicit request =>
-    if (appConfig.isClosed) Redirect(routes.ServiceUnavailableController.onPageLoad()) else Ok(view())
+    Ok(
+      view(
+        pageTitle = "site.error.pageNotFound404.title",
+        heading = "site.error.pageNotFound404.heading",
+        message1 = "site.error.pageNotFound404.message.1",
+        message2 = "site.error.pageNotFound404.message.2"
+      )
+    )
   }
 }
