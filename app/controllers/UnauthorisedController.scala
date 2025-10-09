@@ -32,6 +32,6 @@ class UnauthorisedController @Inject() (
     with I18nSupport {
 
   def onPageLoad(): Action[AnyContent] = Action { implicit request =>
-    if (appConfig.isClosed) Redirect(routes.ServiceUnavailableController.onPageLoad()) else Ok(view())
+    if (appConfig.isClosed) Redirect(routes.NotFoundController.onPageLoad()) else Ok(view())
   }
 }

@@ -23,7 +23,7 @@ import views.html.NotFound
 
 import javax.inject.Inject
 
-class ServiceUnavailableController @Inject() (
+class NotFoundController @Inject() (
   val controllerComponents: MessagesControllerComponents,
   view: NotFound
 ) extends FrontendBaseController

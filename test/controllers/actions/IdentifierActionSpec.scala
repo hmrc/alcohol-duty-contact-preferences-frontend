@@ -63,7 +63,7 @@ class IdentifierActionSpec extends SpecBase {
     val result: Future[Result] = identifierAction.invokeBlock(FakeRequest(), testAction)
 
     status(result) mustBe SEE_OTHER
-    redirectLocation(result).value mustBe routes.ServiceUnavailableController.onPageLoad().url
+    redirectLocation(result).value mustBe routes.NotFoundController.onPageLoad().url
   }
 
   "invokeBlock when the service is not closed" - {

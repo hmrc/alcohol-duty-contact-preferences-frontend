@@ -48,4 +48,4 @@ GET         /account/sign-out-survey                     controllers.auth.SignOu
 
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad()
 
-GET         /page-not-found                              controllers.ServiceUnavailableController.onPageLoad()
+GET         /page-not-found                              controllers.NotFoundController.onPageLoad()

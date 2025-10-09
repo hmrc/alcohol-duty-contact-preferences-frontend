@@ -60,7 +60,7 @@ class AuthenticatedIdentifierAction @Inject() (
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     if (config.isClosed) {
-      Future.successful(Redirect(routes.ServiceUnavailableController.onPageLoad()))
+      Future.successful(Redirect(routes.NotFoundController.onPageLoad()))
     } else {
       authorised(predicate).retrieve(internalId and groupIdentifier and allEnrolments and credentials) {
         case optInternalId ~ optGroupId ~ enrolments ~ optCredId =>
