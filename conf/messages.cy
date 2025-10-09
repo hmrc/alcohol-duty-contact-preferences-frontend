@@ -9,6 +9,10 @@ site.submit = Cyflwyno
 site.startAgain = Dechrau eto
 site.govuk = GOV.UK
 site.returnToBusinessAccount = Ewch yn ôl i’ch cyfrif treth busnes
+site.error.pageNotFound404.title = Heb ddod o hyd i’r dudalen
+site.error.pageNotFound404.heading = Heb ddod o hyd i’r dudalen
+site.error.pageNotFound404.message.1 = Os gwnaethoch deipio’r cyfeiriad gwe, gwiriwch ei fod yn gywir.
+site.error.pageNotFound404.message.2 = Os gwnaethoch ludo’r cyfeiriad gwe, gwiriwch eich bod wedi copïo’r cyfeiriad yn llawn.
 
 date.month = Mis
 date.error.month = mis

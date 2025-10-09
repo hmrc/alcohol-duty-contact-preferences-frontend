@@ -9,6 +9,10 @@ site.submit = Submit
 site.startAgain = Start again
 site.govuk = GOV.UK
 site.returnToBusinessAccount = Go back to your business tax account
+site.error.pageNotFound404.title = Page not found
+site.error.pageNotFound404.heading = Page not found
+site.error.pageNotFound404.message.1 = If you typed the web address, check it is correct.
+site.error.pageNotFound404.message.2 = If you pasted the web address, check you copied the entire address.
 
 date.month = Month
 date.error.month = month
