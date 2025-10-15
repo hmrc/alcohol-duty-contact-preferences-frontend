@@ -41,13 +41,6 @@ class CheckYourAnswersControllerSpec extends SpecBase {
   lazy val checkYourAnswersPostRoute: String =
     controllers.changePreferences.routes.CheckYourAnswersController.onSubmit().url
 
-  val mockAuditService: AuditService = mock[AuditService]
-
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    reset(mockAuditService)
-  }
-
   "CheckYourAnswersController" - {
     "onPageLoad" - {
       "must return OK and the correct view if no call to email verification is needed" in new SetUp {
@@ -162,6 +155,32 @@ class CheckYourAnswersControllerSpec extends SpecBase {
         }
       }
 
+      "must redirect to Journey Recovery if the call to email verification fails" in new SetUp {
+        when(pageCheckHelper.checkDetailsForCheckYourAnswers(any())) thenReturn Right(true)
+        when(emailVerificationService.retrieveAddressStatusAndAddToCache(any(), any(), any())(any())) thenReturn
+          EitherT.leftT(ErrorModel(INTERNAL_SERVER_ERROR, "Unexpected response"))
+
+        val application = applicationBuilder(userAnswers = Some(userAnswersPostNoEmail))
+          .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
+          .overrides(bind[SummaryListHelper].toInstance(summaryListHelper))
+          .overrides(bind[EmailVerificationService].toInstance(emailVerificationService))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, checkYourAnswersGetRoute)
+
+          val result = route(application, request).value
+
+          status(result) mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+
+          verify(pageCheckHelper, times(1)).checkDetailsForCheckYourAnswers(eqTo(userAnswersPostNoEmail))
+          verify(summaryListHelper, times(0)).checkYourAnswersSummaryList(any())(any())
+          verify(emailVerificationService, times(1))
+            .retrieveAddressStatusAndAddToCache(any(), eqTo(emailAddress), eqTo(userAnswersPostNoEmail))(any())
+        }
+      }
+
       "must redirect to Journey Recovery if user answers do not exist" in new SetUp {
         val application = applicationBuilder(userAnswers = None)
           .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
@@ -201,6 +220,29 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           status(result) mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+
+          verify(pageCheckHelper, times(1)).checkDetailsForCheckYourAnswers(eqTo(emptyUserAnswers))
+          verify(summaryListHelper, times(0)).checkYourAnswersSummaryList(any())(any())
+          verify(emailVerificationService, times(0)).retrieveAddressStatusAndAddToCache(any(), any(), any())(any())
+        }
+      }
+
+      "must throw an exception if entered email address is required but missing and not picked up by PageCheckHelper" in new SetUp {
+        when(pageCheckHelper.checkDetailsForCheckYourAnswers(any())) thenReturn Right(true)
+
+        val application = applicationBuilder(userAnswers = Some(emptyUserAnswers))
+          .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
+          .overrides(bind[SummaryListHelper].toInstance(summaryListHelper))
+          .overrides(bind[EmailVerificationService].toInstance(emailVerificationService))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, checkYourAnswersGetRoute)
+
+          val exception = intercept[IllegalStateException] {
+            await(route(application, request).value)
+          }
+          exception.getMessage mustBe "Entered email address missing from user answers but not picked up by PageCheckHelper"
 
           verify(pageCheckHelper, times(1)).checkDetailsForCheckYourAnswers(eqTo(emptyUserAnswers))
           verify(summaryListHelper, times(0)).checkYourAnswersSummaryList(any())(any())
@@ -517,6 +559,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
     val summaryListHelper          = mock[SummaryListHelper]
     val emailVerificationService   = mock[EmailVerificationService]
     val submitPreferencesConnector = mock[SubmitPreferencesConnector]
+    val mockAuditService           = mock[AuditService]
 
     val row1             = SummaryListRow(key = Key(Text("Row1Key")), value = Value(Text("Row1Value")))
     val row2             = SummaryListRow(key = Key(Text("Row2Key")), value = Value(Text("Row2Value")))
