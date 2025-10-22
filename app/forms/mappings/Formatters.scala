@@ -31,7 +31,7 @@ trait Formatters {
         data.get(key) match {
           case None                      => Left(Seq(FormError(key, errorKey, args)))
           case Some(s) if s.trim.isEmpty => Left(Seq(FormError(key, errorKey, args)))
-          case Some(s)                   => Right(s)
+          case Some(s)                   => Right(s.replaceAll("\\s", ""))
         }
 
       override def unbind(key: String, value: String): Map[String, String] =
@@ -47,7 +47,7 @@ trait Formatters {
 
       private val baseFormatter = stringFormatter(requiredKey, args)
 
-      override def bind(key: String, data: Map[String, String]) =
+      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Boolean] =
         baseFormatter
           .bind(key, data)
           .flatMap {
@@ -71,7 +71,7 @@ trait Formatters {
 
       private val baseFormatter = stringFormatter(requiredKey, args)
 
-      override def bind(key: String, data: Map[String, String]) =
+      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], Int] =
         baseFormatter
           .bind(key, data)
           .map(_.replace(",", ""))
@@ -85,7 +85,7 @@ trait Formatters {
                 .map(_ => Seq(FormError(key, nonNumericKey, args)))
           }
 
-      override def unbind(key: String, value: Int) =
+      override def unbind(key: String, value: Int): Map[String, String] =
         baseFormatter.unbind(key, value.toString)
     }
 
@@ -99,7 +99,7 @@ trait Formatters {
       override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], A] =
         baseFormatter.bind(key, data).flatMap { str =>
           ev.withName(str)
-            .map(Right.apply)
+            .map(Right[Seq[FormError], A])
             .getOrElse(Left(Seq(FormError(key, invalidKey, args))))
         }
 
