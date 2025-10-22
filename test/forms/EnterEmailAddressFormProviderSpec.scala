@@ -54,6 +54,12 @@ class EnterEmailAddressFormProviderSpec extends StringFieldBehaviours with SpecB
       form.bind(data).value.value mustBe "name@example"
     }
 
+    "must bind valid email addresses with spaces" in {
+      val data = Map("emailAddress" -> " test @example.com ")
+
+      form.bind(data).value.value mustBe "test@example.com"
+    }
+
     "must unbind valid email addresses" in {
       val data = emailAddress
       form.fill(data).data must contain theSameElementsAs Map(
@@ -83,11 +89,6 @@ class EnterEmailAddressFormProviderSpec extends StringFieldBehaviours with SpecB
 
       "reject missing username" in {
         val data = Map("emailAddress" -> "@domain.com")
-        form.bind(data).errors must contain only FormError("emailAddress", invalidKey, ArraySeq(emailRegex))
-      }
-
-      "reject spaces in email" in {
-        val data = Map("emailAddress" -> "test @example.com")
         form.bind(data).errors must contain only FormError("emailAddress", invalidKey, ArraySeq(emailRegex))
       }
 
