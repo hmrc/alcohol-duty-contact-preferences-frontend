@@ -22,8 +22,8 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchersSugar.eqTo
 import play.api.i18n.Messages
 import services.CountryService
+import uk.gov.hmrc.govukfrontend.views.Aliases.{ActionItem, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
-import viewmodels.govuk.summarylist._
 
 class SummaryListHelperSpec extends SpecBase {
 
@@ -33,45 +33,22 @@ class SummaryListHelperSpec extends SpecBase {
 
   val summaryListHelper = new SummaryListHelper(mockCountryService)
 
-  val contactPreferenceRowEmail = SummaryListRowViewModel(
-    key = KeyViewModel(HtmlContent(messages("checkYourAnswers.contactPreference.key"))),
-    value = ValueViewModel(HtmlContent(messages("checkYourAnswers.contactPreference.email"))),
-    actions = Seq(
-      ActionItemViewModel(
-        HtmlContent(messages("site.change")),
-        controllers.changePreferences.routes.ContactPreferenceController.onPageLoad(CheckMode).url
-      ).withVisuallyHiddenText(messages("checkYourAnswers.contactPreference.change.hidden"))
-    )
+  val contactPreferenceActionItem = ActionItem(
+    content = Text("Change"),
+    href = controllers.changePreferences.routes.ContactPreferenceController.onPageLoad(CheckMode).url,
+    visuallyHiddenText = Some("how you would like to be contacted")
   )
 
-  val contactPreferenceRowPost = SummaryListRowViewModel(
-    key = KeyViewModel(HtmlContent(messages("checkYourAnswers.contactPreference.key"))),
-    value = ValueViewModel(HtmlContent(messages("checkYourAnswers.contactPreference.post"))),
-    actions = Seq(
-      ActionItemViewModel(
-        HtmlContent(messages("site.change")),
-        controllers.changePreferences.routes.ContactPreferenceController.onPageLoad(CheckMode).url
-      ).withVisuallyHiddenText(messages("checkYourAnswers.contactPreference.change.hidden"))
-    )
-  )
-
-  val emailAddressRow = SummaryListRowViewModel(
-    key = KeyViewModel(HtmlContent(messages("checkYourAnswers.emailAddress.key"))),
-    value = ValueViewModel(HtmlContent(emailAddress)),
-    actions = Seq(
-      ActionItemViewModel(
-        HtmlContent(messages("site.change")),
-        controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(CheckMode).url
-      ).withVisuallyHiddenText(messages("checkYourAnswers.emailAddress.change.hidden"))
-    )
+  val emailAddressActionItem = ActionItem(
+    content = Text("Change"),
+    href = controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(CheckMode).url,
+    visuallyHiddenText = Some("email address")
   )
 
   val correspondenceAddressWithCountry = correspondenceAddress + "\nUnited Kingdom"
 
-  val correspondenceAddressRow = SummaryListRowViewModel(
-    key = KeyViewModel(HtmlContent(messages("checkYourAnswers.correspondenceAddress.key"))),
-    value = ValueViewModel(HtmlContent(correspondenceAddressWithCountry.replace("\n", "<br>")))
-  )
+  val addressHtmlString =
+    "<span class='break'>Flat 123</span><span class='break'>1 Example Road</span><span class='break'>London</span><span class='break'>AB1 2CD</span><span class='break'>United Kingdom</span>"
 
   override def beforeEach(): Unit = {
     super.beforeEach()
@@ -82,7 +59,13 @@ class SummaryListHelperSpec extends SpecBase {
     "must return a summary list with the correct rows if email is selected" in {
       val summaryList = summaryListHelper.checkYourAnswersSummaryList(userAnswersPostNoEmail)
 
-      summaryList mustBe SummaryListViewModel(rows = Seq(contactPreferenceRowEmail, emailAddressRow))
+      val expectedKeys    = Seq(Text("How would you like to be contacted?"), Text("Email address"))
+      val expectedValues  = Seq(Text("Email me when I have a digital message"), Text(emailAddress))
+      val expectedActions = Seq(contactPreferenceActionItem, emailAddressActionItem)
+
+      summaryList.rows.map(_.key.content) mustBe expectedKeys
+      summaryList.rows.map(_.value.content) mustBe expectedValues
+      summaryList.rows.map(_.actions.get.items.head) mustBe expectedActions
       verify(mockCountryService, times(0)).tryLookupCountryName(any())
     }
 
@@ -91,7 +74,13 @@ class SummaryListHelperSpec extends SpecBase {
 
       val summaryList = summaryListHelper.checkYourAnswersSummaryList(userAnswers)
 
-      summaryList mustBe SummaryListViewModel(rows = Seq(contactPreferenceRowPost, correspondenceAddressRow))
+      val expectedKeys    = Seq(Text("How would you like to be contacted?"), Text("Address"))
+      val expectedValues  = Seq(Text("Send me letters by post"), HtmlContent(addressHtmlString))
+      val expectedActions = Seq(Some(contactPreferenceActionItem), None)
+
+      summaryList.rows.map(_.key.content) mustBe expectedKeys
+      summaryList.rows.map(_.value.content) mustBe expectedValues
+      summaryList.rows.map(_.actions.map(_.items.head)) mustBe expectedActions
       verify(mockCountryService, times(1)).tryLookupCountryName(countryCode)
     }
 
@@ -116,7 +105,13 @@ class SummaryListHelperSpec extends SpecBase {
 
       val summaryList = summaryListHelper.correspondenceAddressSummaryList(userAnswers)
 
-      summaryList mustBe SummaryListViewModel(rows = Seq(correspondenceAddressRow))
+      val expectedKeys    = Seq(Text("Address"))
+      val expectedValues  = Seq(HtmlContent(addressHtmlString))
+      val expectedActions = Seq(None)
+
+      summaryList.rows.map(_.key.content) mustBe expectedKeys
+      summaryList.rows.map(_.value.content) mustBe expectedValues
+      summaryList.rows.map(_.actions.map(_.items.head)) mustBe expectedActions
       verify(mockCountryService, times(1)).tryLookupCountryName(countryCode)
     }
   }
