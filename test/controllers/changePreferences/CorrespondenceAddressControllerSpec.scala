@@ -25,6 +25,7 @@ import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import utils.{PageCheckHelper, SummaryListHelper}
 import viewmodels.govuk.summarylist._
@@ -43,18 +44,17 @@ class CorrespondenceAddressControllerSpec extends SpecBase {
       val mockPageCheckHelper   = mock[PageCheckHelper]
       val mockSummaryListHelper = mock[SummaryListHelper]
 
-      val fullCorrespondenceAddress = correspondenceAddress + "\nUnited Kingdom"
-      val expectedSummaryList       = SummaryListViewModel(rows =
+      val testSummaryList = SummaryListViewModel(rows =
         Seq(
           SummaryListRowViewModel(
-            key = KeyViewModel(HtmlContent(messages("checkYourAnswers.correspondenceAddress.key"))),
-            value = ValueViewModel(HtmlContent(fullCorrespondenceAddress.replace("\n", "<br>")))
+            key = KeyViewModel(Text("Address")),
+            value = ValueViewModel(HtmlContent("test address html"))
           )
         )
       )
 
       when(mockPageCheckHelper.checkDetailsForCorrespondenceAddressPage(any())) thenReturn Right(())
-      when(mockSummaryListHelper.correspondenceAddressSummaryList(any())(any())) thenReturn expectedSummaryList
+      when(mockSummaryListHelper.correspondenceAddressSummaryList(any())(any())) thenReturn testSummaryList
 
       val application = applicationBuilder(userAnswers = Some(userAnswers))
         .overrides(bind[PageCheckHelper].toInstance(mockPageCheckHelper))
@@ -69,7 +69,7 @@ class CorrespondenceAddressControllerSpec extends SpecBase {
         val view = application.injector.instanceOf[CorrespondenceAddressView]
 
         status(result) mustEqual OK
-        contentAsString(result) mustEqual view(expectedSummaryList)(
+        contentAsString(result) mustEqual view(testSummaryList)(
           request,
           getMessages(application)
         ).toString

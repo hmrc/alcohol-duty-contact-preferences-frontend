@@ -21,6 +21,7 @@ import models.{CheckMode, SubscriptionSummary, UserAnswers}
 import pages.changePreferences.ContactPreferencePage
 import play.api.i18n.Messages
 import services.CountryService
+import uk.gov.hmrc.govukfrontend.views.Aliases.Text
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.{SummaryList, SummaryListRow}
 import viewmodels.govuk.summarylist._
@@ -66,12 +67,12 @@ class SummaryListHelper @Inject() (countryService: CountryService) {
 
   private def contactPreferenceRow(emailSelected: Boolean)(implicit messages: Messages): SummaryListRow =
     SummaryListRowViewModel(
-      key = KeyViewModel(HtmlContent(messages("checkYourAnswers.contactPreference.key"))),
-      value = if (emailSelected) { ValueViewModel(HtmlContent(messages("checkYourAnswers.contactPreference.email"))) }
-      else { ValueViewModel(HtmlContent(messages("checkYourAnswers.contactPreference.post"))) },
+      key = KeyViewModel(Text(messages("checkYourAnswers.contactPreference.key"))),
+      value = if (emailSelected) { ValueViewModel(Text(messages("checkYourAnswers.contactPreference.email"))) }
+      else { ValueViewModel(Text(messages("checkYourAnswers.contactPreference.post"))) },
       actions = Seq(
         ActionItemViewModel(
-          HtmlContent(messages("site.change")),
+          Text(messages("site.change")),
           controllers.changePreferences.routes.ContactPreferenceController.onPageLoad(CheckMode).url
         ).withVisuallyHiddenText(messages("checkYourAnswers.contactPreference.change.hidden"))
       )
@@ -79,19 +80,21 @@ class SummaryListHelper @Inject() (countryService: CountryService) {
 
   private def emailAddressRow(emailAddress: String)(implicit messages: Messages): SummaryListRow =
     SummaryListRowViewModel(
-      key = KeyViewModel(HtmlContent(messages("checkYourAnswers.emailAddress.key"))),
-      value = ValueViewModel(HtmlContent(emailAddress)),
+      key = KeyViewModel(Text(messages("checkYourAnswers.emailAddress.key"))),
+      value = ValueViewModel(Text(emailAddress)),
       actions = Seq(
         ActionItemViewModel(
-          HtmlContent(messages("site.change")),
+          Text(messages("site.change")),
           controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(CheckMode).url
         ).withVisuallyHiddenText(messages("checkYourAnswers.emailAddress.change.hidden"))
       )
     )
 
-  private def correspondenceAddressRow(correspondenceAddress: String)(implicit messages: Messages): SummaryListRow =
+  private def correspondenceAddressRow(correspondenceAddress: String)(implicit messages: Messages): SummaryListRow = {
+    val addressHtmlString = correspondenceAddress.split("\n").map(line => s"<span class='break'>$line</span>").mkString
     SummaryListRowViewModel(
-      key = KeyViewModel(HtmlContent(messages("checkYourAnswers.correspondenceAddress.key"))),
-      value = ValueViewModel(HtmlContent(correspondenceAddress.replace("\n", "<br>")))
+      key = KeyViewModel(Text(messages("checkYourAnswers.correspondenceAddress.key"))),
+      value = ValueViewModel(HtmlContent(addressHtmlString))
     )
+  }
 }
