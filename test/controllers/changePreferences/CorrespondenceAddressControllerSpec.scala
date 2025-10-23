@@ -20,7 +20,6 @@ import base.SpecBase
 import controllers.routes
 import models.ErrorModel
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchersSugar.eqTo
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.test.FakeRequest
@@ -29,6 +28,11 @@ import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import utils.{PageCheckHelper, SummaryListHelper}
 import viewmodels.govuk.summarylist._
 import views.html.changePreferences.CorrespondenceAddressView
+
+// For Scala3
+import org.mockito.ArgumentMatchers.{eq => eqTo}
+import org.mockito.Mockito.{never, times, verify, when}
+
 
 class CorrespondenceAddressControllerSpec extends SpecBase {
 

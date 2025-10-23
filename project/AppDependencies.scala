@@ -15,7 +15,6 @@ object AppDependencies {
     "org.typelevel"     %% "cats-core"                     % "2.13.0",
     "com.beachape"      %% "enumeratum"                     % "1.9.0",
     "com.beachape"      %% "enumeratum-play"                % "1.9.0",
-    "com.beachape"      %% "enumeratum-cats"                % "1.9.0"
   )
 
   val test = Seq(

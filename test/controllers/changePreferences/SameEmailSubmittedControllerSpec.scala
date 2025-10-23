@@ -20,12 +20,15 @@ import base.SpecBase
 import controllers.routes
 import models.ErrorModel
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchersSugar.eqTo
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import utils.PageCheckHelper
 import views.html.changePreferences.SameEmailSubmittedView
+
+// For Scala3
+import org.mockito.ArgumentMatchers.{eq => eqTo}
+import org.mockito.Mockito.{never, times, verify, when}
 
 class SameEmailSubmittedControllerSpec extends SpecBase {
 

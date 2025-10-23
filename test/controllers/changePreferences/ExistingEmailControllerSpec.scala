@@ -23,7 +23,6 @@ import forms.ExistingEmailFormProvider
 import models.{ErrorModel, NormalMode}
 import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchersSugar.eqTo
 import pages.changePreferences.ExistingEmailPage
 import play.api.data.Form
 import play.api.inject.bind
@@ -33,6 +32,10 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HttpResponse
 import utils.PageCheckHelper
 import views.html.changePreferences.ExistingEmailView
+
+// For Scala3
+import org.mockito.ArgumentMatchers.{eq => eqTo}
+import org.mockito.Mockito.{never, times, verify, when}
 
 import scala.concurrent.Future
 

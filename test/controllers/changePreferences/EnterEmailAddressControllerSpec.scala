@@ -27,10 +27,15 @@ import play.api.data.Form
 import play.api.inject.bind
 import play.api.mvc.Call
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import services.{EmailVerificationService, UserAnswersService}
 import uk.gov.hmrc.http.HttpResponse
 import views.html.changePreferences.EnterEmailAddressView
+
+// For Scala3
+import org.mockito.ArgumentMatchers.{eq => eqTo}
+import org.mockito.Mockito.{never, times, verify, when}
+
 
 import scala.concurrent.Future
 

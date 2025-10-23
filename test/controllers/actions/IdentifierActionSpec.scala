@@ -20,7 +20,6 @@ import base.SpecBase
 import config.FrontendAppConfig
 import controllers.routes
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchersSugar.eqTo
 import play.api.mvc.{BodyParsers, Request, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -31,6 +30,10 @@ import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.{allEnrolments, credentials, groupIdentifier, internalId => retriveInternalId}
 import uk.gov.hmrc.auth.core.retrieve.{Credentials, ~}
 import uk.gov.hmrc.http.UnauthorizedException
+
+// For Scala3
+import org.mockito.ArgumentMatchers.{eq => eqTo}
+import org.mockito.Mockito.when
 
 import scala.concurrent.Future
 
@@ -236,7 +239,7 @@ class IdentifierActionSpec extends SpecBase {
         val result: Future[Result] = identifierAction.invokeBlock(FakeRequest(), testAction)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe routes.UnauthorisedController.onPageLoad.url
+        redirectLocation(result).value mustBe routes.UnauthorisedController.onPageLoad().url
       }
     }
 
