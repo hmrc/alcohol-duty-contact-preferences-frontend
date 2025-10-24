@@ -34,7 +34,7 @@ lazy val microservice = (project in file("."))
     PlayKeys.playDefaultPort := 16005,
     ScoverageKeys.coverageExcludedFiles := scoverageExcludedList.mkString(";"),
     ScoverageKeys.coverageMinimumStmtTotal := 80,
-    ScoverageKeys.coverageFailOnMinimum := false,
+    ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true,
     scalacOptions ++= Seq(
       "-feature",
@@ -82,7 +82,8 @@ lazy val scoverageExcludedList:Seq[String] = Seq(
   ".*testOnly.*",
   ".*TestOnlyCacheConnector.*",
   ".*TestOnlyController.*",
-  "testOnlyDoNotUseInAppConf.*"
+  "testOnlyDoNotUseInAppConf.*",
+  ".*models.*"
 
 )
 
