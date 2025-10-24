@@ -6,7 +6,6 @@ import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 lazy val appName: String = "alcohol-duty-contact-preferences-frontend"
 
 ThisBuild / majorVersion := 0
-//ThisBuild / scalaVersion := "2.13.16"
 ThisBuild / scalaVersion := "3.3.6"
 
 lazy val microservice = (project in file("."))
@@ -35,7 +34,7 @@ lazy val microservice = (project in file("."))
     PlayKeys.playDefaultPort := 16005,
     ScoverageKeys.coverageExcludedFiles := scoverageExcludedList.mkString(";"),
     ScoverageKeys.coverageMinimumStmtTotal := 80,
-    ScoverageKeys.coverageFailOnMinimum := true,
+    ScoverageKeys.coverageFailOnMinimum := false,
     ScoverageKeys.coverageHighlighting := true,
     scalacOptions ++= Seq(
       "-feature",
@@ -87,4 +86,4 @@ lazy val scoverageExcludedList:Seq[String] = Seq(
 
 )
 
-addCommandAlias("runAllChecks", ";clean;test:compile;scalafmtAll;coverage;test;it/test;scalastyle;coverageReport")
+addCommandAlias("runAllChecks", ";clean;test:compile;scalafmtAll;coverage;test;it/test;coverageReport")

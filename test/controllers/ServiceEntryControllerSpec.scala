@@ -21,13 +21,16 @@ import connectors.UserAnswersConnector
 import models.audit.{ContactPreference, JourneyStart}
 import models.{BouncedEmail, ChangePreference, NormalMode, UpdateEmail}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchersSugar.eqTo
 import pages.changePreferences.ContactPreferencePage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.AuditService
 import uk.gov.hmrc.http.{HttpResponse, UpstreamErrorResponse}
+
+// For Scala3
+import org.mockito.ArgumentMatchers.{eq => eqTo}
+import org.mockito.Mockito.*
 
 import scala.concurrent.Future
 

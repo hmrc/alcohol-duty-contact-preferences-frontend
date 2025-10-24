@@ -18,20 +18,23 @@ package handlers
 
 import base.SpecBase
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchersSugar.eqTo
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.i18n.{Messages, MessagesApi}
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import play.twirl.api.Html
 import views.html.{ErrorTemplate, NotFound}
+
+// For Scala3
+import org.mockito.ArgumentMatchers.{eq => eqTo}
+import org.mockito.Mockito.*
 
 import scala.concurrent.Future
 
 class ErrorHandlerSpec extends SpecBase {
 
-  import ErrorHandlerSpec._
+  import ErrorHandlerSpec.*
 
   "ErrorHandler" - {
     "must return the correct error page for a not found" in {

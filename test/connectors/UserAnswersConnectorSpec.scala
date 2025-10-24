@@ -26,7 +26,7 @@ import uk.gov.hmrc.http.{HttpResponse, StringContextOps, UpstreamErrorResponse}
 
 // For Scala3
 import org.mockito.ArgumentMatchers.{eq => eqTo}
-import org.mockito.Mockito.{atLeastOnce, times, verify, when}
+import org.mockito.Mockito.*
 
 import scala.concurrent.Future
 

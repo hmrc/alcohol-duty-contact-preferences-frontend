@@ -28,7 +28,7 @@ import views.html.changePreferences.SameEmailSubmittedView
 
 // For Scala3
 import org.mockito.ArgumentMatchers.{eq => eqTo}
-import org.mockito.Mockito.{never, times, verify, when}
+import org.mockito.Mockito.*
 
 class SameEmailSubmittedControllerSpec extends SpecBase {
 
