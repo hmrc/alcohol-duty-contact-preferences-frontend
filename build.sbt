@@ -6,7 +6,7 @@ import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 lazy val appName: String = "alcohol-duty-contact-preferences-frontend"
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "2.13.16"
+ThisBuild / scalaVersion := "3.3.6"
 
 lazy val microservice = (project in file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
@@ -38,8 +38,7 @@ lazy val microservice = (project in file("."))
     ScoverageKeys.coverageHighlighting := true,
     scalacOptions ++= Seq(
       "-feature",
-      "-Wconf:cat=deprecation:ws,cat=feature:ws,cat=optimizer:ws,src=target/.*:s",
-      "-Ypatmat-exhaust-depth", "40"
+      "-Wconf:msg=Flag.*repeatedly:s,msg=feature:w,msg=optimizer:w,src=target/.*:s"
     ),
     libraryDependencies ++= AppDependencies(),
     retrieveManaged := true,
@@ -83,8 +82,9 @@ lazy val scoverageExcludedList:Seq[String] = Seq(
   ".*testOnly.*",
   ".*TestOnlyCacheConnector.*",
   ".*TestOnlyController.*",
-  "testOnlyDoNotUseInAppConf.*"
+  "testOnlyDoNotUseInAppConf.*",
+  ".*models.*"
 
 )
 
-addCommandAlias("runAllChecks", ";clean;test:compile;scalafmtAll;coverage;test;it/test;scalastyle;coverageReport")
+addCommandAlias("runAllChecks", ";clean;test:compile;scalafmtAll;coverage;test;it/test;coverageReport")

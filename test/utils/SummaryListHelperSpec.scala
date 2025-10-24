@@ -19,11 +19,14 @@ package utils
 import base.SpecBase
 import models.CheckMode
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchersSugar.eqTo
 import play.api.i18n.Messages
 import services.CountryService
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 import viewmodels.govuk.summarylist._
+
+// For Scala3
+import org.mockito.ArgumentMatchers.{eq => eqTo}
+import org.mockito.Mockito.*
 
 class SummaryListHelperSpec extends SpecBase {
 
