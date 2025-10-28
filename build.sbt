@@ -69,6 +69,8 @@ lazy val it =
       Test / scalafmtOnCompile := true
     )
 
+// Models have been added to exclude list as there is a known Scala3 limitation
+// Models are covered by other unit and integration tests
 lazy val scoverageExcludedList:Seq[String] = Seq(
   "<empty>",
   "Reverse.*",
