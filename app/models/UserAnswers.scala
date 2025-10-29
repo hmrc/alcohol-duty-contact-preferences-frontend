@@ -16,8 +16,8 @@
 
 package models
 
-import play.api.libs.functional.syntax._
-import play.api.libs.json._
+import play.api.libs.functional.syntax.*
+import play.api.libs.json.*
 import queries.{Gettable, Settable}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
@@ -82,7 +82,7 @@ object UserAnswers {
       (__ \ "startedTime").format(MongoJavatimeFormats.instantFormat) and
       (__ \ "lastUpdated").format(MongoJavatimeFormats.instantFormat) and
       (__ \ "validUntil").formatNullable(MongoJavatimeFormats.instantFormat)
-  )(UserAnswers.apply, unlift(UserAnswers.unapply))
+  )(UserAnswers.apply, o => Tuple.fromProductTyped(o))
 
 }
 

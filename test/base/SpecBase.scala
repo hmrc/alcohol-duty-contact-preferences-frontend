@@ -21,7 +21,7 @@ import config.FrontendAppConfig
 import controllers.actions._
 import generators.ModelGenerators
 import models.UserAnswers
-import org.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers

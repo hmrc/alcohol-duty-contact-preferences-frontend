@@ -23,6 +23,9 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import views.html.UnauthorisedView
 
+// For Scala3
+import org.mockito.Mockito.*
+
 class UnauthorisedControllerSpec extends SpecBase {
 
   val mockAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
@@ -30,13 +33,7 @@ class UnauthorisedControllerSpec extends SpecBase {
   "Unauthorised Controller" - {
 
     "must return OK and the correct view for a GET" in {
-      when(mockAppConfig.isClosed).thenReturn(false)
-
-      val application = applicationBuilder()
-        .overrides(
-          bind[FrontendAppConfig].toInstance(mockAppConfig)
-        )
-        .build()
+      val application = applicationBuilder().build()
 
       running(application) {
         val request = FakeRequest(GET, routes.UnauthorisedController.onPageLoad().url)
