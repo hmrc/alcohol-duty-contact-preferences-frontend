@@ -83,9 +83,8 @@ emailLocked.heading = You cannot request another confirmation code
 emailLocked.guidance1 = To keep your account secure, we limit how many times you can request an email confirmation code.
 emailLocked.guidance2 = You can try again in 24 hours.
 
-checkYourAnswers.title = Check your answers
-checkYourAnswers.heading = Check your answers
-checkYourAnswers.h2 = Contact preference
+checkYourAnswers.title = Check your contact preference
+checkYourAnswers.heading = Check your contact preference
 checkYourAnswers.contactPreference.key = How would you like to be contacted?
 checkYourAnswers.contactPreference.email = Email me when I have a digital message
 checkYourAnswers.contactPreference.post = Send me letters by post
