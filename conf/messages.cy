@@ -83,9 +83,8 @@ emailLocked.heading = Ni allwch ofyn am god cadarnhau arall
 emailLocked.guidance1 = Er mwyn cadw’ch cyfrif yn ddiogel, rydym yn cyfyngu ar nifer y troeon y gallwch ofyn am god cadarnhau e-bost.
 emailLocked.guidance2 = Gallwch roi cynnig arall arni ymhen 24 awr.
 
-checkYourAnswers.title = Gwiriwch eich atebion
-checkYourAnswers.heading = Gwiriwch eich atebion
-checkYourAnswers.h2 = Dewis o ran cysylltu
+checkYourAnswers.title = Gwiriwch eich dewis cyswllt
+checkYourAnswers.heading = Gwiriwch eich dewis cyswllt
 checkYourAnswers.contactPreference.key = Sut yr hoffech i ni gysylltu â chi?
 checkYourAnswers.contactPreference.email = E-bostiwch fi pan fo gennyf neges ddigidol
 checkYourAnswers.contactPreference.post = Anfonwch lythyrau ataf drwy’r post
