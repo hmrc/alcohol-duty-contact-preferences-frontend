@@ -250,13 +250,17 @@ class IdentifierActionSpec extends SpecBase {
         when(mockAppConfig.isClosed).thenReturn(false)
         when(mockAppConfig.enrolmentServiceName).thenReturn(enrolment)
         when(mockAppConfig.loginUrl).thenReturn(loginUrl)
+        when(mockAppConfig.appName).thenReturn("alcohol-duty-contact-preferences-frontend")
+        when(mockAppConfig.affinityGroup).thenReturn("Organisation")
         when(mockAppConfig.loginContinueUrl).thenReturn(loginContinueUrl)
         when(mockAuthConnector.authorise[Unit](any(), any())(any(), any())).thenReturn(Future.failed(exception))
 
         val result: Future[Result] = identifierAction.invokeBlock(FakeRequest(), testAction)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result).value mustBe s"$loginUrl?continue=$loginContinueUrl"
+        redirectLocation(
+          result
+        ).value mustBe s"$loginUrl?continue=$loginContinueUrl&origin=alcohol-duty-contact-preferences-frontend&affinityGroup=Organisation"
       }
     }
 
