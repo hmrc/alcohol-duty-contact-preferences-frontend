@@ -14,17 +14,15 @@
  * limitations under the License.
  *@
 
-@import config.Constants.Css
 @import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.SummaryList
-@import views.html.components.{PageHeading, SubHeading}
+@import views.html.components.PageHeading
 
 @this(
         layout: templates.Layout,
         formHelper: FormWithCSRF,
         govukButton: GovukButton,
         govukSummaryList: GovukSummaryList,
-        pageHeading: PageHeading,
-        subHeading: SubHeading
+        pageHeading: PageHeading
 )
 
 @(list: SummaryList)(implicit request: Request[_], messages: Messages)
@@ -34,8 +32,6 @@
     @formHelper(action = controllers.changePreferences.routes.CheckYourAnswersController.onSubmit(), Symbol("autoComplete") -> "off") {
 
         @pageHeading(messages("checkYourAnswers.heading"))
-
-        @subHeading(messages("checkYourAnswers.h2"), classes = Css.headingMCssClass)
 
         @govukSummaryList(list)
 

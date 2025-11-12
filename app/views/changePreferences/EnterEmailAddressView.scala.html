@@ -38,7 +38,7 @@
             InputViewModel(
                 field = form("emailAddress"),
                 label = LabelViewModel(messages("changePreferences.enter-email-address.title")).asPageHeading(size = LabelSize.Large),
-            )
+            ).asEmail()
         )
 
         @govukButton(

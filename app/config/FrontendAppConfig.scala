@@ -25,8 +25,9 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 @Singleton
 class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig: ServicesConfig) {
 
-  val host: String    = configuration.get[String]("host")
-  val appName: String = configuration.get[String]("appName")
+  val host: String          = configuration.get[String]("host")
+  val appName: String       = configuration.get[String]("appName")
+  val affinityGroup: String = configuration.get[String]("affinityGroup")
 
   private val contactHost                         = configuration.get[String]("contact-frontend.host")
   private val contactFormServiceIdentifier        = "alcohol-duty-contact-preferences-frontend"
@@ -44,9 +45,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
 
   private val exitSurveyBaseUrl: String = configuration.get[String]("urls.feedbackFrontendBase")
   val exitSurveyUrl: String             = s"$exitSurveyBaseUrl/feedback/alcohol-duty-contact-preferences-frontend"
-
-  val languageTranslationEnabled: Boolean =
-    configuration.get[Boolean]("features.welsh-translation")
 
   def languageMap: Map[String, Lang] = Map(
     "en" -> Lang("en"),
