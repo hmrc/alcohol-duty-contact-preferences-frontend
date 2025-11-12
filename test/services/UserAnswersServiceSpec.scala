@@ -23,6 +23,9 @@ import org.mockito.ArgumentMatchers.any
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
 import uk.gov.hmrc.http.HttpResponse
 
+// For Scala3
+import org.mockito.Mockito.*
+
 import scala.concurrent.Future
 
 class UserAnswersServiceSpec extends SpecBase {
