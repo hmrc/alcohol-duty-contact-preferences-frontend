@@ -33,8 +33,8 @@ class StartEmailVerificationJourneyHelperSpec extends SpecBase {
     backUrl = "/enter-email-address-url",
     email = EmailModel(address = emailAddress2, enterUrl = "/enter-email-address-url"),
     labels = Labels(
-      LanguageInfo(pageTitle = "test-service-name", userFacingServiceName = "testOrigin"),
-      LanguageInfo(pageTitle = "test-service-name", userFacingServiceName = "testOrigin")
+      LanguageInfo(pageTitle = "test-service-name", userFacingServiceName = "testSignature"),
+      LanguageInfo(pageTitle = "test-service-name", userFacingServiceName = "testSignature")
     ),
     lang = "en"
   )
@@ -46,7 +46,8 @@ class StartEmailVerificationJourneyHelperSpec extends SpecBase {
       when(mockConfig.startEmailVerificationContinueUrl).thenReturn("/test-continue")
       when(mockConfig.accessibilityStatementUrl).thenReturn("/test-accessibility-url")
       when(mockConfig.startEmailVerificationBackUrl).thenReturn("/enter-email-address-url")
-      when(mockMessages(eqTo("emailVerificationJourney.signature"))).thenReturn("testOrigin")
+      when(mockMessages(eqTo("emailVerificationJourney.origin"))).thenReturn("testOrigin")
+      when(mockMessages(eqTo("emailVerificationJourney.signature"))).thenReturn("testSignature")
       when(mockMessages(eqTo("service.name"))).thenReturn("test-service-name")
       when(mockMessages.lang).thenReturn(Lang("en"))
 

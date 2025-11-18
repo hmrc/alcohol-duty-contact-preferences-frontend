@@ -50,7 +50,7 @@ class StartEmailVerificationJourneyHelper @Inject() (
     EmailVerificationRequest(
       credId = credId,
       continueUrl = config.startEmailVerificationContinueUrl,
-      origin = messages("emailVerificationJourney.signature"),
+      origin = messages("emailVerificationJourney.origin"),
       deskproServiceName = "alcohol-duty-returns-frontend",
       accessibilityStatementUrl = config.accessibilityStatementUrl,
       backUrl = enterEmailAddressPageUrl,
