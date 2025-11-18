@@ -102,5 +102,4 @@ preferenceUpdated.post.guidance = Byddwn ni’n anfon llythyrau atoch ynglŷn â
 emailFound.title = Byddwn ni’n anfon e-bost atoch pan fo gennych neges ddigidol
 emailFound.heading = Byddwn ni’n anfon e-bost atoch yn {0} pan fo gennych neges ddigidol
 
-emailVerificationJourney.origin = Rheoli%E2%80%99ch Gwasanaeth Toll Alcohol
 emailVerificationJourney.signature = Rheoli’ch Gwasanaeth Toll Alcohol

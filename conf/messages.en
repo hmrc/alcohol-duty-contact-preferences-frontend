@@ -102,5 +102,4 @@ preferenceUpdated.post.guidance = We will send you letters about your Alcohol Du
 emailFound.title = We will email you when you have a digital message
 emailFound.heading = We will email you at {0} when you have a digital message
 
-emailVerificationJourney.origin = Manage your Alcohol Duty Service
 emailVerificationJourney.signature = Manage your Alcohol Duty Service
