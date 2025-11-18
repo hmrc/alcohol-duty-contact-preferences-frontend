@@ -20,6 +20,7 @@ import config.FrontendAppConfig
 import models.{EmailModel, EmailVerificationRequest, Labels, LanguageInfo}
 import play.api.i18n.Messages
 
+import java.net.URLEncoder
 import javax.inject.Inject
 
 class StartEmailVerificationJourneyHelper @Inject() (
@@ -50,7 +51,7 @@ class StartEmailVerificationJourneyHelper @Inject() (
     EmailVerificationRequest(
       credId = credId,
       continueUrl = config.startEmailVerificationContinueUrl,
-      origin = messages("emailVerificationJourney.signature"),
+      origin = URLEncoder.encode(messages("emailVerificationJourney.signature"), "utf-8"),
       deskproServiceName = "alcohol-duty-returns-frontend",
       accessibilityStatementUrl = config.accessibilityStatementUrl,
       backUrl = enterEmailAddressPageUrl,
