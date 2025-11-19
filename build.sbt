@@ -33,7 +33,7 @@ lazy val microservice = (project in file("."))
     ),
     PlayKeys.playDefaultPort := 16005,
     ScoverageKeys.coverageExcludedFiles := scoverageExcludedList.mkString(";"),
-    ScoverageKeys.coverageMinimumStmtTotal := 80,
+    ScoverageKeys.coverageMinimumStmtTotal := 90,
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true,
     scalacOptions ++= Seq(
@@ -76,8 +76,6 @@ lazy val it =
       Test / scalafmtOnCompile := true
     )
 
-// Models have been added to exclude list as there is a known Scala3 limitation
-// Models are covered by other unit and integration tests
 lazy val scoverageExcludedList:Seq[String] = Seq(
   "<empty>",
   "Reverse.*",
@@ -92,8 +90,10 @@ lazy val scoverageExcludedList:Seq[String] = Seq(
   ".*TestOnlyCacheConnector.*",
   ".*TestOnlyController.*",
   "testOnlyDoNotUseInAppConf.*",
-  ".*models.*"
-
+  ".*config.*",
+  ".*models.audit.*",
+  ".*viewmodels.ErrorMessageAwareness",
+  ".*viewmodels.ImplicitConversions",
 )
 
 addCommandAlias("runAllChecks", ";clean;test:compile;it/compile;scalafmtAll;coverage;test;it/test;coverageReport")
