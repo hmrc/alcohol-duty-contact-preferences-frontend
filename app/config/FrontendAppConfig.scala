@@ -39,6 +39,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   val loginUrl: String                  = configuration.get[String]("urls.login")
   val loginContinueUrl: String          = configuration.get[String]("urls.loginContinue")
   val signOutUrl: String                = configuration.get[String]("urls.signOut")
+  val serviceTimeoutUrl: String         = configuration.get[String]("urls.serviceTimeout")
   val businessTaxAccountUrl: String     = configuration.get[String]("urls.businessTaxAccount")
   val accessibilityStatementUrl: String = configuration.get[String]("accessibility-statement.host") ++
     configuration.get[String]("accessibility-statement.url")

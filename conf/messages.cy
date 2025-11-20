@@ -7,6 +7,7 @@ site.yes = Iawn
 site.continue = Parhau
 site.submit = Cyflwyno
 site.startAgain = Dechrau eto
+site.signIn = Mewngofnodi
 site.govuk = GOV.UK
 site.returnToBusinessAccount = Ewch yn ôl i’ch cyfrif treth busnes
 site.error.pageNotFound404.title = Heb ddod o hyd i’r dudalen
@@ -22,6 +23,9 @@ timeout.title = Rydych ar fin cael eich allgofnodi
 timeout.message = Am resymau diogelwch, cewch eich allgofnodi o’r gwasanaeth hwn ymhen
 timeout.keepAlive = Peidio ag allgofnodi
 timeout.signOut = Allgofnodi
+
+signedOut.title = Er eich diogelwch, gwnaethom eich allgofnodi
+signedOut.heading = Er eich diogelwch, gwnaethom eich allgofnodi
 
 error.prefix = Gwall
 error.title.prefix = Gwall:
