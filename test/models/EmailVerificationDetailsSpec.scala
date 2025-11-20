@@ -20,8 +20,9 @@ import base.SpecBase
 import play.api.libs.json.Json
 
 class EmailVerificationDetailsSpec extends SpecBase {
-  val emailVerificationDetails: EmailVerificationDetails = EmailVerificationDetails(emailAddress, isVerified = true, isLocked = false)
-  
+  val emailVerificationDetails: EmailVerificationDetails =
+    EmailVerificationDetails(emailAddress, isVerified = true, isLocked = false)
+
   "EmailVerificationDetails" - {
     val json = s"""{"emailAddress":"$emailAddress","isVerified":true,"isLocked":false}"""
 

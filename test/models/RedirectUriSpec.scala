@@ -21,7 +21,7 @@ import play.api.libs.json.Json
 
 class RedirectUriSpec extends SpecBase {
   val redirectUri: RedirectUri = RedirectUri("foo")
-  
+
   "EmailVerificationDetails" - {
     val json = s"""{"redirectUri":"foo"}"""
 

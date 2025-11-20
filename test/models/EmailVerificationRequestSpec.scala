@@ -23,7 +23,8 @@ class EmailVerificationRequestSpec extends SpecBase {
   val emailVerificationRequest: EmailVerificationRequest = testEmailVerificationRequest
 
   "EmailVerificationRequest" - {
-    val json = s"""{"credId":"cred-id","continueUrl":"/test-continue-url","origin":"testOrigin","deskproServiceName":"test-deskpro-name","accessibilityStatementUrl":"/test-accessibility-url","backUrl":"/test-back-url","email":{"address":"john.doe@example.com","enterUrl":"/test-enter-url"},"labels":{"cy":{"pageTitle":"testTitle","userFacingServiceName":"testServiceName"},"en":{"pageTitle":"testTitle2","userFacingServiceName":"testServiceName2"}},"lang":"en"}"""
+    val json =
+      s"""{"credId":"cred-id","continueUrl":"/test-continue-url","origin":"testOrigin","deskproServiceName":"test-deskpro-name","accessibilityStatementUrl":"/test-accessibility-url","backUrl":"/test-back-url","email":{"address":"john.doe@example.com","enterUrl":"/test-enter-url"},"labels":{"cy":{"pageTitle":"testTitle","userFacingServiceName":"testServiceName"},"en":{"pageTitle":"testTitle2","userFacingServiceName":"testServiceName2"}},"lang":"en"}"""
 
     "must serialise to json" in {
       Json.toJson(emailVerificationRequest).toString() mustBe json

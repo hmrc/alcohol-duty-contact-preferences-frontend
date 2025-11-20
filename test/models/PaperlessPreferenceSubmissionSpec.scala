@@ -21,9 +21,10 @@ import play.api.libs.json.Json
 
 class PaperlessPreferenceSubmissionSpec extends SpecBase {
   val paperlessPreferenceSubmission: PaperlessPreferenceSubmission = contactPreferenceSubmissionEmail
-  
+
   "PaperlessPreferenceSubmission" - {
-    val json = s"""{"paperlessPreference":"1","emailAddress":"john.doe@example.com","emailVerification":"1","bouncedEmail":"0"}"""
+    val json =
+      s"""{"paperlessPreference":"1","emailAddress":"john.doe@example.com","emailVerification":"1","bouncedEmail":"0"}"""
 
     "must serialise to json" in {
       Json.toJson(paperlessPreferenceSubmission).toString() mustBe json
