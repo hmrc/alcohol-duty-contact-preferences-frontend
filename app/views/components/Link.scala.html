@@ -20,4 +20,4 @@
 
 @(id: String, text: String, href: String, newTab: Boolean = false, classes: String = Css.linkNoVisitedStateCssClass, fullStop: String = "")
 
-<a class="@classes" href="@href" @if(newTab) { target="_blank" rel="noopener noreferrer" } id="@id">@text + fullStop</a>
+<a class="@classes" href="@href" @if(newTab) { target="_blank" rel="noopener noreferrer" } id="@id">@text</a> + fullStop
