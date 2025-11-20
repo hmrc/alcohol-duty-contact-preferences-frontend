@@ -44,7 +44,7 @@ class SignOutController @Inject() (
 
   private def handleSignOut(request: RequestWithOptAppaId[AnyContent], continueUrl: Seq[String]): Result =
     request.appaId match {
-      case Some(_) => Redirect(url = config.signOutUrl, Map("continue" -> continueUrl))
+      case Some(_) => Redirect(config.signOutUrl, Map("continue" -> continueUrl))
       case None    =>
         logger.info("User not authenticated when signing out.")
         Redirect(config.signOutUrl, Map("continue" -> continueUrl))
