@@ -26,7 +26,7 @@ import play.api.test.Helpers._
 import utils.PageCheckHelper
 import views.html.changePreferences.SameEmailSubmittedView
 
-import org.mockito.ArgumentMatchers.{eq => eqTo}
+import org.mockito.ArgumentMatchers.eq as eqTo
 import org.mockito.Mockito.*
 
 class SameEmailSubmittedControllerSpec extends SpecBase {
@@ -49,7 +49,7 @@ class SameEmailSubmittedControllerSpec extends SpecBase {
         val result  = route(application, request).value
         val view    = application.injector.instanceOf[SameEmailSubmittedView]
 
-        status(result) mustEqual OK
+        status(result)          mustEqual OK
         contentAsString(result) mustEqual view(appConfig.businessTaxAccountUrl, testEmail)(
           request,
           messages(application)
@@ -69,7 +69,7 @@ class SameEmailSubmittedControllerSpec extends SpecBase {
         val request = FakeRequest(GET, emailFoundRoute)
         val result  = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
+        status(result)                 mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
         verify(mockHelper, never).checkDetailsForSameEmailSubmittedPage(any())
       }
@@ -89,7 +89,7 @@ class SameEmailSubmittedControllerSpec extends SpecBase {
         val request = FakeRequest(GET, emailFoundRoute)
         val result  = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
+        status(result)                 mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
         verify(mockHelper, times(1)).checkDetailsForSameEmailSubmittedPage(eqTo(emptyUserAnswers))
       }

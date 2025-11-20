@@ -31,7 +31,7 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.{allEnrolments, credentials,
 import uk.gov.hmrc.auth.core.retrieve.{Credentials, ~}
 import uk.gov.hmrc.http.UnauthorizedException
 
-import org.mockito.ArgumentMatchers.{eq => eqTo}
+import org.mockito.ArgumentMatchers.eq as eqTo
 import org.mockito.Mockito.when
 
 import scala.concurrent.Future
@@ -64,7 +64,7 @@ class IdentifierActionSpec extends SpecBase {
 
     val result: Future[Result] = identifierAction.invokeBlock(FakeRequest(), testAction)
 
-    status(result) mustBe SEE_OTHER
+    status(result)                 mustBe SEE_OTHER
     redirectLocation(result).value mustBe routes.NotFoundController.onPageLoad().url
   }
 
@@ -92,7 +92,7 @@ class IdentifierActionSpec extends SpecBase {
 
       val result: Future[Result] = identifierAction.invokeBlock(FakeRequest(), testAction)
 
-      status(result) mustBe OK
+      status(result)          mustBe OK
       contentAsString(result) mustBe testContent
     }
 
@@ -221,7 +221,7 @@ class IdentifierActionSpec extends SpecBase {
       }
     }
 
-    "redirect to the unauthorised page if not authorised" in {
+    "redirect to the unauthorised page if not authorised" in
       List(
         InsufficientEnrolments(),
         InsufficientConfidenceLevel(),
@@ -237,12 +237,11 @@ class IdentifierActionSpec extends SpecBase {
 
         val result: Future[Result] = identifierAction.invokeBlock(FakeRequest(), testAction)
 
-        status(result) mustBe SEE_OTHER
+        status(result)                 mustBe SEE_OTHER
         redirectLocation(result).value mustBe routes.UnauthorisedController.onPageLoad().url
       }
-    }
 
-    "redirect to the login page if no longer authorised or never logged in" in {
+    "redirect to the login page if no longer authorised or never logged in" in
       List(
         BearerTokenExpired(),
         MissingBearerToken(),
@@ -262,9 +261,8 @@ class IdentifierActionSpec extends SpecBase {
         status(result) mustBe SEE_OTHER
         redirectLocation(
           result
-        ).value mustBe s"$loginUrl?continue=$loginContinueUrl&origin=alcohol-duty-contact-preferences-frontend&affinityGroup=Organisation"
+        ).value        mustBe s"$loginUrl?continue=$loginContinueUrl&origin=alcohol-duty-contact-preferences-frontend&affinityGroup=Organisation"
       }
-    }
 
     "return the exception if there is any other exception" in {
       val msg = "Test Exception"

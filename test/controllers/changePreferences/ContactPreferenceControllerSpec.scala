@@ -32,7 +32,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HttpResponse
 import views.html.changePreferences.ContactPreferenceView
 
-import org.mockito.ArgumentMatchers.{eq => eqTo}
+import org.mockito.ArgumentMatchers.eq as eqTo
 import org.mockito.Mockito.*
 
 import scala.concurrent.Future
@@ -62,7 +62,7 @@ class ContactPreferenceControllerSpec extends SpecBase {
 
           val view = application.injector.instanceOf[ContactPreferenceView]
 
-          status(result) mustEqual OK
+          status(result)          mustEqual OK
           contentAsString(result) mustEqual view(form, NormalMode)(request, getMessages(application)).toString
         }
       }
@@ -77,7 +77,7 @@ class ContactPreferenceControllerSpec extends SpecBase {
 
           val view = application.injector.instanceOf[ContactPreferenceView]
 
-          status(result) mustEqual OK
+          status(result)          mustEqual OK
           contentAsString(result) mustEqual view(form.fill(false), NormalMode)(
             request,
             getMessages(application)
@@ -95,7 +95,7 @@ class ContactPreferenceControllerSpec extends SpecBase {
 
           val view = application.injector.instanceOf[ContactPreferenceView]
 
-          status(result) mustEqual OK
+          status(result)          mustEqual OK
           contentAsString(result) mustEqual view(form.fill(true), CheckMode)(request, getMessages(application)).toString
         }
       }
@@ -108,7 +108,7 @@ class ContactPreferenceControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
         }
       }
@@ -121,7 +121,7 @@ class ContactPreferenceControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
         }
       }
@@ -149,7 +149,7 @@ class ContactPreferenceControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual onwardRoute.url
 
           verify(mockUserAnswersConnector, times(1)).set(any())(any())
@@ -178,7 +178,7 @@ class ContactPreferenceControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual onwardRoute.url
 
           verify(mockUserAnswersConnector, times(1)).set(any())(any())
@@ -208,7 +208,7 @@ class ContactPreferenceControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual onwardRoute.url
 
           verify(mockUserAnswersConnector, times(1)).set(any())(any())
@@ -231,7 +231,7 @@ class ContactPreferenceControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual BAD_REQUEST
+          status(result)          mustEqual BAD_REQUEST
           contentAsString(result) mustEqual view(boundForm, NormalMode)(request, getMessages(application)).toString
         }
       }
@@ -246,7 +246,7 @@ class ContactPreferenceControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
         }
       }

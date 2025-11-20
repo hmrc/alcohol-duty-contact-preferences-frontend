@@ -36,7 +36,7 @@ class NotFoundControllerSpec extends SpecBase {
 
         val view = application.injector.instanceOf[NotFound]
 
-        status(result) mustEqual OK
+        status(result)          mustEqual OK
         contentAsString(result) mustEqual view(
           pageTitle = "site.error.pageNotFound404.title",
           heading = "site.error.pageNotFound404.heading",

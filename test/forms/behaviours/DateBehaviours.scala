@@ -25,8 +25,7 @@ import play.api.data.{Form, FormError}
 class DateBehaviours extends FieldBehaviours {
 
   def dateField(form: Form[_], key: String, validData: Gen[LocalDate]): Unit =
-    "bind valid data" in {
-
+    "bind valid data" in
       forAll(validData -> "valid date") { (date: LocalDate) =>
         val data = Map(
           s"$key.day"   -> date.getDayOfMonth.toString,
@@ -37,9 +36,8 @@ class DateBehaviours extends FieldBehaviours {
         val result = form.bind(data)
 
         result.value.value mustEqual date
-        result.errors mustBe empty
+        result.errors         mustBe empty
       }
-    }
 
   def dateFieldWithMax(form: Form[_], key: String, max: LocalDate, formError: FormError): Unit =
     s"fail to bind a date greater than ${max.format(DateTimeFormatter.ISO_LOCAL_DATE)}" in {

@@ -30,7 +30,7 @@ import utils.{PageCheckHelper, SummaryListHelper}
 import viewmodels.govuk.summarylist._
 import views.html.changePreferences.CorrespondenceAddressView
 
-import org.mockito.ArgumentMatchers.{eq => eqTo}
+import org.mockito.ArgumentMatchers.eq as eqTo
 import org.mockito.Mockito.*
 
 class CorrespondenceAddressControllerSpec extends SpecBase {
@@ -70,7 +70,7 @@ class CorrespondenceAddressControllerSpec extends SpecBase {
 
         val view = application.injector.instanceOf[CorrespondenceAddressView]
 
-        status(result) mustEqual OK
+        status(result)          mustEqual OK
         contentAsString(result) mustEqual view(testSummaryList)(
           request,
           getMessages(application)
@@ -95,7 +95,7 @@ class CorrespondenceAddressControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
+        status(result)                 mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
 
         verify(mockPageCheckHelper, times(0)).checkDetailsForCorrespondenceAddressPage(any())
@@ -121,7 +121,7 @@ class CorrespondenceAddressControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
+        status(result)                 mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
         verify(mockPageCheckHelper, times(1)).checkDetailsForCorrespondenceAddressPage(eqTo(userAnswersPostWithEmail))

@@ -34,7 +34,7 @@ import views.html.changePreferences.CheckYourAnswersView
 
 import scala.concurrent.Future
 
-import org.mockito.ArgumentMatchers.{eq => eqTo}
+import org.mockito.ArgumentMatchers.eq as eqTo
 import org.mockito.Mockito.*
 
 class CheckYourAnswersControllerSpec extends SpecBase {
@@ -63,7 +63,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           val view = application.injector.instanceOf[CheckYourAnswersView]
 
-          status(result) mustEqual OK
+          status(result)          mustEqual OK
           contentAsString(result) mustEqual view(dummySummaryList)(
             request,
             getMessages(application)
@@ -95,7 +95,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           val view = application.injector.instanceOf[CheckYourAnswersView]
 
-          status(result) mustEqual OK
+          status(result)          mustEqual OK
           contentAsString(result) mustEqual view(dummySummaryList)(
             request,
             getMessages(application)
@@ -126,7 +126,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual
             controllers.changePreferences.routes.EmailLockedController.onPageLoad().url
 
@@ -155,7 +155,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(pageCheckHelper, times(1)).checkDetailsForCheckYourAnswers(eqTo(userAnswersPostNoEmail))
@@ -181,7 +181,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(pageCheckHelper, times(1)).checkDetailsForCheckYourAnswers(eqTo(userAnswersPostNoEmail))
@@ -203,7 +203,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(pageCheckHelper, times(0)).checkDetailsForCheckYourAnswers(any())
@@ -228,7 +228,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(pageCheckHelper, times(1)).checkDetailsForCheckYourAnswers(eqTo(emptyUserAnswers))
@@ -283,7 +283,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           val request = FakeRequest(POST, checkYourAnswersPostRoute)
           val result  = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual
             controllers.changePreferences.routes.SameEmailSubmittedController.onPageLoad().url
 
@@ -320,7 +320,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual controllers.changePreferences.routes.PreferenceUpdatedController
             .onPageLoad()
             .url
@@ -359,7 +359,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual controllers.changePreferences.routes.PreferenceUpdatedController
             .onPageLoad()
             .url
@@ -398,7 +398,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual controllers.changePreferences.routes.PreferenceUpdatedController
             .onPageLoad()
             .url
@@ -437,7 +437,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual controllers.changePreferences.routes.PreferenceUpdatedController
             .onPageLoad()
             .url
@@ -477,7 +477,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(pageCheckHelper, times(1)).checkDetailsToCreateSubmission(eqTo(completeUserAnswers))
@@ -530,7 +530,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(pageCheckHelper, times(0)).checkDetailsForCheckYourAnswers(any())
@@ -553,7 +553,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(pageCheckHelper, times(1)).checkDetailsToCreateSubmission(eqTo(userAnswersPostWithEmail))

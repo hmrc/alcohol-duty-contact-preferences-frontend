@@ -232,7 +232,7 @@ class NavigatorSpec extends SpecBase {
         request = dataRequest
       )
 
-      status(result) mustBe SEE_OTHER
+      status(result)                 mustBe SEE_OTHER
       redirectLocation(result).value mustBe
         controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad().url
     }
@@ -248,7 +248,7 @@ class NavigatorSpec extends SpecBase {
         request = dataRequest
       )
 
-      status(result) mustBe SEE_OTHER
+      status(result)                 mustBe SEE_OTHER
       redirectLocation(result).value mustBe controllers.changePreferences.routes.EmailLockedController.onPageLoad().url
     }
 
@@ -269,7 +269,7 @@ class NavigatorSpec extends SpecBase {
           request = mockDataRequest
         )
 
-        status(result) mustBe SEE_OTHER
+        status(result)                 mustBe SEE_OTHER
         redirectLocation(result).value mustBe "http://localhost:9890/email-verification-frontend/test"
       }
 
@@ -288,7 +288,7 @@ class NavigatorSpec extends SpecBase {
           request = mockDataRequest
         )
 
-        status(result) mustBe SEE_OTHER
+        status(result)                 mustBe SEE_OTHER
         redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
 
@@ -305,7 +305,7 @@ class NavigatorSpec extends SpecBase {
           request = mockDataRequest
         )
 
-        status(result) mustBe SEE_OTHER
+        status(result)                 mustBe SEE_OTHER
         redirectLocation(result).value mustBe controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }

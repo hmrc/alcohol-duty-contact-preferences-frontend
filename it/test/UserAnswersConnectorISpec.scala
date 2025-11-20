@@ -47,7 +47,7 @@ class UserAnswersConnectorISpec extends ISpecBase with WireMockHelper {
         )
 
         whenReady(connector.get(appaId)) { result =>
-          result.isLeft mustBe true
+          result.isLeft                       mustBe true
           result.swap.toOption.get.statusCode mustBe INTERNAL_SERVER_ERROR
         }
       }
@@ -81,7 +81,7 @@ class UserAnswersConnectorISpec extends ISpecBase with WireMockHelper {
         )
 
         whenReady(connector.createUserAnswers(userDetails)) { result =>
-          result.isLeft mustBe true
+          result.isLeft                       mustBe true
           result.swap.toOption.get.statusCode mustBe BAD_REQUEST
         }
       }

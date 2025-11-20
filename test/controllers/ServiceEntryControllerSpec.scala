@@ -28,7 +28,7 @@ import play.api.test.Helpers._
 import services.AuditService
 import uk.gov.hmrc.http.{HttpResponse, UpstreamErrorResponse}
 
-import org.mockito.ArgumentMatchers.{eq => eqTo}
+import org.mockito.ArgumentMatchers.eq as eqTo
 import org.mockito.Mockito.*
 
 import scala.concurrent.Future
@@ -75,7 +75,7 @@ class ServiceEntryControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual
             controllers.changePreferences.routes.ContactPreferenceController.onPageLoad(NormalMode).url
 
@@ -110,7 +110,7 @@ class ServiceEntryControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual
             controllers.changePreferences.routes.ExistingEmailController.onPageLoad().url
 
@@ -136,7 +136,7 @@ class ServiceEntryControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(mockUserAnswersConnector, times(1)).createUserAnswers(any())(any())
@@ -173,7 +173,7 @@ class ServiceEntryControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual
             controllers.changePreferences.routes.EmailErrorController.onPageLoad().url
 
@@ -199,7 +199,7 @@ class ServiceEntryControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(mockUserAnswersConnector, times(1)).createUserAnswers(any())(any())
@@ -223,7 +223,7 @@ class ServiceEntryControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(mockUserAnswersConnector, times(1)).createUserAnswers(any())(any())

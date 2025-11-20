@@ -62,7 +62,7 @@ class EnterEmailAddressControllerSpec extends SpecBase {
 
           val view = application.injector.instanceOf[EnterEmailAddressView]
 
-          status(result) mustEqual OK
+          status(result)          mustEqual OK
           contentAsString(result) mustEqual view(form, NormalMode)(
             request,
             getMessages(application)
@@ -80,7 +80,7 @@ class EnterEmailAddressControllerSpec extends SpecBase {
 
           val view = application.injector.instanceOf[EnterEmailAddressView]
 
-          status(result) mustEqual OK
+          status(result)          mustEqual OK
           contentAsString(result) mustEqual view(form.fill(emailAddress), CheckMode)(
             request,
             getMessages(application)
@@ -97,7 +97,7 @@ class EnterEmailAddressControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
         }
       }
@@ -110,7 +110,7 @@ class EnterEmailAddressControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
         }
       }
@@ -123,7 +123,7 @@ class EnterEmailAddressControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
         }
       }
@@ -144,7 +144,7 @@ class EnterEmailAddressControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual BAD_REQUEST
+          status(result)          mustEqual BAD_REQUEST
           contentAsString(result) mustEqual view(boundForm, NormalMode)(request, getMessages(application)).toString
         }
       }
@@ -170,7 +170,7 @@ class EnterEmailAddressControllerSpec extends SpecBase {
                 .withFormUrlEncodedBody(("emailAddress", emailAddress2))
             val result  = route(application, request).value
 
-            status(result) mustEqual SEE_OTHER
+            status(result)                 mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
             verify(mockUserAnswersService, times(1)).set(any())(any())
           }
@@ -200,7 +200,7 @@ class EnterEmailAddressControllerSpec extends SpecBase {
                 .withFormUrlEncodedBody(("emailAddress", emailAddress2))
             val result  = route(application, request).value
 
-            status(result) mustEqual SEE_OTHER
+            status(result)                 mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual
               controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad().url
             verify(mockUserAnswersService, times(1)).set(any())(any())
@@ -231,7 +231,7 @@ class EnterEmailAddressControllerSpec extends SpecBase {
                 .withFormUrlEncodedBody(("emailAddress", "TestEmail@email.com"))
             val result  = route(application, request).value
 
-            status(result) mustEqual SEE_OTHER
+            status(result)                 mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
             verify(mockEmailVerificationService, times(1)).retrieveAddressStatusAndAddToCache(any(), any(), any())(
               any()
@@ -265,7 +265,7 @@ class EnterEmailAddressControllerSpec extends SpecBase {
                 .withFormUrlEncodedBody(("emailAddress", "TestEmail@email.com"))
             val result  = route(application, request).value
 
-            status(result) mustEqual SEE_OTHER
+            status(result)                 mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual "/email-verification-frontend"
             verify(mockEmailVerificationService, times(1)).retrieveAddressStatusAndAddToCache(any(), any(), any())(
               any()

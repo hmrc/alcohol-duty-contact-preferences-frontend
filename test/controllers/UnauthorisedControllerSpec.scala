@@ -41,7 +41,7 @@ class UnauthorisedControllerSpec extends SpecBase {
 
         val view = application.injector.instanceOf[UnauthorisedView]
 
-        status(result) mustEqual OK
+        status(result)          mustEqual OK
         contentAsString(result) mustEqual view()(request, messages(application)).toString
       }
     }
@@ -60,7 +60,7 @@ class UnauthorisedControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
+        status(result)                 mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.NotFoundController.onPageLoad().url
       }
     }
