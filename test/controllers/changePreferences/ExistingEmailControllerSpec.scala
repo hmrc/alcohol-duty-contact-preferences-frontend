@@ -33,7 +33,7 @@ import uk.gov.hmrc.http.HttpResponse
 import utils.PageCheckHelper
 import views.html.changePreferences.ExistingEmailView
 
-// For Scala3
+
 import org.mockito.ArgumentMatchers.{eq => eqTo}
 import org.mockito.Mockito.*
 

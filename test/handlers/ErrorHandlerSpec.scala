@@ -26,7 +26,7 @@ import play.api.test.Helpers.*
 import play.twirl.api.Html
 import views.html.{ErrorTemplate, NotFound}
 
-// For Scala3
+
 import org.mockito.ArgumentMatchers.{eq => eqTo}
 import org.mockito.Mockito.*
 

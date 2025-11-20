@@ -24,7 +24,7 @@ import services.CountryService
 import uk.gov.hmrc.govukfrontend.views.Aliases.{ActionItem, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
 
-// For Scala3
+
 import org.mockito.ArgumentMatchers.{eq => eqTo}
 import org.mockito.Mockito.*
 

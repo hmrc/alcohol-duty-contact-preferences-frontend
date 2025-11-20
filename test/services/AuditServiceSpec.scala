@@ -22,7 +22,7 @@ import models.audit._
 import org.mockito.ArgumentMatchers.any
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
-// For Scala3
+
 import org.mockito.ArgumentMatchers.{eq => eqTo}
 import org.mockito.Mockito.*
 

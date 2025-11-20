@@ -32,7 +32,7 @@ import services.{EmailVerificationService, UserAnswersService}
 import uk.gov.hmrc.http.HttpResponse
 import views.html.changePreferences.EnterEmailAddressView
 
-// For Scala3
+
 import org.mockito.Mockito.*
 
 import scala.concurrent.Future

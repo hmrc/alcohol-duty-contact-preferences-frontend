@@ -26,7 +26,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.*
 import uk.gov.hmrc.http.UpstreamErrorResponse
 
-// For Scala3
+
 import org.mockito.ArgumentMatchers.{eq => eqTo}
 import org.mockito.Mockito.when
 

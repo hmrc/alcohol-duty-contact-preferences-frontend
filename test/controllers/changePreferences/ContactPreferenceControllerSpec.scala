@@ -32,7 +32,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HttpResponse
 import views.html.changePreferences.ContactPreferenceView
 
-// For Scala3
+
 import org.mockito.ArgumentMatchers.{eq => eqTo}
 import org.mockito.Mockito.*
 

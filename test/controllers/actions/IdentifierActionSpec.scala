@@ -31,7 +31,7 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.{allEnrolments, credentials,
 import uk.gov.hmrc.auth.core.retrieve.{Credentials, ~}
 import uk.gov.hmrc.http.UnauthorizedException
 
-// For Scala3
+
 import org.mockito.ArgumentMatchers.{eq => eqTo}
 import org.mockito.Mockito.when
 

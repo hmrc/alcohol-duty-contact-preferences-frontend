@@ -25,7 +25,7 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.http.{HttpResponse, UpstreamErrorResponse}
 
-// For Scala3
+
 import org.mockito.ArgumentMatchers.{eq => eqTo}
 import org.mockito.Mockito.*
 
