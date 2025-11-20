@@ -57,19 +57,9 @@ class IdentifierActionSpec extends SpecBase {
     Future(Ok(testContent))
   }
 
-  "invokeBlock must redirect to Page Not Found when the service is closed" in {
-    when(mockAppConfig.isClosed).thenReturn(true)
-
-    val result: Future[Result] = identifierAction.invokeBlock(FakeRequest(), testAction)
-
-    status(result) mustBe SEE_OTHER
-    redirectLocation(result).value mustBe routes.NotFoundController.onPageLoad().url
-  }
-
-  "invokeBlock when the service is not closed" - {
+  "invokeBlock must" - {
 
     "execute the block and return OK if authorised" in {
-      when(mockAppConfig.isClosed).thenReturn(false)
       when(mockAppConfig.enrolmentServiceName).thenReturn(enrolment)
       when(mockAppConfig.enrolmentIdentifierKey).thenReturn(appaIdKey)
       when(
@@ -95,7 +85,6 @@ class IdentifierActionSpec extends SpecBase {
     }
 
     "execute the block and throw IllegalStateException if cannot get the internalId" in {
-      when(mockAppConfig.isClosed).thenReturn(false)
       when(mockAppConfig.enrolmentServiceName).thenReturn(enrolment)
       when(mockAppConfig.enrolmentIdentifierKey).thenReturn(appaIdKey)
       when(
@@ -120,7 +109,6 @@ class IdentifierActionSpec extends SpecBase {
     }
 
     "execute the block and throw IllegalStateException if cannot get the groupId" in {
-      when(mockAppConfig.isClosed).thenReturn(false)
       when(mockAppConfig.enrolmentServiceName).thenReturn(enrolment)
       when(mockAppConfig.enrolmentIdentifierKey).thenReturn(appaIdKey)
       when(
@@ -145,7 +133,6 @@ class IdentifierActionSpec extends SpecBase {
     }
 
     "execute the block and throw IllegalStateException if cannot get the enrolment" in {
-      when(mockAppConfig.isClosed).thenReturn(false)
       when(mockAppConfig.enrolmentServiceName).thenReturn(enrolment)
       when(mockAppConfig.enrolmentIdentifierKey).thenReturn(appaIdKey)
       when(
@@ -170,7 +157,6 @@ class IdentifierActionSpec extends SpecBase {
     }
 
     "execute the block and throw IllegalStateException if cannot get the APPAID enrolment" in {
-      when(mockAppConfig.isClosed).thenReturn(false)
       when(mockAppConfig.enrolmentServiceName).thenReturn(enrolment)
       when(mockAppConfig.enrolmentIdentifierKey).thenReturn(appaIdKey)
       when(
@@ -195,7 +181,6 @@ class IdentifierActionSpec extends SpecBase {
     }
 
     "execute the block and throw IllegalStateException if cannot get the credentials" in {
-      when(mockAppConfig.isClosed).thenReturn(false)
       when(mockAppConfig.enrolmentServiceName).thenReturn(enrolment)
       when(mockAppConfig.enrolmentIdentifierKey).thenReturn(appaIdKey)
       when(
@@ -229,7 +214,6 @@ class IdentifierActionSpec extends SpecBase {
         IncorrectCredentialStrength(),
         new UnauthorizedException("")
       ).foreach { exception =>
-        when(mockAppConfig.isClosed).thenReturn(false)
         when(mockAppConfig.enrolmentServiceName).thenReturn(enrolment)
         when(mockAuthConnector.authorise[Unit](any(), any())(any(), any())).thenReturn(Future.failed(exception))
 
@@ -247,7 +231,6 @@ class IdentifierActionSpec extends SpecBase {
         InvalidBearerToken(),
         SessionRecordNotFound()
       ).foreach { exception =>
-        when(mockAppConfig.isClosed).thenReturn(false)
         when(mockAppConfig.enrolmentServiceName).thenReturn(enrolment)
         when(mockAppConfig.loginUrl).thenReturn(loginUrl)
         when(mockAppConfig.appName).thenReturn("alcohol-duty-contact-preferences-frontend")
@@ -267,7 +250,6 @@ class IdentifierActionSpec extends SpecBase {
     "return the exception if there is any other exception" in {
       val msg = "Test Exception"
 
-      when(mockAppConfig.isClosed).thenReturn(false)
       when(mockAppConfig.enrolmentServiceName).thenReturn(enrolment)
       when(mockAuthConnector.authorise[Unit](any(), any())(any(), any()))
         .thenReturn(Future.failed(new RuntimeException(msg)))

@@ -47,5 +47,3 @@ GET         /email-error                                 controllers.changePrefe
 GET         /account/sign-out-survey                     controllers.auth.SignOutController.signOut()
 
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad()
-
-GET         /page-not-found                              controllers.NotFoundController.onPageLoad()
