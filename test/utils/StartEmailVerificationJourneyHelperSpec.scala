@@ -21,7 +21,6 @@ import config.FrontendAppConfig
 import models.{EmailModel, EmailVerificationRequest, Labels, LanguageInfo}
 import play.api.i18n.{Lang, Messages}
 
-
 import org.mockito.Mockito.*
 
 class StartEmailVerificationJourneyHelperSpec extends SpecBase {

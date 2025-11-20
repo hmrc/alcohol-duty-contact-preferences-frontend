@@ -30,7 +30,6 @@ import utils.{PageCheckHelper, SummaryListHelper}
 import viewmodels.govuk.summarylist._
 import views.html.changePreferences.CorrespondenceAddressView
 
-
 import org.mockito.ArgumentMatchers.{eq => eqTo}
 import org.mockito.Mockito.*
 

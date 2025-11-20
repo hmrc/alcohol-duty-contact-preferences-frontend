@@ -34,7 +34,6 @@ import views.html.changePreferences.CheckYourAnswersView
 
 import scala.concurrent.Future
 
-
 import org.mockito.ArgumentMatchers.{eq => eqTo}
 import org.mockito.Mockito.*
 

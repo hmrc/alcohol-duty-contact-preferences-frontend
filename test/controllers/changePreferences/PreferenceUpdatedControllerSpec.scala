@@ -27,7 +27,6 @@ import play.api.test.Helpers._
 import utils.PageCheckHelper
 import views.html.changePreferences.PreferenceUpdatedView
 
-
 import org.mockito.ArgumentMatchers.{eq => eqTo}
 import org.mockito.Mockito.*
 

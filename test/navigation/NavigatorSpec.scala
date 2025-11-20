@@ -30,7 +30,6 @@ import play.api.i18n.Messages
 import play.api.test.Helpers.{defaultAwaitTimeout, redirectLocation, status}
 import utils.StartEmailVerificationJourneyHelper
 
-
 import org.mockito.Mockito.*
 
 import scala.concurrent.Future

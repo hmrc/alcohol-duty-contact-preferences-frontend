@@ -28,7 +28,6 @@ import play.api.test.Helpers._
 import services.AuditService
 import uk.gov.hmrc.http.{HttpResponse, UpstreamErrorResponse}
 
-
 import org.mockito.ArgumentMatchers.{eq => eqTo}
 import org.mockito.Mockito.*
 
