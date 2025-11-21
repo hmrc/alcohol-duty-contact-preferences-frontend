@@ -1,5 +1,5 @@
-@*
- * Copyright 2023 HM Revenue & Customs
+/*
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,12 +12,24 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import config.Constants.Css
+package models
 
-@this()
+import base.SpecBase
+import play.api.libs.json.Json
 
-@(id: String, text: String, href: String, newTab: Boolean = false, classes: String = Css.linkNoVisitedStateCssClass, fullStop: String = "")
+class UserDetailsSpec extends SpecBase {
 
-<a class="@classes" href="@href" @if(newTab) { target="_blank" rel="noopener noreferrer" } id="@id">@text</a>@fullStop
+  "UserDetails" - {
+    val json = s"""{"appaId":"$appaId","userId":"$userId"}"""
+
+    "must serialise to json" in {
+      Json.toJson(userDetails).toString() mustBe json
+    }
+
+    "must deserialise from json" in {
+      Json.parse(json).as[UserDetails] mustBe userDetails
+    }
+  }
+}

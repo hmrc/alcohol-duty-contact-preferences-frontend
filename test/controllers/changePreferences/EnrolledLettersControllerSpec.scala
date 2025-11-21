@@ -20,12 +20,14 @@ import base.SpecBase
 import controllers.routes
 import models.ErrorModel
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchersSugar.eqTo
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import utils.PageCheckHelper
 import views.html.changePreferences.EnrolledLettersView
+
+import org.mockito.ArgumentMatchers.eq as eqTo
+import org.mockito.Mockito.*
 
 class EnrolledLettersControllerSpec extends SpecBase {
 
@@ -50,7 +52,7 @@ class EnrolledLettersControllerSpec extends SpecBase {
 
         val view = application.injector.instanceOf[EnrolledLettersView]
 
-        status(result) mustEqual OK
+        status(result)          mustEqual OK
         contentAsString(result) mustEqual view(appConfig.businessTaxAccountUrl)(
           request,
           getMessages(application)
@@ -76,7 +78,7 @@ class EnrolledLettersControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
+        status(result)                 mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
 
         verify(mockHelper, times(0)).checkDetailsForEnrolledLettersPage(any())
@@ -99,7 +101,7 @@ class EnrolledLettersControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
+        status(result)                 mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
         verify(mockHelper, times(1)).checkDetailsForEnrolledLettersPage(eqTo(userAnswers))

@@ -35,8 +35,9 @@
             link(
                 id = "update-email-address-link",
                 text = messages("enrolledEmails.updateEmailLink"),
-                href = controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode).url
-            ) + "."
+                href = controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode).url,
+                fullStop = "."
+            )
         ))
 
     @paragraph(content =

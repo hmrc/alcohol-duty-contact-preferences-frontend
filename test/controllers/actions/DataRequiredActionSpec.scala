@@ -50,7 +50,7 @@ class DataRequiredActionSpec extends SpecBase {
           )
           .header
 
-      result.status mustEqual SEE_OTHER
+      result.status                mustEqual SEE_OTHER
       result.headers.get(LOCATION) mustEqual Some(routes.JourneyRecoveryController.onPageLoad().url)
     }
 
@@ -68,11 +68,11 @@ class DataRequiredActionSpec extends SpecBase {
 
       result.isRight mustBe true
       result.map { dataRequest =>
-        dataRequest.request mustEqual identifierRequest
+        dataRequest.request     mustEqual identifierRequest
         dataRequest.userAnswers mustEqual userAnswers
-        dataRequest.appaId mustEqual appaId
-        dataRequest.groupId mustEqual groupId
-        dataRequest.userId mustEqual userId
+        dataRequest.appaId      mustEqual appaId
+        dataRequest.groupId     mustEqual groupId
+        dataRequest.userId      mustEqual userId
       }
     }
   }

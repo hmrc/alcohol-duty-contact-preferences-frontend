@@ -20,8 +20,10 @@ import base.SpecBase
 import models.ChangePreference
 import models.audit._
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchersSugar.eqTo
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+
+import org.mockito.ArgumentMatchers.eq as eqTo
+import org.mockito.Mockito.*
 
 class AuditServiceSpec extends SpecBase {
 

@@ -6,7 +6,8 @@ import uk.gov.hmrc.versioning.SbtGitVersioning.autoImport.majorVersion
 lazy val appName: String = "alcohol-duty-contact-preferences-frontend"
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "2.13.16"
+ThisBuild / scalaVersion := "3.3.6"
+ThisBuild / scalacOptions += "-Wconf:msg=Flag.*repeatedly:s"
 
 lazy val microservice = (project in file("."))
   .enablePlugins(PlayScala, SbtDistributablesPlugin)
@@ -33,13 +34,12 @@ lazy val microservice = (project in file("."))
     ),
     PlayKeys.playDefaultPort := 16005,
     ScoverageKeys.coverageExcludedFiles := scoverageExcludedList.mkString(";"),
-    ScoverageKeys.coverageMinimumStmtTotal := 80,
+    ScoverageKeys.coverageMinimumStmtTotal := 90,
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true,
     scalacOptions ++= Seq(
       "-feature",
-      "-Wconf:cat=deprecation:ws,cat=feature:ws,cat=optimizer:ws,src=target/.*:s",
-      "-Ypatmat-exhaust-depth", "40"
+      "-Wconf:msg=deprecation:w,msg=feature:w,msg=optimizer:w,src=target/.*:s",
     ),
     libraryDependencies ++= AppDependencies(),
     retrieveManaged := true,
@@ -64,7 +64,8 @@ lazy val microservice = (project in file("."))
 
 lazy val testSettings: Seq[Def.Setting[_]] = Seq(
   fork := true,
-  unmanagedSourceDirectories += baseDirectory.value / "test-utils"
+  unmanagedSourceDirectories += baseDirectory.value / "test-utils",
+  scalafmtOnCompile := true
 )
 
 lazy val it =
@@ -90,8 +91,11 @@ lazy val scoverageExcludedList:Seq[String] = Seq(
   ".*testOnly.*",
   ".*TestOnlyCacheConnector.*",
   ".*TestOnlyController.*",
-  "testOnlyDoNotUseInAppConf.*"
-
+  "testOnlyDoNotUseInAppConf.*",
+  ".*config.*",
+  ".*models.audit.*",
+  ".*viewmodels.ErrorMessageAwareness",
+  ".*viewmodels.ImplicitConversions",
 )
 
-addCommandAlias("runAllChecks", ";clean;test:compile;scalafmtAll;coverage;test;it/test;scalastyle;coverageReport")
+addCommandAlias("runAllChecks", ";clean;test:compile;it/compile;scalafmtAll;coverage;test;it/test;coverageReport")

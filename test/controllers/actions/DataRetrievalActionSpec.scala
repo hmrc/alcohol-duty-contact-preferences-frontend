@@ -20,12 +20,14 @@ import base.SpecBase
 import connectors.UserAnswersConnector
 import models.requests.{IdentifierRequest, OptionalDataRequest}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchersSugar.eqTo
 import play.api.http.Status.SEE_OTHER
 import play.api.mvc.Result
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import uk.gov.hmrc.http.UpstreamErrorResponse
+
+import org.mockito.ArgumentMatchers.eq as eqTo
+import org.mockito.Mockito.when
 
 import scala.concurrent.Future
 

@@ -36,7 +36,7 @@ class ServiceTimeoutControllerSpec extends SpecBase {
 
         val view = application.injector.instanceOf[ServiceTimeoutView]
 
-        status(result) mustEqual OK
+        status(result)          mustEqual OK
         contentAsString(result) mustEqual view(appConfig.loginContinueUrl)(
           request,
           getMessages(application)
