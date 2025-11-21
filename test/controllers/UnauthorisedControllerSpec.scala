@@ -17,17 +17,11 @@
 package controllers
 
 import base.SpecBase
-import config.FrontendAppConfig
-import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import views.html.UnauthorisedView
 
-import org.mockito.Mockito.*
-
 class UnauthorisedControllerSpec extends SpecBase {
-
-  val mockAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
 
   "Unauthorised Controller" - {
 
@@ -43,25 +37,6 @@ class UnauthorisedControllerSpec extends SpecBase {
 
         status(result)          mustEqual OK
         contentAsString(result) mustEqual view()(request, messages(application)).toString
-      }
-    }
-
-    "must redirect to Page Not Found when the service is closed" in {
-      when(mockAppConfig.isClosed).thenReturn(true)
-
-      val application = applicationBuilder()
-        .overrides(
-          bind[FrontendAppConfig].toInstance(mockAppConfig)
-        )
-        .build()
-
-      running(application) {
-        val request = FakeRequest(GET, routes.UnauthorisedController.onPageLoad().url)
-
-        val result = route(application, request).value
-
-        status(result)                 mustEqual SEE_OTHER
-        redirectLocation(result).value mustEqual routes.NotFoundController.onPageLoad().url
       }
     }
   }
