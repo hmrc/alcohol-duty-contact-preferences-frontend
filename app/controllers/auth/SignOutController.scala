@@ -18,9 +18,10 @@ package controllers.auth
 
 import config.FrontendAppConfig
 import controllers.actions.SignOutAction
+import models.requests.RequestWithOptAppaId
 import play.api.Logging
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents, Result}
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendBaseController
 
 import javax.inject.Inject
@@ -34,11 +35,18 @@ class SignOutController @Inject() (
     with I18nSupport {
 
   def signOut(): Action[AnyContent] = signOutAction { implicit request =>
+    handleSignOut(request, Seq(config.exitSurveyUrl))
+  }
+
+  def signOutNoSurvey(): Action[AnyContent] = signOutAction { implicit request =>
+    handleSignOut(request, Seq(config.serviceTimeoutUrl))
+  }
+
+  private def handleSignOut(request: RequestWithOptAppaId[AnyContent], continueUrl: Seq[String]): Result =
     request.appaId match {
-      case Some(_) => Redirect(config.signOutUrl, Map("continue" -> Seq(config.exitSurveyUrl)))
+      case Some(_) => Redirect(config.signOutUrl, Map("continue" -> continueUrl))
       case None    =>
         logger.info("User not authenticated when signing out.")
-        Redirect(config.signOutUrl, Map("continue" -> Seq(config.exitSurveyUrl)))
+        Redirect(config.signOutUrl, Map("continue" -> continueUrl))
     }
-  }
 }
