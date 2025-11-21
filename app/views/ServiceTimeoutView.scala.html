@@ -1,5 +1,5 @@
 @*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,22 @@
  * limitations under the License.
  *@
 
-@import config.Constants.Css
+@import components.PageHeading
 
-@this()
+@this(
+        layout: templates.Layout,
+        govukButton: GovukButton,
+        pageHeading: PageHeading
+)
 
-@(id: String, text: String, href: String, newTab: Boolean = false, classes: String = Css.linkNoVisitedStateCssClass, fullStop: String = "")
+@(continueUrl: String)(implicit request: Request[_], messages: Messages)
 
-<a class="@classes" href="@href" @if(newTab) { target="_blank" rel="noopener noreferrer" } id="@id">@text</a>@fullStop
+@layout(pageTitle = titleNoForm(messages("signedOut.title")), showBackLink = false, timeout = false) {
+
+    @pageHeading(messages("signedOut.heading"))
+
+    @govukButton(
+        ButtonViewModel("signInButton", messages("site.signIn"))
+        .asLink(continueUrl)
+    )
+}

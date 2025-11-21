@@ -37,7 +37,7 @@ class EmailLockedControllerSpec extends SpecBase {
 
         val view = application.injector.instanceOf[EmailLockedView]
 
-        status(result) mustEqual OK
+        status(result)          mustEqual OK
         contentAsString(result) mustEqual view(appConfig.businessTaxAccountUrl)(
           request,
           getMessages(application)
@@ -53,7 +53,7 @@ class EmailLockedControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
+        status(result)                 mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
       }
     }

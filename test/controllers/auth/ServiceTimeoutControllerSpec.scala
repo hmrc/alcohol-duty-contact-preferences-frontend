@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,31 +14,33 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.auth
 
 import base.SpecBase
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import views.html.UnauthorisedView
+import views.html.ServiceTimeoutView
 
-class UnauthorisedControllerSpec extends SpecBase {
+class ServiceTimeoutControllerSpec extends SpecBase {
 
-  val mockAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
-
-  "Unauthorised Controller" - {
+  "ServiceTimeout Controller" - {
 
     "must return OK and the correct view for a GET" in {
+
       val application = applicationBuilder().build()
 
       running(application) {
-        val request = FakeRequest(GET, routes.UnauthorisedController.onPageLoad().url)
+        val request = FakeRequest(GET, controllers.auth.routes.ServiceTimeoutController.onPageLoad().url)
 
         val result = route(application, request).value
 
-        val view = application.injector.instanceOf[UnauthorisedView]
+        val view = application.injector.instanceOf[ServiceTimeoutView]
 
         status(result)          mustEqual OK
-        contentAsString(result) mustEqual view()(request, messages(application)).toString
+        contentAsString(result) mustEqual view(appConfig.loginContinueUrl)(
+          request,
+          getMessages(application)
+        ).toString
       }
     }
   }

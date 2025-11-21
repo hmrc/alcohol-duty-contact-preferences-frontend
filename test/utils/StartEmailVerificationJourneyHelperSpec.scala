@@ -19,8 +19,9 @@ package utils
 import base.SpecBase
 import config.FrontendAppConfig
 import models.{EmailModel, EmailVerificationRequest, Labels, LanguageInfo}
-import org.mockito.ArgumentMatchersSugar.eqTo
 import play.api.i18n.{Lang, Messages}
+
+import org.mockito.Mockito.*
 
 class StartEmailVerificationJourneyHelperSpec extends SpecBase {
 
@@ -46,8 +47,8 @@ class StartEmailVerificationJourneyHelperSpec extends SpecBase {
       when(mockConfig.startEmailVerificationContinueUrl).thenReturn("/test-continue")
       when(mockConfig.accessibilityStatementUrl).thenReturn("/test-accessibility-url")
       when(mockConfig.startEmailVerificationBackUrl).thenReturn("/enter-email-address-url")
-      when(mockMessages(eqTo("emailVerificationJourney.signature"))).thenReturn("testOrigin")
-      when(mockMessages(eqTo("service.name"))).thenReturn("test-service-name")
+      when(mockMessages("emailVerificationJourney.signature")).thenReturn("testOrigin")
+      when(mockMessages("service.name")).thenReturn("test-service-name")
       when(mockMessages.lang).thenReturn(Lang("en"))
 
       val result: EmailVerificationRequest = testHelper.createRequest(credId, emailAddress2)

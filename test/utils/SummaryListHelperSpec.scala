@@ -19,11 +19,13 @@ package utils
 import base.SpecBase
 import models.CheckMode
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchersSugar.eqTo
 import play.api.i18n.Messages
 import services.CountryService
 import uk.gov.hmrc.govukfrontend.views.Aliases.{ActionItem, Text}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.HtmlContent
+
+import org.mockito.ArgumentMatchers.eq as eqTo
+import org.mockito.Mockito.*
 
 class SummaryListHelperSpec extends SpecBase {
 
@@ -63,8 +65,8 @@ class SummaryListHelperSpec extends SpecBase {
       val expectedValues  = Seq(Text("Email me when I have a digital message"), Text(emailAddress))
       val expectedActions = Seq(contactPreferenceActionItem, emailAddressActionItem)
 
-      summaryList.rows.map(_.key.content) mustBe expectedKeys
-      summaryList.rows.map(_.value.content) mustBe expectedValues
+      summaryList.rows.map(_.key.content)            mustBe expectedKeys
+      summaryList.rows.map(_.value.content)          mustBe expectedValues
       summaryList.rows.map(_.actions.get.items.head) mustBe expectedActions
       verify(mockCountryService, times(0)).tryLookupCountryName(any())
     }
@@ -78,8 +80,8 @@ class SummaryListHelperSpec extends SpecBase {
       val expectedValues  = Seq(Text("Send me letters by post"), HtmlContent(addressHtmlString))
       val expectedActions = Seq(Some(contactPreferenceActionItem), None)
 
-      summaryList.rows.map(_.key.content) mustBe expectedKeys
-      summaryList.rows.map(_.value.content) mustBe expectedValues
+      summaryList.rows.map(_.key.content)               mustBe expectedKeys
+      summaryList.rows.map(_.value.content)             mustBe expectedValues
       summaryList.rows.map(_.actions.map(_.items.head)) mustBe expectedActions
       verify(mockCountryService, times(1)).tryLookupCountryName(countryCode)
     }
@@ -109,8 +111,8 @@ class SummaryListHelperSpec extends SpecBase {
       val expectedValues  = Seq(HtmlContent(addressHtmlString))
       val expectedActions = Seq(None)
 
-      summaryList.rows.map(_.key.content) mustBe expectedKeys
-      summaryList.rows.map(_.value.content) mustBe expectedValues
+      summaryList.rows.map(_.key.content)               mustBe expectedKeys
+      summaryList.rows.map(_.value.content)             mustBe expectedValues
       summaryList.rows.map(_.actions.map(_.items.head)) mustBe expectedActions
       verify(mockCountryService, times(1)).tryLookupCountryName(countryCode)
     }

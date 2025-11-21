@@ -40,7 +40,7 @@ class JourneyRecoveryControllerSpec extends SpecBase {
           val startAgainView = application.injector.instanceOf[JourneyRecoveryStartAgainView]
           val appConfig      = application.injector.instanceOf[FrontendAppConfig]
 
-          status(result) mustEqual OK
+          status(result)          mustEqual OK
           contentAsString(result) mustEqual startAgainView(appConfig.businessTaxAccountUrl)(
             request,
             messages(application)

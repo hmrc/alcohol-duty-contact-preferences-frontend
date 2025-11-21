@@ -20,13 +20,15 @@ import base.SpecBase
 import config.Constants.submissionDetailsKey
 import models.ErrorModel
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchersSugar.eqTo
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import utils.PageCheckHelper
 import views.html.changePreferences.PreferenceUpdatedView
+
+import org.mockito.ArgumentMatchers.eq as eqTo
+import org.mockito.Mockito.*
 
 class PreferenceUpdatedControllerSpec extends SpecBase {
 
@@ -53,7 +55,7 @@ class PreferenceUpdatedControllerSpec extends SpecBase {
 
         val view = application.injector.instanceOf[PreferenceUpdatedView]
 
-        status(result) mustEqual OK
+        status(result)          mustEqual OK
         contentAsString(result) mustEqual view(Some(emailAddress), appConfig.businessTaxAccountUrl)(
           request,
           getMessages(application)
@@ -81,7 +83,7 @@ class PreferenceUpdatedControllerSpec extends SpecBase {
 
         val view = application.injector.instanceOf[PreferenceUpdatedView]
 
-        status(result) mustEqual OK
+        status(result)          mustEqual OK
         contentAsString(result) mustEqual view(None, appConfig.businessTaxAccountUrl)(
           request,
           getMessages(application)
@@ -105,7 +107,7 @@ class PreferenceUpdatedControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
+        status(result)                 mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
 
         verify(mockHelper, times(0)).checkDetailsForPreferenceUpdatedPage(any())
@@ -128,7 +130,7 @@ class PreferenceUpdatedControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
+        status(result)                 mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
 
         verify(mockHelper, times(0)).checkDetailsForPreferenceUpdatedPage(any())
@@ -153,7 +155,7 @@ class PreferenceUpdatedControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
+        status(result)                 mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
 
         verify(mockHelper, times(0)).checkDetailsForPreferenceUpdatedPage(any())
@@ -178,7 +180,7 @@ class PreferenceUpdatedControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
+        status(result)                 mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
 
         verify(mockHelper, times(1)).checkDetailsForPreferenceUpdatedPage(eqTo(emptyUserAnswers))

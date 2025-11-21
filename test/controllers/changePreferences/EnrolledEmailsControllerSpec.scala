@@ -20,12 +20,14 @@ import base.SpecBase
 import controllers.routes
 import models.ErrorModel
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchersSugar.eqTo
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import utils.PageCheckHelper
 import views.html.changePreferences.EnrolledEmailsView
+
+import org.mockito.ArgumentMatchers.eq as eqTo
+import org.mockito.Mockito.*
 
 class EnrolledEmailsControllerSpec extends SpecBase {
 
@@ -49,7 +51,7 @@ class EnrolledEmailsControllerSpec extends SpecBase {
 
         val view = application.injector.instanceOf[EnrolledEmailsView]
 
-        status(result) mustEqual OK
+        status(result)          mustEqual OK
         contentAsString(result) mustEqual view(emailAddress, appConfig.businessTaxAccountUrl)(
           request,
           getMessages(application)
@@ -75,7 +77,7 @@ class EnrolledEmailsControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
+        status(result)                 mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual controllers.routes.JourneyRecoveryController.onPageLoad().url
 
         verify(mockHelper, times(0)).checkDetailsForEnrolledEmailsPage(any())
@@ -98,7 +100,7 @@ class EnrolledEmailsControllerSpec extends SpecBase {
 
         val result = route(application, request).value
 
-        status(result) mustEqual SEE_OTHER
+        status(result)                 mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
         verify(mockHelper, times(1)).checkDetailsForEnrolledEmailsPage(eqTo(userAnswersPostNoEmail))

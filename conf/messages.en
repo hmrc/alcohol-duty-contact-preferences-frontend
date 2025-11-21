@@ -7,6 +7,7 @@ site.yes = Yes
 site.continue = Continue
 site.submit = Submit
 site.startAgain = Start again
+site.signIn = Sign in
 site.govuk = GOV.UK
 site.returnToBusinessAccount = Go back to your business tax account
 site.error.pageNotFound404.title = Page not found
@@ -22,6 +23,9 @@ timeout.title = You’re about to be signed out
 timeout.message = For security reasons, you will be signed out of this service in
 timeout.keepAlive = Stay signed in
 timeout.signOut = Sign out
+
+signedOut.title = For your security, we signed you out
+signedOut.heading = For your security, we signed you out
 
 error.title.prefix = Error:
 error.prefix = Error

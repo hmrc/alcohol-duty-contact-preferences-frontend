@@ -19,11 +19,13 @@ package connectors
 import base.SpecBase
 import config.FrontendAppConfig
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchersSugar.eqTo
 import play.api.http.Status.{BAD_GATEWAY, CREATED, INTERNAL_SERVER_ERROR, OK}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.client.{HttpClientV2, RequestBuilder}
 import uk.gov.hmrc.http.{HttpResponse, StringContextOps, UpstreamErrorResponse}
+
+import org.mockito.ArgumentMatchers.eq as eqTo
+import org.mockito.Mockito.*
 
 import scala.concurrent.Future
 
@@ -77,7 +79,7 @@ class SubmitPreferencesConnectorSpec extends SpecBase {
 
       whenReady(connector.submitContactPreferences(contactPreferenceSubmissionEmail, appaId).value) { result =>
         result.swap.toOption.get.status mustBe INTERNAL_SERVER_ERROR
-        result.swap.toOption.get.message must include("Invalid JSON format")
+        result.swap.toOption.get.message  must include("Invalid JSON format")
 
         verify(connector.httpClient, times(1)).put(eqTo(url"$mockUrl"))(any())
         verify(requestBuilder, times(1)).execute[Either[UpstreamErrorResponse, HttpResponse]](any(), any())
@@ -105,7 +107,7 @@ class SubmitPreferencesConnectorSpec extends SpecBase {
 
       whenReady(connector.submitContactPreferences(contactPreferenceSubmissionEmail, appaId).value) { result =>
         result.swap.toOption.get.status mustBe BAD_GATEWAY
-        result.swap.toOption.get.message must include("Unexpected response")
+        result.swap.toOption.get.message  must include("Unexpected response")
 
         verify(connector.httpClient, times(1)).put(eqTo(url"$mockUrl"))(any())
         verify(requestBuilder, times(1)).execute[Either[UpstreamErrorResponse, HttpResponse]](any(), any())
@@ -131,7 +133,7 @@ class SubmitPreferencesConnectorSpec extends SpecBase {
 
       whenReady(connector.submitContactPreferences(contactPreferenceSubmissionEmail, appaId).value) { result =>
         result.swap.toOption.get.status mustBe INTERNAL_SERVER_ERROR
-        result.swap.toOption.get.message must include("Unexpected status code")
+        result.swap.toOption.get.message  must include("Unexpected status code")
 
         verify(connector.httpClient, times(1)).put(eqTo(url"$mockUrl"))(any())
         verify(requestBuilder, times(1)).execute[Either[UpstreamErrorResponse, HttpResponse]](any(), any())

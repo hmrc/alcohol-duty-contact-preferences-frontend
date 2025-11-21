@@ -20,7 +20,6 @@ import base.SpecBase
 import config.FrontendAppConfig
 import models.requests.RequestWithOptAppaId
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchersSugar.eqTo
 import play.api.mvc.{BodyParsers, Result}
 import play.api.test.Helpers._
 import uk.gov.hmrc.auth.core.AffinityGroup.Organisation
@@ -29,6 +28,9 @@ import uk.gov.hmrc.auth.core.CredentialStrength.strong
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals.allEnrolments
 import uk.gov.hmrc.http.UnauthorizedException
+
+import org.mockito.ArgumentMatchers.eq as eqTo
+import org.mockito.Mockito.when
 
 import scala.collection.mutable
 import scala.concurrent.Future
@@ -81,7 +83,7 @@ class SignOutActionSpec extends SpecBase {
 
       val result: Future[Result] = signOutAction.invokeBlock(FakeRequestWithoutSession(), testAction(appaIdStore))
 
-      status(result) mustBe SEE_OTHER
+      status(result)           mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(signOutUrl)
 
       appaIdStore.synchronized {
@@ -139,7 +141,7 @@ class SignOutActionSpec extends SpecBase {
       }
     }
 
-    "redirect to the sign out page and do not release locks if not authorised" in {
+    "redirect to the sign out page and do not release locks if not authorised" in
       List(
         InsufficientEnrolments(),
         InsufficientConfidenceLevel(),
@@ -156,14 +158,13 @@ class SignOutActionSpec extends SpecBase {
 
         val result: Future[Result] = signOutAction.invokeBlock(FakeRequestWithoutSession(), testAction(appaIdStore))
 
-        status(result) mustBe SEE_OTHER
+        status(result)           mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(signOutUrl)
 
         appaIdStore.synchronized {
           appaIdStore(appaIdStoreKey) mustBe None
         }
       }
-    }
 
     "return the exception if there is any other exception" in {
       val msg = "Test Exception"

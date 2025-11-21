@@ -67,16 +67,13 @@ http://localhost:16005/manage-alcohol-duty/contact-preference/test-only/clear-al
 
 > `sbt it/test`
 
-## Scalafmt and Scalastyle
+## Scalafmt
 
 To check if all the scala files in the project are formatted correctly:
 > `sbt scalafmtCheckAll`
 
 To format all the scala files in the project correctly:
 > `sbt scalafmtAll`
-
-To check if there are any scalastyle errors, warnings or infos:
-> `sbt scalastyle`
 >
 
 ## All tests and checks

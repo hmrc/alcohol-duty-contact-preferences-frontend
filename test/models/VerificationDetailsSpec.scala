@@ -1,5 +1,5 @@
-@*
- * Copyright 2023 HM Revenue & Customs
+/*
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,12 +12,25 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import config.Constants.Css
+package models
 
-@this()
+import base.SpecBase
+import play.api.libs.json.Json
 
-@(id: String, text: String, href: String, newTab: Boolean = false, classes: String = Css.linkNoVisitedStateCssClass, fullStop: String = "")
+class VerificationDetailsSpec extends SpecBase {
+  val verificationDetails: VerificationDetails = VerificationDetails(credId)
 
-<a class="@classes" href="@href" @if(newTab) { target="_blank" rel="noopener noreferrer" } id="@id">@text</a>@fullStop
+  "EmailVerificationDetails" - {
+    val json = s"""{"credId":"$credId"}"""
+
+    "must serialise to json" in {
+      Json.toJson(verificationDetails).toString() mustBe json
+    }
+
+    "must deserialise from json" in {
+      Json.parse(json).as[VerificationDetails] mustBe verificationDetails
+    }
+  }
+}

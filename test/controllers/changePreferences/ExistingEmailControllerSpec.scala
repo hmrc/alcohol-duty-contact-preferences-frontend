@@ -23,7 +23,6 @@ import forms.ExistingEmailFormProvider
 import models.{ErrorModel, NormalMode}
 import navigation.Navigator
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchersSugar.eqTo
 import pages.changePreferences.ExistingEmailPage
 import play.api.data.Form
 import play.api.inject.bind
@@ -33,6 +32,9 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.HttpResponse
 import utils.PageCheckHelper
 import views.html.changePreferences.ExistingEmailView
+
+import org.mockito.ArgumentMatchers.eq as eqTo
+import org.mockito.Mockito.*
 
 import scala.concurrent.Future
 
@@ -63,7 +65,7 @@ class ExistingEmailControllerSpec extends SpecBase {
 
           val view = application.injector.instanceOf[ExistingEmailView]
 
-          status(result) mustEqual OK
+          status(result)          mustEqual OK
           contentAsString(result) mustEqual view(form, emailAddress)(
             request,
             getMessages(application)
@@ -91,7 +93,7 @@ class ExistingEmailControllerSpec extends SpecBase {
 
           val view = application.injector.instanceOf[ExistingEmailView]
 
-          status(result) mustEqual OK
+          status(result)          mustEqual OK
           contentAsString(result) mustEqual view(form.fill(false), emailAddress)(
             request,
             getMessages(application)
@@ -117,7 +119,7 @@ class ExistingEmailControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(mockHelper, times(0)).checkDetailsForExistingEmailPage(any())
@@ -140,7 +142,7 @@ class ExistingEmailControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(mockHelper, times(1)).checkDetailsForExistingEmailPage(eqTo(userAnswersPostNoEmail))
@@ -172,7 +174,7 @@ class ExistingEmailControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual onwardRoute.url
 
           verify(mockHelper, times(1)).checkDetailsForExistingEmailPage(eqTo(userAnswersPostWithEmail))
@@ -208,7 +210,7 @@ class ExistingEmailControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual BAD_REQUEST
+          status(result)          mustEqual BAD_REQUEST
           contentAsString(result) mustEqual view(boundForm, emailAddress)(request, getMessages(application)).toString
 
           verify(mockHelper, times(1)).checkDetailsForExistingEmailPage(eqTo(userAnswersPostWithEmail))
@@ -242,7 +244,7 @@ class ExistingEmailControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(mockHelper, times(0)).checkDetailsForExistingEmailPage(any())
@@ -275,7 +277,7 @@ class ExistingEmailControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(mockHelper, times(1)).checkDetailsForExistingEmailPage(eqTo(userAnswersPostNoEmail))

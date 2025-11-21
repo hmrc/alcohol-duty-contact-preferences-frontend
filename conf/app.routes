@@ -45,5 +45,7 @@ GET         /confirmation-digital-message                controllers.changePrefe
 GET         /email-error                                 controllers.changePreferences.EmailErrorController.onPageLoad()
 
 GET         /account/sign-out-survey                     controllers.auth.SignOutController.signOut()
+GET         /account/sign-out-no-survey                  controllers.auth.SignOutController.signOutNoSurvey()
+GET         /signed-out                                  controllers.auth.ServiceTimeoutController.onPageLoad()
 
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad()

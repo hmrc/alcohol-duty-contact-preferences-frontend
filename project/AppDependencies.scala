@@ -15,14 +15,12 @@ object AppDependencies {
     "org.typelevel"     %% "cats-core"                     % "2.13.0",
     "com.beachape"      %% "enumeratum"                     % "1.9.0",
     "com.beachape"      %% "enumeratum-play"                % "1.9.0",
-    "com.beachape"      %% "enumeratum-cats"                % "1.9.0"
   )
 
   val test = Seq(
     "uk.gov.hmrc"             %% "bootstrap-test-play-30"  % bootstrapVersion,
     "uk.gov.hmrc.mongo"       %% "hmrc-mongo-test-play-30" % hmrcMongoVersion,
-    "org.scalatestplus"       %% "scalacheck-1-17"         % "3.2.18.0",
-    "org.mockito"             %% "mockito-scala"           % mockitoScalaVersion
+    "org.scalatestplus"       %% "scalacheck-1-17"         % "3.2.18.0"
   ).map(_ % Test)
 
   def apply(): Seq[ModuleID] = compile ++ test

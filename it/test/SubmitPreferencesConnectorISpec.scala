@@ -39,7 +39,7 @@ class SubmitPreferencesConnectorISpec extends ISpecBase with WireMockHelper {
 
         whenReady(connector.submitContactPreferences(contactPreferenceSubmissionEmail, appaId).value) {
           case Right(details) =>
-            details.processingDate mustBe testSubmissionResponse.processingDate
+            details.processingDate   mustBe testSubmissionResponse.processingDate
             details.formBundleNumber mustBe testSubmissionResponse.formBundleNumber
           case _              => fail("Test failed: result did not match expected value")
         }
@@ -55,7 +55,7 @@ class SubmitPreferencesConnectorISpec extends ISpecBase with WireMockHelper {
 
         whenReady(connector.submitContactPreferences(contactPreferenceSubmissionEmail, appaId).value) { result =>
           result.swap.toOption.get.status mustBe INTERNAL_SERVER_ERROR
-          result.swap.toOption.get.message must include("Invalid JSON format")
+          result.swap.toOption.get.message  must include("Invalid JSON format")
         }
       }
 

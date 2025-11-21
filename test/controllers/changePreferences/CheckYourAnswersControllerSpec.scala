@@ -21,17 +21,21 @@ import cats.data.EitherT
 import connectors.SubmitPreferencesConnector
 import controllers.routes
 import models.audit.{Actions, ContactPreference, EmailVerificationOutcome, JourneyOutcome}
-import models.{EmailVerificationDetails, ErrorModel}
+import models.{EmailVerificationDetails, ErrorModel, PaperlessPreferenceSubmittedResponse}
 import org.mockito.ArgumentMatchers.any
-import org.mockito.ArgumentMatchersSugar.eqTo
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import services.{AuditService, EmailVerificationService}
 import uk.gov.hmrc.govukfrontend.views.viewmodels.content.Text
-import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist._
+import uk.gov.hmrc.govukfrontend.views.viewmodels.summarylist.*
 import utils.{PageCheckHelper, SummaryListHelper}
 import views.html.changePreferences.CheckYourAnswersView
+
+import scala.concurrent.Future
+
+import org.mockito.ArgumentMatchers.eq as eqTo
+import org.mockito.Mockito.*
 
 class CheckYourAnswersControllerSpec extends SpecBase {
 
@@ -59,7 +63,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           val view = application.injector.instanceOf[CheckYourAnswersView]
 
-          status(result) mustEqual OK
+          status(result)          mustEqual OK
           contentAsString(result) mustEqual view(dummySummaryList)(
             request,
             getMessages(application)
@@ -74,7 +78,9 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       "must return OK and the correct view if a call to email verification is made and the email is verified" in new SetUp {
         when(pageCheckHelper.checkDetailsForCheckYourAnswers(any())) thenReturn Right(true)
         when(emailVerificationService.retrieveAddressStatusAndAddToCache(any(), any(), any())(any())) thenReturn
-          EitherT.rightT(EmailVerificationDetails(emailAddress, isVerified = true, isLocked = false))
+          EitherT.rightT[Future, EmailVerificationDetails](
+            EmailVerificationDetails(emailAddress, isVerified = true, isLocked = false)
+          )
 
         val application = applicationBuilder(userAnswers = Some(userAnswersPostNoEmail))
           .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
@@ -89,7 +95,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           val view = application.injector.instanceOf[CheckYourAnswersView]
 
-          status(result) mustEqual OK
+          status(result)          mustEqual OK
           contentAsString(result) mustEqual view(dummySummaryList)(
             request,
             getMessages(application)
@@ -105,7 +111,9 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       "must redirect to the Email Locked Page if a call to email verification is made and the email is locked" in new SetUp {
         when(pageCheckHelper.checkDetailsForCheckYourAnswers(any())) thenReturn Right(true)
         when(emailVerificationService.retrieveAddressStatusAndAddToCache(any(), any(), any())(any())) thenReturn
-          EitherT.rightT(EmailVerificationDetails(emailAddress, isVerified = false, isLocked = true))
+          EitherT.rightT[Future, EmailVerificationDetails](
+            EmailVerificationDetails(emailAddress, isVerified = false, isLocked = true)
+          )
 
         val application = applicationBuilder(userAnswers = Some(userAnswersPostNoEmail))
           .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
@@ -118,7 +126,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual
             controllers.changePreferences.routes.EmailLockedController.onPageLoad().url
 
@@ -132,7 +140,9 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       "must redirect to Journey Recovery if a call to email verification is made and the email is neither verified nor locked" in new SetUp {
         when(pageCheckHelper.checkDetailsForCheckYourAnswers(any())) thenReturn Right(true)
         when(emailVerificationService.retrieveAddressStatusAndAddToCache(any(), any(), any())(any())) thenReturn
-          EitherT.rightT(EmailVerificationDetails(emailAddress, isVerified = false, isLocked = false))
+          EitherT.rightT[Future, EmailVerificationDetails](
+            EmailVerificationDetails(emailAddress, isVerified = false, isLocked = false)
+          )
 
         val application = applicationBuilder(userAnswers = Some(userAnswersPostNoEmail))
           .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
@@ -145,7 +155,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(pageCheckHelper, times(1)).checkDetailsForCheckYourAnswers(eqTo(userAnswersPostNoEmail))
@@ -158,7 +168,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
       "must redirect to Journey Recovery if the call to email verification fails" in new SetUp {
         when(pageCheckHelper.checkDetailsForCheckYourAnswers(any())) thenReturn Right(true)
         when(emailVerificationService.retrieveAddressStatusAndAddToCache(any(), any(), any())(any())) thenReturn
-          EitherT.leftT(ErrorModel(INTERNAL_SERVER_ERROR, "Unexpected response"))
+          EitherT.leftT[Future, ErrorModel](ErrorModel(INTERNAL_SERVER_ERROR, "Unexpected response"))
 
         val application = applicationBuilder(userAnswers = Some(userAnswersPostNoEmail))
           .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
@@ -171,7 +181,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(pageCheckHelper, times(1)).checkDetailsForCheckYourAnswers(eqTo(userAnswersPostNoEmail))
@@ -193,7 +203,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(pageCheckHelper, times(0)).checkDetailsForCheckYourAnswers(any())
@@ -218,7 +228,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(pageCheckHelper, times(1)).checkDetailsForCheckYourAnswers(eqTo(emptyUserAnswers))
@@ -273,7 +283,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           val request = FakeRequest(POST, checkYourAnswersPostRoute)
           val result  = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual
             controllers.changePreferences.routes.SameEmailSubmittedController.onPageLoad().url
 
@@ -296,7 +306,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           contactPreferenceSubmissionEmail
         )
         when(submitPreferencesConnector.submitContactPreferences(any(), any())(any())) thenReturn
-          EitherT.rightT(testSubmissionResponse)
+          EitherT.rightT[Future, PaperlessPreferenceSubmittedResponse](testSubmissionResponse)
 
         val completeUserAnswers = userAnswersPostWithEmail.copy(verifiedEmailAddresses = Set(emailAddress))
 
@@ -310,7 +320,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual controllers.changePreferences.routes.PreferenceUpdatedController
             .onPageLoad()
             .url
@@ -335,7 +345,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           contactPreferenceSubmissionEmail
         )
         when(submitPreferencesConnector.submitContactPreferences(any(), any())(any())) thenReturn
-          EitherT.rightT(testSubmissionResponse)
+          EitherT.rightT[Future, PaperlessPreferenceSubmittedResponse](testSubmissionResponse)
 
         val completeUserAnswers = userAnswersPostWithBouncedEmail.copy(verifiedEmailAddresses = Set(emailAddress))
 
@@ -349,7 +359,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual controllers.changePreferences.routes.PreferenceUpdatedController
             .onPageLoad()
             .url
@@ -374,7 +384,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           contactPreferenceSubmissionPost
         )
         when(submitPreferencesConnector.submitContactPreferences(any(), any())(any())) thenReturn
-          EitherT.rightT(testSubmissionResponse)
+          EitherT.rightT[Future, PaperlessPreferenceSubmittedResponse](testSubmissionResponse)
 
         val completeUserAnswers = userAnswers.copy(verifiedEmailAddresses = Set())
 
@@ -388,7 +398,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual controllers.changePreferences.routes.PreferenceUpdatedController
             .onPageLoad()
             .url
@@ -413,7 +423,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           contactPreferenceSubmissionNewEmail
         )
         when(submitPreferencesConnector.submitContactPreferences(any(), any())(any())) thenReturn
-          EitherT.rightT(testSubmissionResponse)
+          EitherT.rightT[Future, PaperlessPreferenceSubmittedResponse](testSubmissionResponse)
 
         val completeUserAnswers = userAnswersEmailUpdate
 
@@ -427,7 +437,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual controllers.changePreferences.routes.PreferenceUpdatedController
             .onPageLoad()
             .url
@@ -453,7 +463,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           contactPreferenceSubmissionEmail
         )
         when(submitPreferencesConnector.submitContactPreferences(any(), any())(any())) thenReturn
-          EitherT.leftT(ErrorModel(INTERNAL_SERVER_ERROR, "Unexpected response"))
+          EitherT.leftT[Future, ErrorModel](ErrorModel(INTERNAL_SERVER_ERROR, "Unexpected response"))
 
         val completeUserAnswers = userAnswersPostWithEmail.copy(verifiedEmailAddresses = Set(emailAddress))
 
@@ -467,7 +477,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(pageCheckHelper, times(1)).checkDetailsToCreateSubmission(eqTo(completeUserAnswers))
@@ -490,7 +500,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           contactPreferenceSubmissionPost
         )
         when(submitPreferencesConnector.submitContactPreferences(any(), any())(any())) thenReturn
-          EitherT.rightT(testSubmissionResponse)
+          EitherT.rightT[Future, PaperlessPreferenceSubmittedResponse](testSubmissionResponse)
 
         val completeUserAnswers = userAnswersPostNoEmail
 
@@ -520,7 +530,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(pageCheckHelper, times(0)).checkDetailsForCheckYourAnswers(any())
@@ -543,7 +553,7 @@ class CheckYourAnswersControllerSpec extends SpecBase {
 
           val result = route(application, request).value
 
-          status(result) mustEqual SEE_OTHER
+          status(result)                 mustEqual SEE_OTHER
           redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
 
           verify(pageCheckHelper, times(1)).checkDetailsToCreateSubmission(eqTo(userAnswersPostWithEmail))
