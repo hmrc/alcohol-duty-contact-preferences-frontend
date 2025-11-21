@@ -27,15 +27,13 @@ import java.net.URLEncoder
 class SignOutControllerSpec extends SpecBase {
 
   "signOut" - {
-
     "when user is authenticated, must redirect to sign out, specifying the exit survey as the continue URL" in {
-      val application =
-        applicationBuilder(None)
-          .overrides(
-            bind[FakeAppaId].toInstance(FakeAppaId(Some(appaId))),
-            bind[SignOutAction].to[FakeSignOutAction]
-          )
-          .build()
+      val application = applicationBuilder(None)
+        .overrides(
+          bind[FakeAppaId].toInstance(FakeAppaId(Some(appaId))),
+          bind[SignOutAction].to[FakeSignOutAction]
+        )
+        .build()
 
       running(application) {
 
@@ -53,13 +51,12 @@ class SignOutControllerSpec extends SpecBase {
     }
 
     "when user is not authenticated, must still redirect to sign out, specifying the exit survey as the continue URL" in {
-      val application =
-        applicationBuilder()
-          .overrides(
-            bind[FakeAppaId].toInstance(FakeAppaId(None)),
-            bind[SignOutAction].to[FakeSignOutAction]
-          )
-          .build()
+      val application = applicationBuilder()
+        .overrides(
+          bind[FakeAppaId].toInstance(FakeAppaId(None)),
+          bind[SignOutAction].to[FakeSignOutAction]
+        )
+        .build()
 
       running(application) {
 
@@ -72,6 +69,54 @@ class SignOutControllerSpec extends SpecBase {
         val expectedRedirectUrl = s"${appConfig.signOutUrl}?continue=$encodedContinueUrl"
 
         status(result)                 mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual expectedRedirectUrl
+      }
+    }
+  }
+
+  "signOutNoSurvey" - {
+    "when user is authenticated, must redirect to sign out, specifying the ServiceTimeout controller as the continue URL" in {
+      val application = applicationBuilder(None)
+        .overrides(
+          bind[FakeAppaId].toInstance(FakeAppaId(Some(appaId))),
+          bind[SignOutAction].to[FakeSignOutAction]
+        )
+        .build()
+
+      running(application) {
+
+        val appConfig = application.injector.instanceOf[FrontendAppConfig]
+        val request   = FakeRequestWithoutSession(GET, routes.SignOutController.signOutNoSurvey().url)
+
+        val result = route(application, request).value
+
+        val encodedContinueUrl  = URLEncoder.encode(appConfig.serviceTimeoutUrl, "UTF-8")
+        val expectedRedirectUrl = s"${appConfig.signOutUrl}?continue=$encodedContinueUrl"
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result).value mustEqual expectedRedirectUrl
+      }
+    }
+
+    "when user is not authenticated, must still redirect to sign out, specifying the ServiceTimeout controller as the continue URL" in {
+      val application = applicationBuilder()
+        .overrides(
+          bind[FakeAppaId].toInstance(FakeAppaId(None)),
+          bind[SignOutAction].to[FakeSignOutAction]
+        )
+        .build()
+
+      running(application) {
+
+        val appConfig = application.injector.instanceOf[FrontendAppConfig]
+        val request   = FakeRequestWithoutSession(GET, routes.SignOutController.signOutNoSurvey().url)
+
+        val result = route(application, request).value
+
+        val encodedContinueUrl  = URLEncoder.encode(appConfig.serviceTimeoutUrl, "UTF-8")
+        val expectedRedirectUrl = s"${appConfig.signOutUrl}?continue=$encodedContinueUrl"
+
+        status(result) mustEqual SEE_OTHER
         redirectLocation(result).value mustEqual expectedRedirectUrl
       }
     }
