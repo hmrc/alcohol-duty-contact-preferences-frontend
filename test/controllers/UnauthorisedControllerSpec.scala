@@ -23,8 +23,6 @@ import views.html.UnauthorisedView
 
 class UnauthorisedControllerSpec extends SpecBase {
 
-  val mockAppConfig: FrontendAppConfig = mock[FrontendAppConfig]
-
   "Unauthorised Controller" - {
 
     "must return OK and the correct view for a GET" in {
