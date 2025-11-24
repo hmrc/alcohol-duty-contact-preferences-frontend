@@ -49,5 +49,3 @@ GET         /account/sign-out-no-survey                  controllers.auth.SignOu
 GET         /signed-out                                  controllers.auth.ServiceTimeoutController.onPageLoad()
 
 GET         /unauthorised                                controllers.UnauthorisedController.onPageLoad()
-
-GET         /page-not-found                              controllers.NotFoundController.onPageLoad()

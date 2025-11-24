@@ -52,8 +52,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
     "cy" -> Lang("cy")
   )
 
-  val isClosed: Boolean = configuration.get[Boolean]("features.service-closed")
-
   val timeout: Int                   = configuration.get[Int]("timeout-dialog.timeout")
   val countdown: Int                 = configuration.get[Int]("timeout-dialog.countdown")
   val enrolmentServiceName: String   = configuration.get[String]("enrolment.serviceName")
