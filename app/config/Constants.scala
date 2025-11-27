@@ -68,8 +68,6 @@ object Constants {
     val labelMCssClass  = "govuk-label--m"
     val labelSCssClass  = "govuk-label--s"
 
-    val captionXLCssClass = "govuk-caption-xl"
-
     val fieldsetLegendXLCssClass = "govuk-fieldset__legend--xl"
     val fieldsetLegendLCssClass  = "govuk-fieldset__legend--l"
     val fieldsetLegendMCssClass  = "govuk-fieldset__legend--m"

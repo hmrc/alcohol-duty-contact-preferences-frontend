@@ -18,24 +18,22 @@
 @import components.{PageHeading, Paragraph}
 
 @this(
-    layout: templates.Layout,
-    govukButton: GovukButton,
-    pageHeading: PageHeading,
-    paragraph: Paragraph
+        layout: templates.Layout,
+        govukButton: GovukButton,
+        pageHeading: PageHeading,
+        paragraph: Paragraph
 )
 
 @(businessTaxAccountUrl: String)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("journeyRecovery.startAgain.title"))) {
 
-@pageHeading(messages("journeyRecovery.startAgain.heading"))
+    @pageHeading(messages("journeyRecovery.startAgain.heading"))
 
-@paragraph(content = Text(messages("journeyRecovery.startAgain.guidance")))
+    @paragraph(messages("journeyRecovery.startAgain.guidance"))
 
-<p class="govuk-body">
     @govukButton(
-    ButtonViewModel("startAgainButton", messages("site.startAgain"))
-    .asLink(businessTaxAccountUrl)
+        ButtonViewModel("startAgainButton", messages("site.startAgain"))
+        .asLink(businessTaxAccountUrl)
     )
-</p>
 }
