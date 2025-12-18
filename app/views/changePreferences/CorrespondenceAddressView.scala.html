@@ -36,18 +36,22 @@
 
     @paragraph(messages("correspondenceAddress.guidance"))
 
-    @paragraph(content = HtmlContent(
-        messages("correspondenceAddress.contact.text1") +
-        link(
-          id = "change-correspondence-address-link",
-          text = messages("correspondenceAddress.contact.linkText"),
-          href = messages("correspondenceAddress.contact.url"),
-          newTab = true
-        ) + " " + messages("correspondenceAddress.contact.text2")
-    ))
+    @paragraph(
+        content = HtmlContent(HtmlFormat.fill(Seq(
+            Html(messages("correspondenceAddress.contact.text1")),
+            link(
+                id = "change-correspondence-address-link",
+                text = messages("correspondenceAddress.contact.linkText"),
+                href = messages("correspondenceAddress.contact.url"),
+                newTab = true
+            ),
+            Html(" "),
+            Html(messages("correspondenceAddress.contact.text2"))
+        )))
+    )
 
     @govukButton(
         ButtonViewModel("continueButton", messages("site.continue"))
-            .asLink(controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad().url)
+        .asLink(controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad().url)
     )
 }
