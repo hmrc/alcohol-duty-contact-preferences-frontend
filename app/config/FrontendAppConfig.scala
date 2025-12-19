@@ -94,4 +94,6 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   val emailVerificationRedirectBaseUrl: String =
     configuration.get[String]("microservice.services.email-verification-frontend.prefix")
 
+  val newServiceNavigationEnabled: Boolean = configuration.get[Boolean]("play-frontend-hmrc.forceServiceNavigation")
+
 }

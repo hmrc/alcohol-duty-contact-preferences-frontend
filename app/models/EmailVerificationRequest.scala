@@ -27,7 +27,8 @@ case class EmailVerificationRequest(
   backUrl: String,
   email: EmailModel,
   labels: Labels,
-  lang: String
+  lang: String,
+  useNewGovUkServiceNavigation: Boolean
 )
 
 object EmailVerificationRequest {

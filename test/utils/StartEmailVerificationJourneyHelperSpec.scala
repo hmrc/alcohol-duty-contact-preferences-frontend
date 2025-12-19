@@ -37,7 +37,8 @@ class StartEmailVerificationJourneyHelperSpec extends SpecBase {
       LanguageInfo(pageTitle = "test-service-name", userFacingServiceName = "testOrigin"),
       LanguageInfo(pageTitle = "test-service-name", userFacingServiceName = "testOrigin")
     ),
-    lang = "en"
+    lang = "en",
+    useNewGovUkServiceNavigation = true
   )
 
   "StartEmailVerificationJourneyHelper.createRequest" - {
@@ -47,6 +48,7 @@ class StartEmailVerificationJourneyHelperSpec extends SpecBase {
       when(mockConfig.startEmailVerificationContinueUrl).thenReturn("/test-continue")
       when(mockConfig.accessibilityStatementUrl).thenReturn("/test-accessibility-url")
       when(mockConfig.startEmailVerificationBackUrl).thenReturn("/enter-email-address-url")
+      when(mockConfig.newServiceNavigationEnabled).thenReturn(true)
       when(mockMessages("emailVerificationJourney.signature")).thenReturn("testOrigin")
       when(mockMessages("service.name")).thenReturn("test-service-name")
       when(mockMessages.lang).thenReturn(Lang("en"))
