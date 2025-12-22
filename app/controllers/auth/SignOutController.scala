@@ -46,7 +46,7 @@ class SignOutController @Inject() (
     request.appaId match {
       case Some(_) => Redirect(config.signOutUrl, Map("continue" -> continueUrl))
       case None    =>
-        logger.info("User not authenticated when signing out.")
+        logger.info("[SignOutController] [handleSignOut] User not authenticated when signing out.")
         Redirect(config.signOutUrl, Map("continue" -> continueUrl))
     }
 }

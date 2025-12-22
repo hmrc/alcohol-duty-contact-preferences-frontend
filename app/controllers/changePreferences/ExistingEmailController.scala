@@ -58,7 +58,7 @@ class ExistingEmailController @Inject() (
         }
         Ok(view(preparedForm, email))
       case Left(error)  =>
-        logger.warn(error.message)
+        logger.warn(s"[ExistingEmailController] [onPageLoad] ${error.message}")
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
@@ -80,7 +80,7 @@ class ExistingEmailController @Inject() (
             }
           )
       case Left(error)  =>
-        logger.warn(error.message)
+        logger.warn(s"[ExistingEmailController] [onSubmit] ${error.message}")
         Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
   }

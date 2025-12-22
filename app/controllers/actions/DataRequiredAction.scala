@@ -32,7 +32,7 @@ class DataRequiredActionImpl @Inject() (implicit val executionContext: Execution
   override protected def refine[A](request: OptionalDataRequest[A]): Future[Either[Result, DataRequest[A]]] =
     request.userAnswers match {
       case None       =>
-        logger.warn(s"Data required action: Unable to get userAnswers for ${request.appaId}")
+        logger.warn(s"[DataRequiredAction] [refine] Unable to get userAnswers for ${request.appaId}")
         Future.successful(Left(Redirect(routes.JourneyRecoveryController.onPageLoad())))
       case Some(data) =>
         Future.successful(

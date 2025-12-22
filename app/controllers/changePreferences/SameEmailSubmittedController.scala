@@ -43,7 +43,7 @@ class SameEmailSubmittedController @Inject() (
     helper.checkDetailsForSameEmailSubmittedPage(request.userAnswers) match {
       case Right(email) => Ok(view(appConfig.businessTaxAccountUrl, email))
       case Left(error)  =>
-        logger.warn(error.message)
+        logger.warn(s"[SameEmailSubmittedController] [onPageLoad] ${error.message}")
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
