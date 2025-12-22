@@ -68,7 +68,7 @@ class SignOutActionImpl @Inject() (
         block(RequestWithOptAppaId(request, None))
       case e: UnauthorizedException  =>
         logger.debug(
-          s"[SignOutAction] [getOinvokeBlockrElseFailWithUnauthorised] Returning a request with AppaId set to None since there was an UnauthorizedException:",
+          s"[SignOutAction] [invokeBlock] Returning a request with AppaId set to None since there was an UnauthorizedException:",
           e
         )
         block(RequestWithOptAppaId(request, None))
