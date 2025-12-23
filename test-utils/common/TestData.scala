@@ -150,7 +150,8 @@ trait TestData extends ModelGenerators {
     backUrl = "/test-back-url",
     email = EmailModel(address = emailAddress, enterUrl = "/test-enter-url"),
     labels = Labels(LanguageInfo("testTitle", "testServiceName"), LanguageInfo("testTitle2", "testServiceName2")),
-    lang = "en"
+    lang = "en",
+    useNewGovUkServiceNavigation = true
   )
 
   val testJsonRedirectUriString: String =

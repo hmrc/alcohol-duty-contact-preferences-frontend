@@ -57,7 +57,8 @@ class StartEmailVerificationJourneyHelper @Inject() (
       backUrl = enterEmailAddressPageUrl,
       email = email,
       labels = labels,
-      lang = language
+      lang = language,
+      useNewGovUkServiceNavigation = config.newServiceNavigationEnabled
     )
   }
 
