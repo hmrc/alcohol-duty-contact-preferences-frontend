@@ -78,7 +78,7 @@ correspondenceAddress.title = Eich cyfeiriad gohebu
 correspondenceAddress.heading = Eich cyfeiriad gohebu
 correspondenceAddress.guidance = Byddwn ni’n defnyddio’r cyfeiriad hwn i anfon negeseuon atoch chi ynglŷn â’ch Datganiadau Toll Alcohol.
 correspondenceAddress.contact.text1 = Os yw’r cyfeiriad hwn yn anghywir,
-correspondenceAddress.contact.linkText =  defnyddiwch y ffurflen ar-lein i ddiweddaru’ch cyfeiriad ar gyfer eich cymeradwyaeth
+correspondenceAddress.contact.linkText =  defnyddiwch y ffurflen ar-lein i ddiweddaru’ch cyfeiriad ar gyfer eich cymeradwyaeth (yn agor tab newydd)
 correspondenceAddress.contact.url = https://www.gov.uk/guidance/make-a-change-to-your-alcoholic-products-producer-approval-appa
 correspondenceAddress.contact.text2 = ar gyfer cynhyrchwyr cynhyrchion alcoholaidd (APPA).
 

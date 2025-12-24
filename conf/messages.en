@@ -78,7 +78,7 @@ correspondenceAddress.title = Your correspondence address
 correspondenceAddress.heading = Your correspondence address
 correspondenceAddress.guidance = We will use this address to send you messages about your Alcohol Duty returns.
 correspondenceAddress.contact.text1 = If this address is wrong,
-correspondenceAddress.contact.linkText = use the online form to update your address
+correspondenceAddress.contact.linkText = use the online form to update your address (opens in new tab)
 correspondenceAddress.contact.url = https://www.gov.uk/guidance/make-a-change-to-your-alcoholic-products-producer-approval-appa
 correspondenceAddress.contact.text2 = for your alcoholic products producer approval (APPA).
 
