@@ -39,7 +39,9 @@ class EmailErrorController @Inject() (
     request.userAnswers.subscriptionSummary.bouncedEmail match {
       case Some(true) => Ok(view())
       case _          =>
-        logger.warn("Bounced email flag is not set. Redirecting to journey recovery.")
+        logger.warn(
+          "[EmailErrorController] [onPageLoad] Bounced email flag is not set. Redirecting to journey recovery."
+        )
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }

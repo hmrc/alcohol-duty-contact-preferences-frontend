@@ -44,7 +44,7 @@ class CorrespondenceAddressController @Inject() (
         val addressSummaryList = summaryListHelper.correspondenceAddressSummaryList(request.userAnswers)
         Ok(view(addressSummaryList))
       case Left(error) =>
-        logger.warn(error.message)
+        logger.warn(s"[CorrespondenceAddressController] [onPageLoad] ${error.message}")
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }

@@ -57,7 +57,9 @@ class ServiceEntryController @Inject() (
                 _              <- userAnswersConnector.set(updatedAnswers)
               } yield Redirect(controllers.changePreferences.routes.ExistingEmailController.onPageLoad())
             } else {
-              logger.warn("Error on service entry: User is trying to update email but not on email")
+              logger.warn(
+                "[ServiceEntryController] [createUserAnswersAndRedirect] Error on service entry: User is trying to update email but not on email"
+              )
               Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
             }
           case BouncedEmail     =>
@@ -68,12 +70,16 @@ class ServiceEntryController @Inject() (
                 _              <- userAnswersConnector.set(updatedAnswers)
               } yield Redirect(controllers.changePreferences.routes.EmailErrorController.onPageLoad())
             } else {
-              logger.warn("Error on service entry: User does not have a bounced email")
+              logger.warn(
+                "[ServiceEntryController] [createUserAnswersAndRedirect] Error on service entry: User does not have a bounced email"
+              )
               Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
             }
         }
       case Left(error) =>
-        logger.warn(s"Error creating user answers: ${error.message}")
+        logger.warn(
+          s"[ServiceEntryController] [createUserAnswersAndRedirect] Error creating user answers: ${error.message}"
+        )
         Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
   }

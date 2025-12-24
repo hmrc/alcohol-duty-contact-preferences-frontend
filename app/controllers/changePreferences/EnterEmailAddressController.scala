@@ -61,12 +61,12 @@ class EnterEmailAddressController @Inject() (
             request.userAnswers.emailAddress match {
               case Some(value) => Ok(view(form.fill(value), mode))
               case None        =>
-                logger.warn("No email address in user answers in check mode")
+                logger.warn("[EnterEmailAddressController] [onPageLoad] No email address in user answers in check mode")
                 Redirect(routes.JourneyRecoveryController.onPageLoad())
             }
         }
       case _          =>
-        logger.warn("Contact preference in user answers is not email")
+        logger.warn("[EnterEmailAddressController] [onPageLoad] Contact preference in user answers is not email")
         Redirect(routes.JourneyRecoveryController.onPageLoad())
     }
   }
@@ -83,7 +83,7 @@ class EnterEmailAddressController @Inject() (
             updateUserAnswersAndGetVerificationStatus(value, updatedRequest.userAnswers, request.credId).value.flatMap {
               case Left(error)                  =>
                 logger.warn(
-                  s"Failed to submit user's entered email address. status: ${error.status}"
+                  s"[EnterEmailAddressController] [onSubmit] Failed to submit user's entered email address. status: ${error.status}"
                 )
                 Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
               case Right(addressEnteredDetails) =>

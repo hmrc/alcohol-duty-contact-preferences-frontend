@@ -54,7 +54,7 @@ class DataRetrievalActionImpl @Inject() (
             )
           )
         case Left(ex) if ex.statusCode == NOT_FOUND =>
-          logger.info(s"User answers for ${request.appaId} not found")
+          logger.info(s"[DataRetrievalAction] [refine] User answers for ${request.appaId} not found")
           Right(
             OptionalDataRequest(
               request.request,
@@ -66,7 +66,7 @@ class DataRetrievalActionImpl @Inject() (
             )
           )
         case Left(ex)                               =>
-          logger.warn("Data retrieval failed with exception: ", ex)
+          logger.warn("[DataRetrievalAction] [refine] Data retrieval failed with exception: ", ex)
           Left(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       }
   }
