@@ -77,10 +77,10 @@ changePreferences.enter-email-address.format-error = Nodwch gyfeiriad e-bost yn 
 correspondenceAddress.title = Eich cyfeiriad gohebu
 correspondenceAddress.heading = Eich cyfeiriad gohebu
 correspondenceAddress.guidance = Byddwn ni’n defnyddio’r cyfeiriad hwn i anfon negeseuon atoch chi ynglŷn â’ch Datganiadau Toll Alcohol.
-correspondenceAddress.contact.text1 = Gallwch
-correspondenceAddress.contact.linkText =  gysylltu â ni
-correspondenceAddress.contact.url = https://www.gov.uk/find-hmrc-contacts/ymholiadau-taw-tollau-ac-ecseis
-correspondenceAddress.contact.text2 = os oes angen i chi ddiweddaru’ch cyfeiriad.
+correspondenceAddress.contact.text1 = Os yw’r cyfeiriad hwn yn anghywir,
+correspondenceAddress.contact.linkText =  defnyddiwch y ffurflen ar-lein i ddiweddaru’ch cyfeiriad ar gyfer eich cymeradwyaeth
+correspondenceAddress.contact.url = https://www.gov.uk/guidance/make-a-change-to-your-alcoholic-products-producer-approval-appa
+correspondenceAddress.contact.text2 = ar gyfer cynhyrchwyr cynhyrchion alcoholaidd (APPA).
 
 emailLocked.title = Ni allwch ofyn am god cadarnhau arall
 emailLocked.heading = Ni allwch ofyn am god cadarnhau arall
