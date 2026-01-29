@@ -3,7 +3,7 @@ organisation: mdtp
 digital-service: Alcohol Duty Reforms
 description: Enables alcohol duty customers to update their communication preference (digital or paper)
 owning-teams:
-  - DDCE Live Services
+  - DDCE Live Service
 type: service
 service-type: frontend
 test-repositories:
