@@ -21,3 +21,5 @@ addSbtPlugin("com.github.sbt" % "sbt-uglify" % "3.0.1")
 addSbtPlugin("com.github.sbt" % "sbt-digest" % "2.0.0")
 
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.6")
+
+addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.6.4")
