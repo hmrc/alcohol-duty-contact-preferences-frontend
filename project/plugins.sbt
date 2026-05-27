@@ -1,6 +1,8 @@
 resolvers += "HMRC-open-artefacts-maven" at "https://open.artefacts.tax.service.gov.uk/maven2"
 
-resolvers += Resolver.url("HMRC-open-artefacts-ivy", url("https://open.artefacts.tax.service.gov.uk/ivy2"))(Resolver.ivyStylePatterns)
+resolvers += Resolver.url("HMRC-open-artefacts-ivy", url("https://open.artefacts.tax.service.gov.uk/ivy2"))(
+  Resolver.ivyStylePatterns
+)
 
 resolvers += "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases/"
 
@@ -21,3 +23,5 @@ addSbtPlugin("com.github.sbt" % "sbt-uglify" % "3.0.1")
 addSbtPlugin("com.github.sbt" % "sbt-digest" % "2.0.0")
 
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.6")
+
+addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.6.4")
