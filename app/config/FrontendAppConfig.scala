@@ -46,7 +46,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
 
   private val exitSurveyBaseUrl: String = configuration.get[String]("urls.feedbackFrontendBase")
   val exitSurveyUrl: String             =
-    s"$exitSurveyBaseUrl/feedback/alcohol-duty-contact-preferences-frontend?useServiceNavigation"
+    s"$exitSurveyBaseUrl/feedback/alcohol-duty-contact-preferences-frontend?"
 
   def languageMap: Map[String, Lang] = Map(
     "en" -> Lang("en"),
