@@ -34,7 +34,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   private lazy val contactPreferencesHost: String = servicesConfig.baseUrl("alcohol-duty-contact-preferences")
 
   def feedbackUrl(implicit request: RequestHeader): String =
-    s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=${host + request.uri}&useServiceNavigation"
+    s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=${host + request.uri}"
 
   val loginUrl: String                  = configuration.get[String]("urls.login")
   val loginContinueUrl: String          = configuration.get[String]("urls.loginContinue")
