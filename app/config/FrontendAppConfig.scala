@@ -29,10 +29,10 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
   val appName: String       = configuration.get[String]("appName")
   val affinityGroup: String = configuration.get[String]("affinityGroup")
 
-  private val contactHost                         = configuration.get[String]("contact-frontend.host")
-  private val contactFormServiceIdentifier        = "alcohol-duty-contact-preferences-frontend"
-  private lazy val contactPreferencesHost: String = servicesConfig.baseUrl("alcohol-duty-contact-preferences")
-  private lazy val returnsFrontendHost: String    = servicesConfig.baseUrl("alcohol-duty-returns-frontend")
+  private val contactHost                                             = configuration.get[String]("contact-frontend.host")
+  private val contactFormServiceIdentifier                            = "alcohol-duty-contact-preferences-frontend"
+  private lazy val contactPreferencesHost: String                     = servicesConfig.baseUrl("alcohol-duty-contact-preferences")
+  private lazy val returnsFrontendStartYourReturnUrl: String          = configuration.get[String]("urls.returnsFrontendStartYourReturn")
 
   def feedbackUrl(implicit request: RequestHeader): String =
     s"$contactHost/contact/beta-feedback?service=$contactFormServiceIdentifier&backUrl=${host + request.uri}"
@@ -46,7 +46,7 @@ class FrontendAppConfig @Inject() (configuration: Configuration, servicesConfig:
     configuration.get[String]("accessibility-statement.url")
 
   def returnsFrontendContactPreferenceCompleteUrl(periodKey: String): String =
-    s"$returnsFrontendHost/manage-alcohol-duty/before-you-start-your-return/$periodKey/contact-preference-complete"
+    s"$returnsFrontendStartYourReturnUrl/$periodKey/contact-preference-complete"
 
   private val exitSurveyBaseUrl: String = configuration.get[String]("urls.feedbackFrontendBase")
   val exitSurveyUrl: String             =
