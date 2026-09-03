@@ -61,7 +61,9 @@ class BeforeYouStartController @Inject() (
       case Some(_) =>
         val preparedForm = request.userAnswers.get(ContactPreferencePage) match {
           case Some(true)  =>
-            form.fill(BeforeYouStartAnswer(contactPreferenceEmail = true, emailAddress = request.userAnswers.emailAddress))
+            form.fill(
+              BeforeYouStartAnswer(contactPreferenceEmail = true, emailAddress = request.userAnswers.emailAddress)
+            )
           case Some(false) => form.fill(BeforeYouStartAnswer(contactPreferenceEmail = false, emailAddress = None))
           case None        => form
         }
@@ -82,7 +84,7 @@ class BeforeYouStartController @Inject() (
             {
               case BeforeYouStartAnswer(false, _)                 => continueByPost()
               case BeforeYouStartAnswer(true, Some(emailAddress)) => continueByEmail(emailAddress)
-              case BeforeYouStartAnswer(true, None)                =>
+              case BeforeYouStartAnswer(true, None)               =>
                 logger.warn("[BeforeYouStartController] [onSubmit] Email selected but no email address bound")
                 Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
             }
@@ -107,7 +109,9 @@ class BeforeYouStartController @Inject() (
       for {
         updatedAnswers <- Future.fromTry(userAnswersWithEmail.set(ContactPreferencePage, true))
         _              <-
-          userAnswersService.set(updatedAnswers.copy(verifiedEmailAddresses = updatedAnswers.verifiedEmailAddresses + emailAddress)).value
+          userAnswersService
+            .set(updatedAnswers.copy(verifiedEmailAddresses = updatedAnswers.verifiedEmailAddresses + emailAddress))
+            .value
       } yield Redirect(controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad())
     } else {
       Future.fromTry(userAnswersWithEmail.set(ContactPreferencePage, true)).flatMap { updatedAnswers =>
