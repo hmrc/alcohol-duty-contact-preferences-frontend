@@ -20,6 +20,7 @@ import base.SpecBase
 import controllers.routes
 import models.ErrorModel
 import org.mockito.ArgumentMatchers.any
+import pages.changePreferences.ReturnPeriodKeyPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -59,6 +60,27 @@ class EnrolledLettersControllerSpec extends SpecBase {
         ).toString
 
         verify(mockHelper, times(1)).checkDetailsForEnrolledLettersPage(eqTo(userAnswersPostNoEmail))
+      }
+    }
+
+    "must redirect to the returns-frontend for a GET if the journey was started to set a contact preference before starting a return" in {
+      val mockHelper = mock[PageCheckHelper]
+
+      when(mockHelper.checkDetailsForEnrolledLettersPage(any())) thenReturn Right(())
+
+      val userAnswersWithPeriodKey = userAnswersPostNoEmail.set(ReturnPeriodKeyPage, "24AA").success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswersWithPeriodKey))
+        .overrides(bind[PageCheckHelper].toInstance(mockHelper))
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, enrolledLettersRoute)
+
+        val result = route(application, request).value
+
+        status(result)            mustEqual SEE_OTHER
+        redirectLocation(result).value must include("/before-you-start-your-return/24AA/contact-preference-complete")
       }
     }
 

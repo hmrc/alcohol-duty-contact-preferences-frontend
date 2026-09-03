@@ -18,7 +18,7 @@ package utils
 
 import base.SpecBase
 import models.{ErrorModel, PaperlessPreferenceSubmission}
-import pages.changePreferences.ContactPreferencePage
+import pages.changePreferences.{ContactPreferencePage, ReturnPeriodKeyPage}
 import play.api.http.Status.{BAD_REQUEST, CONFLICT, INTERNAL_SERVER_ERROR}
 
 class PageCheckHelperSpec extends SpecBase {
@@ -328,6 +328,25 @@ class PageCheckHelperSpec extends SpecBase {
         ),
         emailAddress = Some(subscriptionEmail)
       )
+
+      val result = testHelper.checkDetailsForSameEmailSubmittedPage(userAnswersWithMatchingEmail)
+
+      result mustBe Right(subscriptionEmail)
+    }
+
+    "must return a Right with email when user is not on email but the journey was started to set a contact preference before starting a return, and the emails match" in {
+      val subscriptionEmail            = "existing@example.com"
+      val userAnswersWithMatchingEmail = userAnswersPostWithEmail
+        .copy(
+          subscriptionSummary = userAnswersPostWithEmail.subscriptionSummary.copy(
+            emailAddress = Some(subscriptionEmail),
+            paperlessReference = false
+          ),
+          emailAddress = Some(subscriptionEmail)
+        )
+        .set(ReturnPeriodKeyPage, "24AA")
+        .success
+        .value
 
       val result = testHelper.checkDetailsForSameEmailSubmittedPage(userAnswersWithMatchingEmail)
 

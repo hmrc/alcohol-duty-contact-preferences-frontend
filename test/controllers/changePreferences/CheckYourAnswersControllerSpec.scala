@@ -23,6 +23,7 @@ import controllers.routes
 import models.audit.{Actions, ContactPreference, EmailVerificationOutcome, JourneyOutcome}
 import models.{EmailVerificationDetails, ErrorModel, PaperlessPreferenceSubmittedResponse}
 import org.mockito.ArgumentMatchers.any
+import pages.changePreferences.ReturnPeriodKeyPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.*
@@ -72,6 +73,34 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           verify(pageCheckHelper, times(1)).checkDetailsForCheckYourAnswers(eqTo(userAnswers))
           verify(summaryListHelper, times(1)).checkYourAnswersSummaryList(eqTo(userAnswers))(any())
           verify(emailVerificationService, times(0)).retrieveAddressStatusAndAddToCache(any(), any(), any())(any())
+        }
+      }
+
+      "must include a back link to the Before You Start page when the journey was started to set a contact preference before starting a return" in new SetUp {
+        when(pageCheckHelper.checkDetailsForCheckYourAnswers(any())) thenReturn Right(false)
+
+        val userAnswersForReturn = userAnswers.set(ReturnPeriodKeyPage, "24AA").success.value
+
+        val application = applicationBuilder(userAnswers = Some(userAnswersForReturn))
+          .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper))
+          .overrides(bind[SummaryListHelper].toInstance(summaryListHelper))
+          .overrides(bind[EmailVerificationService].toInstance(emailVerificationService))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, checkYourAnswersGetRoute)
+
+          val result = route(application, request).value
+
+          val view = application.injector.instanceOf[CheckYourAnswersView]
+
+          status(result)          mustEqual OK
+          contentAsString(result) mustEqual view(
+            dummySummaryList,
+            Some(controllers.changePreferences.routes.BeforeYouStartController.onPageLoad().url)
+          )(request, getMessages(application)).toString
+
+          verify(pageCheckHelper, times(1)).checkDetailsForCheckYourAnswers(eqTo(userAnswersForReturn))
         }
       }
 
@@ -290,6 +319,99 @@ class CheckYourAnswersControllerSpec extends SpecBase {
           verify(pageCheckHelper, times(1)).checkDetailsToCreateSubmission(eqTo(completeUserAnswers))
           verify(submitPreferencesConnector, never).submitContactPreferences(any(), any())(any())
           verify(mockAuditService, times(0)).audit(any())(any(), any())
+        }
+      }
+
+      "must redirect to the Contact Preference Updated page when a newly entered email (not already on the subscription) is submitted successfully during a return journey" in new SetUp {
+        when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Right(
+          contactPreferenceSubmissionEmail
+        )
+        when(submitPreferencesConnector.submitContactPreferences(any(), any())(any())) thenReturn
+          EitherT.rightT[Future, PaperlessPreferenceSubmittedResponse](testSubmissionResponse)
+
+        val completeUserAnswers = userAnswersPostWithEmail
+          .copy(
+            emailAddress = Some(emailAddress2),
+            subscriptionSummary = userAnswersPostWithEmail.subscriptionSummary.copy(emailAddress = Some(emailAddress)),
+            verifiedEmailAddresses = Set(emailAddress2)
+          )
+          .set(ReturnPeriodKeyPage, "24AA")
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
+          .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper), bind[AuditService].toInstance(mockAuditService))
+          .overrides(bind[SubmitPreferencesConnector].toInstance(submitPreferencesConnector))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(POST, checkYourAnswersPostRoute)
+
+          val result = route(application, request).value
+
+          status(result)                 mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual
+            controllers.changePreferences.routes.PreferenceUpdatedController.onPageLoad().url
+        }
+      }
+
+      "must redirect to the Same Email Submitted page when the email submitted successfully was already on the subscription during a return journey" in new SetUp {
+        when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Right(
+          contactPreferenceSubmissionEmail
+        )
+        when(submitPreferencesConnector.submitContactPreferences(any(), any())(any())) thenReturn
+          EitherT.rightT[Future, PaperlessPreferenceSubmittedResponse](testSubmissionResponse)
+
+        val completeUserAnswers = userAnswersPostWithEmail
+          .copy(verifiedEmailAddresses = Set(emailAddress))
+          .set(ReturnPeriodKeyPage, "24AA")
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
+          .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper), bind[AuditService].toInstance(mockAuditService))
+          .overrides(bind[SubmitPreferencesConnector].toInstance(submitPreferencesConnector))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(POST, checkYourAnswersPostRoute)
+
+          val result = route(application, request).value
+
+          status(result)                 mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual
+            controllers.changePreferences.routes.SameEmailSubmittedController.onPageLoad().url
+        }
+      }
+
+      "must redirect to the Same Email Submitted page (not directly to returns-frontend) even if the journey was started to set a contact preference before starting a return" in new SetUp {
+        when(pageCheckHelper.checkDetailsToCreateSubmission(any())) thenReturn Left(
+          ErrorModel(CONFLICT, "Email matches existing subscription")
+        )
+
+        val completeUserAnswers = userAnswers
+          .copy(
+            emailAddress = Some(emailAddress),
+            subscriptionSummary = userAnswers.subscriptionSummary.copy(
+              emailAddress = Some(emailAddress),
+              paperlessReference = true
+            )
+          )
+          .set(ReturnPeriodKeyPage, "24AA")
+          .success
+          .value
+
+        val application = applicationBuilder(userAnswers = Some(completeUserAnswers))
+          .overrides(bind[PageCheckHelper].toInstance(pageCheckHelper), bind[AuditService].toInstance(mockAuditService))
+          .build()
+
+        running(application) {
+          val request = FakeRequest(POST, checkYourAnswersPostRoute)
+          val result  = route(application, request).value
+
+          status(result)                 mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual
+            controllers.changePreferences.routes.SameEmailSubmittedController.onPageLoad().url
         }
       }
 

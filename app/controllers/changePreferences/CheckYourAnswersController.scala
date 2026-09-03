@@ -22,6 +22,7 @@ import connectors.SubmitPreferencesConnector
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import controllers.routes
 import models._
+import pages.changePreferences.ReturnPeriodKeyPage
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.Json
@@ -52,6 +53,10 @@ class CheckYourAnswersController @Inject() (
     with Logging {
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
+    val backLinkHref = request.userAnswers
+      .get(ReturnPeriodKeyPage)
+      .map(_ => controllers.changePreferences.routes.BeforeYouStartController.onPageLoad().url)
+
     pageCheckHelper.checkDetailsForCheckYourAnswers(request.userAnswers) match {
       case Right(mustCheckVerificationStatus) =>
         if (mustCheckVerificationStatus) {
@@ -67,7 +72,7 @@ class CheckYourAnswersController @Inject() (
               case Right(EmailVerificationDetails(_, isVerified, isLocked)) =>
                 if (isVerified) {
                   val summaryList = summaryListHelper.checkYourAnswersSummaryList(request.userAnswers)
-                  Ok(view(summaryList))
+                  Ok(view(summaryList, backLinkHref))
                 } else if (isLocked) {
                   Redirect(controllers.changePreferences.routes.EmailLockedController.onPageLoad())
                 } else {
@@ -82,7 +87,7 @@ class CheckYourAnswersController @Inject() (
             }
         } else {
           val summaryList = summaryListHelper.checkYourAnswersSummaryList(request.userAnswers)
-          Future.successful(Ok(view(summaryList)))
+          Future.successful(Ok(view(summaryList, backLinkHref)))
         }
       case Left(error)                        =>
         logger.warn(s"[CheckYourAnswersController] [onPageLoad] ${error.message}")
@@ -115,11 +120,21 @@ class CheckYourAnswersController @Inject() (
                 apiSuccess = true
               )
 
-              val session = request.session + (submissionDetailsKey -> Json.toJson(submissionResponse).toString)
-              Future.successful(
-                Redirect(controllers.changePreferences.routes.PreferenceUpdatedController.onPageLoad())
-                  .withSession(session)
-              )
+              val emailAlreadyOnFile = request.userAnswers.get(ReturnPeriodKeyPage).isDefined &&
+                request.userAnswers.emailAddress.exists(entered =>
+                  request.userAnswers.subscriptionSummary.emailAddress.exists(_.equalsIgnoreCase(entered))
+                )
+
+              if (emailAlreadyOnFile) {
+                Future
+                  .successful(Redirect(controllers.changePreferences.routes.SameEmailSubmittedController.onPageLoad()))
+              } else {
+                val session = request.session + (submissionDetailsKey -> Json.toJson(submissionResponse).toString)
+                Future.successful(
+                  Redirect(controllers.changePreferences.routes.PreferenceUpdatedController.onPageLoad())
+                    .withSession(session)
+                )
+              }
             }
           )
 

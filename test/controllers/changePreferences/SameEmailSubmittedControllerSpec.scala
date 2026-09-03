@@ -20,6 +20,7 @@ import base.SpecBase
 import controllers.routes
 import models.ErrorModel
 import org.mockito.ArgumentMatchers.any
+import pages.changePreferences.ReturnPeriodKeyPage
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -55,6 +56,31 @@ class SameEmailSubmittedControllerSpec extends SpecBase {
           messages(application)
         ).toString
         verify(mockHelper, times(1)).checkDetailsForSameEmailSubmittedPage(eqTo(emptyUserAnswers))
+      }
+    }
+
+    "must return OK and the correct view with a continue-to-return button when the journey was started to set a contact preference before starting a return" in {
+      val mockHelper = mock[PageCheckHelper]
+
+      when(mockHelper.checkDetailsForSameEmailSubmittedPage(any())) thenReturn Right(testEmail)
+
+      val userAnswersForReturn = emptyUserAnswers.set(ReturnPeriodKeyPage, "24AA").success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswersForReturn))
+        .overrides(bind[PageCheckHelper].toInstance(mockHelper))
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, emailFoundRoute)
+        val result  = route(application, request).value
+        val view    = application.injector.instanceOf[SameEmailSubmittedView]
+
+        status(result)          mustEqual OK
+        contentAsString(result) mustEqual view(
+          appConfig.businessTaxAccountUrl,
+          testEmail,
+          Some(appConfig.returnsFrontendContactPreferenceCompleteUrl("24AA"))
+        )(request, messages(application)).toString
       }
     }
 

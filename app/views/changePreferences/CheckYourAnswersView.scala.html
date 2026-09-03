@@ -25,9 +25,9 @@
         pageHeading: PageHeading
 )
 
-@(list: SummaryList)(implicit request: Request[_], messages: Messages)
+@(list: SummaryList, backLinkHref: Option[String] = None)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("checkYourAnswers.title")), showBackLink = false) {
+@layout(pageTitle = titleNoForm(messages("checkYourAnswers.title")), showBackLink = backLinkHref.isDefined, backLinkHref = backLinkHref) {
 
     @formHelper(action = controllers.changePreferences.routes.CheckYourAnswersController.onSubmit(), Symbol("autoComplete") -> "off") {
 

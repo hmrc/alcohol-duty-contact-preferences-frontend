@@ -1,0 +1,85 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import components.{PageHeading, Paragraph}
+@import viewmodels.{LabelSize, LegendSize}
+
+@this(
+        layout: templates.Layout,
+        pageHeading: PageHeading,
+        paragraph: Paragraph,
+        formHelper: FormWithCSRF,
+        govukErrorSummary: GovukErrorSummary,
+        govukRadios: GovukRadios,
+        govukInput: GovukInput,
+        govukButton: GovukButton
+)
+
+@(form: Form[_])(implicit request: Request[_], messages: Messages)
+
+@emailAddressInput = {
+    @govukInput(
+        InputViewModel(
+            field = form("emailAddress"),
+            label = LabelViewModel(messages("beforeYouStart.emailAddress.label")).withCssClass(LabelSize.Small.toString)
+        ).asEmail()
+    )
+}
+
+@layout(pageTitle = title(form, messages("beforeYouStart.title"))) {
+
+    @formHelper(action = controllers.changePreferences.routes.BeforeYouStartController.onSubmit(), Symbol("autoComplete") -> "off") {
+
+        @if(form.errors.nonEmpty) {
+            @govukErrorSummary(ErrorSummaryViewModel(form))
+        }
+
+        @pageHeading(messages("beforeYouStart.heading"))
+
+        @paragraph(messages("beforeYouStart.currentlyPost"))
+
+        @paragraph(messages("beforeYouStart.benefits.intro"))
+
+        <ul class="govuk-list govuk-list--bullet">
+            <li>@messages("beforeYouStart.benefits.bullet1")</li>
+            <li>@messages("beforeYouStart.benefits.bullet2")</li>
+        </ul>
+
+        @govukRadios(
+            RadiosViewModel(
+                field = form("contactPreferenceEmail"),
+                legend = LegendViewModel(messages("beforeYouStart.radios.legend")).withSize(LegendSize.Medium),
+                items = Seq(
+                    RadioItem(
+                        id = Some("contactPreferenceEmail"),
+                        value = Some("true"),
+                        content = Text(messages("beforeYouStart.radios.email")),
+                        conditionalHtml = Some(emailAddressInput)
+                    ),
+                    RadioItem(
+                        id = Some("contactPreferencePost"),
+                        value = Some("false"),
+                        content = Text(messages("beforeYouStart.radios.post"))
+                    )
+                )
+            )
+        )
+
+        @govukButton(
+            ButtonViewModel("continueButton", messages("site.continue"))
+        )
+    }
+}
