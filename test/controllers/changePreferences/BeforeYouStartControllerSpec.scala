@@ -168,7 +168,15 @@ class BeforeYouStartControllerSpec extends SpecBase {
 
       "when post is selected" - {
         "must save the answer and follow the normal navigation to Enrolled Letters" in {
-          val application = applicationBuilder(userAnswers = Some(userAnswersForReturn)).build()
+          val mockUserAnswersService = mock[UserAnswersService]
+
+          when(mockUserAnswersService.set(any())(any())) thenReturn EitherT.rightT[Future, ErrorModel](
+            HttpResponse(OK, "Test success")
+          )
+
+          val application = applicationBuilder(userAnswers = Some(userAnswersForReturn))
+            .overrides(bind[UserAnswersService].toInstance(mockUserAnswersService))
+            .build()
 
           running(application) {
             val request =
@@ -179,6 +187,8 @@ class BeforeYouStartControllerSpec extends SpecBase {
             status(result)                 mustEqual SEE_OTHER
             redirectLocation(result).value mustEqual
               controllers.changePreferences.routes.EnrolledLettersController.onPageLoad().url
+
+            verify(mockUserAnswersService, times(1)).set(any())(any())
           }
         }
       }
@@ -187,9 +197,17 @@ class BeforeYouStartControllerSpec extends SpecBase {
         "and the entered email matches the approved, verified email already on the subscription" - {
           "must skip straight to Check Your Answers without calling the email verification service" in {
             val mockEmailVerificationService = mock[EmailVerificationService]
+            val mockUserAnswersService       = mock[UserAnswersService]
+
+            when(mockUserAnswersService.set(any())(any())) thenReturn EitherT.rightT[Future, ErrorModel](
+              HttpResponse(OK, "Test success")
+            )
 
             val application = applicationBuilder(userAnswers = Some(userAnswersForReturn))
-              .overrides(bind[EmailVerificationService].toInstance(mockEmailVerificationService))
+              .overrides(
+                bind[EmailVerificationService].toInstance(mockEmailVerificationService),
+                bind[UserAnswersService].toInstance(mockUserAnswersService)
+              )
               .build()
 
             running(application) {
@@ -205,6 +223,7 @@ class BeforeYouStartControllerSpec extends SpecBase {
               verify(mockEmailVerificationService, times(0)).retrieveAddressStatusAndAddToCache(any(), any(), any())(
                 any()
               )
+              verify(mockUserAnswersService, times(1)).set(any())(any())
             }
           }
         }
