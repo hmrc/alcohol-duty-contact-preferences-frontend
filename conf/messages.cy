@@ -53,10 +53,10 @@ contactPreference.error.required = Dewiswch sut yr hoffech i ni gysylltu â chi
 
 beforeYouStart.title = Cyn i chi ddechrau
 beforeYouStart.heading = Cyn i chi ddechrau
-beforeYouStart.currentlyPost = We currently contact you by post.
-beforeYouStart.benefits.intro = You can change your contact preference to email so that you:
-beforeYouStart.benefits.bullet1 = receive an email when you have messages about Alcohol Duty in your business tax account
-beforeYouStart.benefits.bullet2 = find out when you have a new message faster
+beforeYouStart.currentlyPost = Ar hyn o bryd rydym yn cysylltu â chi drwy’r post.
+beforeYouStart.benefits.intro = Gallwch newid eich dewis o ran cysylltu i e-bost fel bod y canlynol yn digwydd:
+beforeYouStart.benefits.bullet1 = rydych yn cael e-bost pan fydd gennych negeseuon am Doll Alcohol yn eich cyfrif treth busnes
+beforeYouStart.benefits.bullet2 = rydych yn cael gwybod pryd mae gennych neges newydd yn gyflymach
 beforeYouStart.radios.legend = Sut yr hoffech i ni gysylltu â chi?
 beforeYouStart.radios.email = E-bostiwch fi pan fo gennyf neges yn fy nghyfrif
 beforeYouStart.radios.post = Parhau i gael llythyrau drwy’r post
