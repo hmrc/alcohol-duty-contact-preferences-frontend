@@ -18,8 +18,8 @@ package controllers
 
 import connectors.UserAnswersConnector
 import controllers.actions._
-import models.{BouncedEmail, ChangePreference, EntryMode, NormalMode, UpdateEmail, UserDetails}
-import pages.changePreferences.ContactPreferencePage
+import models.{BouncedEmail, ChangePreference, EntryMode, NormalMode, PreReturn, UpdateEmail, UserDetails}
+import pages.changePreferences.{ContactPreferencePage, ReturnPeriodKeyPage}
 import play.api.Logging
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -40,47 +40,62 @@ class ServiceEntryController @Inject() (
     with I18nSupport
     with Logging {
 
-  def createUserAnswersAndRedirect(mode: EntryMode): Action[AnyContent] = identify.async { implicit request =>
-    userAnswersConnector.createUserAnswers(UserDetails(request.appaId, request.userId)).flatMap {
-      case Right(ua)   =>
-        mode match {
-          case ChangePreference =>
-            auditUtil.auditJourneyStartEvent(request.appaId, ua, ChangePreference.toString)
-            Future.successful(
-              Redirect(controllers.changePreferences.routes.ContactPreferenceController.onPageLoad(NormalMode))
-            )
-          case UpdateEmail      =>
-            if (ua.subscriptionSummary.paperlessReference) {
-              auditUtil.auditJourneyStartEvent(request.appaId, ua, UpdateEmail.toString)
-              for {
-                updatedAnswers <- Future.fromTry(ua.set(ContactPreferencePage, true))
-                _              <- userAnswersConnector.set(updatedAnswers)
-              } yield Redirect(controllers.changePreferences.routes.ExistingEmailController.onPageLoad())
-            } else {
-              logger.warn(
-                "[ServiceEntryController] [createUserAnswersAndRedirect] Error on service entry: User is trying to update email but not on email"
+  def createUserAnswersAndRedirect(mode: EntryMode, periodKey: Option[String]): Action[AnyContent] = identify.async {
+    implicit request =>
+      userAnswersConnector.createUserAnswers(UserDetails(request.appaId, request.userId)).flatMap {
+        case Right(ua)   =>
+          mode match {
+            case ChangePreference =>
+              auditUtil.auditJourneyStartEvent(request.appaId, ua, ChangePreference.toString)
+              Future.successful(
+                Redirect(controllers.changePreferences.routes.ContactPreferenceController.onPageLoad(NormalMode))
               )
-              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-            }
-          case BouncedEmail     =>
-            if (ua.subscriptionSummary.bouncedEmail.contains(true)) {
-              auditUtil.auditJourneyStartEvent(request.appaId, ua, BouncedEmail.toString)
-              for {
-                updatedAnswers <- Future.fromTry(ua.set(ContactPreferencePage, true))
-                _              <- userAnswersConnector.set(updatedAnswers)
-              } yield Redirect(controllers.changePreferences.routes.EmailErrorController.onPageLoad())
-            } else {
-              logger.warn(
-                "[ServiceEntryController] [createUserAnswersAndRedirect] Error on service entry: User does not have a bounced email"
-              )
-              Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-            }
-        }
-      case Left(error) =>
-        logger.warn(
-          s"[ServiceEntryController] [createUserAnswersAndRedirect] Error creating user answers: ${error.message}"
-        )
-        Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
-    }
+            case PreReturn        =>
+              periodKey match {
+                case Some(pk) =>
+                  auditUtil.auditJourneyStartEvent(request.appaId, ua, PreReturn.toString)
+                  for {
+                    updatedAnswers <- Future.fromTry(ua.set(ReturnPeriodKeyPage, pk))
+                    _              <- userAnswersConnector.set(updatedAnswers)
+                  } yield Redirect(controllers.changePreferences.routes.BeforeYouStartController.onPageLoad())
+                case None     =>
+                  logger.warn(
+                    "[ServiceEntryController] [createUserAnswersAndRedirect] Error on service entry: PreReturn entry missing periodKey"
+                  )
+                  Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+              }
+            case UpdateEmail      =>
+              if (ua.subscriptionSummary.paperlessReference) {
+                auditUtil.auditJourneyStartEvent(request.appaId, ua, UpdateEmail.toString)
+                for {
+                  updatedAnswers <- Future.fromTry(ua.set(ContactPreferencePage, true))
+                  _              <- userAnswersConnector.set(updatedAnswers)
+                } yield Redirect(controllers.changePreferences.routes.ExistingEmailController.onPageLoad())
+              } else {
+                logger.warn(
+                  "[ServiceEntryController] [createUserAnswersAndRedirect] Error on service entry: User is trying to update email but not on email"
+                )
+                Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+              }
+            case BouncedEmail     =>
+              if (ua.subscriptionSummary.bouncedEmail.contains(true)) {
+                auditUtil.auditJourneyStartEvent(request.appaId, ua, BouncedEmail.toString)
+                for {
+                  updatedAnswers <- Future.fromTry(ua.set(ContactPreferencePage, true))
+                  _              <- userAnswersConnector.set(updatedAnswers)
+                } yield Redirect(controllers.changePreferences.routes.EmailErrorController.onPageLoad())
+              } else {
+                logger.warn(
+                  "[ServiceEntryController] [createUserAnswersAndRedirect] Error on service entry: User does not have a bounced email"
+                )
+                Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+              }
+          }
+        case Left(error) =>
+          logger.warn(
+            s"[ServiceEntryController] [createUserAnswersAndRedirect] Error creating user answers: ${error.message}"
+          )
+          Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
+      }
   }
 }

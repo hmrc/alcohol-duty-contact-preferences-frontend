@@ -10,6 +10,7 @@ site.startAgain = Start again
 site.signIn = Sign in
 site.govuk = GOV.UK
 site.returnToBusinessAccount = Go back to your business tax account
+site.continueToCompleteReturn = Continue to complete your return
 site.error.pageNotFound404.title = Page not found
 site.error.pageNotFound404.heading = Page not found
 site.error.pageNotFound404.message.1 = If you typed the web address, check it is correct.
@@ -49,6 +50,17 @@ contactPreference.heading = How would you like to be contacted?
 contactPreference.email = Email me when I have a digital message
 contactPreference.post = Send me letters by post
 contactPreference.error.required = Select how you would like to be contacted
+
+beforeYouStart.title = Before You Start
+beforeYouStart.heading = Before You Start
+beforeYouStart.currentlyPost = We currently contact you by post.
+beforeYouStart.benefits.intro = You can change your contact preference to email so that you:
+beforeYouStart.benefits.bullet1 = receive an email when you have messages about Alcohol Duty in your business tax account
+beforeYouStart.benefits.bullet2 = find out when you have a new message faster
+beforeYouStart.radios.legend = How would you like to be contacted:
+beforeYouStart.radios.email = Email me when I have a message in my account
+beforeYouStart.radios.post = Continue receiving letters by post
+beforeYouStart.emailAddress.label = Email Address
 
 enrolledEmails.title = We will email you when you have a digital message
 enrolledEmails.heading = We will email you at {0} when you have a digital message

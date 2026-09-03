@@ -19,6 +19,7 @@ package utils
 import base.SpecBase
 import config.FrontendAppConfig
 import models.{EmailModel, EmailVerificationRequest, Labels, LanguageInfo}
+import pages.changePreferences.ReturnPeriodKeyPage
 import play.api.i18n.{Lang, Messages}
 
 import org.mockito.Mockito.*
@@ -53,9 +54,28 @@ class StartEmailVerificationJourneyHelperSpec extends SpecBase {
       when(mockMessages("service.name")).thenReturn("test-service-name")
       when(mockMessages.lang).thenReturn(Lang("en"))
 
-      val result: EmailVerificationRequest = testHelper.createRequest(credId, emailAddress2)
+      val result: EmailVerificationRequest = testHelper.createRequest(credId, emailAddress2, emptyUserAnswers)
 
       result mustBe testEmailVerificationRequest
+    }
+
+    "must use the Before You Start page as the back/enter url when the journey was started to set a contact preference before starting a return" in new SetUp {
+      implicit val mockMessages: Messages = mock[Messages]
+
+      when(mockConfig.startEmailVerificationContinueUrl).thenReturn("/test-continue")
+      when(mockConfig.accessibilityStatementUrl).thenReturn("/test-accessibility-url")
+      when(mockConfig.startEmailVerificationBeforeYouStartBackUrl).thenReturn("/before-you-start-url")
+      when(mockConfig.newServiceNavigationEnabled).thenReturn(true)
+      when(mockMessages("emailVerificationJourney.signature")).thenReturn("testOrigin")
+      when(mockMessages("service.name")).thenReturn("test-service-name")
+      when(mockMessages.lang).thenReturn(Lang("en"))
+
+      val userAnswersForReturn = emptyUserAnswers.set(ReturnPeriodKeyPage, "24AA").success.value
+
+      val result: EmailVerificationRequest = testHelper.createRequest(credId, emailAddress2, userAnswersForReturn)
+
+      result.backUrl        mustBe "/before-you-start-url"
+      result.email.enterUrl mustBe "/before-you-start-url"
     }
   }
 

@@ -18,6 +18,7 @@ package controllers.changePreferences
 
 import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import pages.changePreferences.ReturnPeriodKeyPage
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -41,7 +42,11 @@ class SameEmailSubmittedController @Inject() (
 
   def onPageLoad: Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     helper.checkDetailsForSameEmailSubmittedPage(request.userAnswers) match {
-      case Right(email) => Ok(view(appConfig.businessTaxAccountUrl, email))
+      case Right(email) =>
+        val continueReturnUrl = request.userAnswers
+          .get(ReturnPeriodKeyPage)
+          .map(appConfig.returnsFrontendContactPreferenceCompleteUrl)
+        Ok(view(appConfig.businessTaxAccountUrl, email, continueReturnUrl))
       case Left(error)  =>
         logger.warn(s"[SameEmailSubmittedController] [onPageLoad] ${error.message}")
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

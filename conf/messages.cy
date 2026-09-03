@@ -10,6 +10,7 @@ site.startAgain = Dechrau eto
 site.signIn = Mewngofnodi
 site.govuk = GOV.UK
 site.returnToBusinessAccount = Ewch yn ôl i’ch cyfrif treth busnes
+site.continueToCompleteReturn = Parhau i gwblhau’ch Datganiad
 site.error.pageNotFound404.title = Heb ddod o hyd i’r dudalen
 site.error.pageNotFound404.heading = Heb ddod o hyd i’r dudalen
 site.error.pageNotFound404.message.1 = Os gwnaethoch deipio’r cyfeiriad gwe, gwiriwch ei fod yn gywir.
@@ -49,6 +50,17 @@ contactPreference.heading = Sut yr hoffech i ni gysylltu â chi?
 contactPreference.email = E-bostiwch fi pan fo gennyf neges ddigidol
 contactPreference.post = Anfonwch lythyrau ataf drwy’r post
 contactPreference.error.required = Dewiswch sut yr hoffech i ni gysylltu â chi
+
+beforeYouStart.title = Cyn i chi ddechrau
+beforeYouStart.heading = Cyn i chi ddechrau
+beforeYouStart.currentlyPost = We currently contact you by post.
+beforeYouStart.benefits.intro = You can change your contact preference to email so that you:
+beforeYouStart.benefits.bullet1 = receive an email when you have messages about Alcohol Duty in your business tax account
+beforeYouStart.benefits.bullet2 = find out when you have a new message faster
+beforeYouStart.radios.legend = Sut yr hoffech i ni gysylltu â chi?
+beforeYouStart.radios.email = E-bostiwch fi pan fo gennyf neges yn fy nghyfrif
+beforeYouStart.radios.post = Parhau i gael llythyrau drwy’r post
+beforeYouStart.emailAddress.label = Cyfeiriad e-bost
 
 enrolledEmails.title = Byddwn ni’n anfon e-bost atoch pan fo gennych neges ddigidol
 enrolledEmails.heading = Byddwn ni’n anfon e-bost atoch yn {0} pan fo gennych neges ddigidol

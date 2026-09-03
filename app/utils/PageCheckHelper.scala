@@ -17,7 +17,7 @@
 package utils
 
 import models.{ErrorModel, PaperlessPreferenceSubmission, UserAnswers}
-import pages.changePreferences.ContactPreferencePage
+import pages.changePreferences.{ContactPreferencePage, ReturnPeriodKeyPage}
 import play.api.http.Status.{BAD_REQUEST, CONFLICT, INTERNAL_SERVER_ERROR}
 
 import javax.inject.Inject
@@ -172,8 +172,11 @@ class PageCheckHelper @Inject() {
       case None        => Left(ErrorModel(INTERNAL_SERVER_ERROR, "Contact preference updated but not found in user answers"))
     }
 
-  def checkDetailsForSameEmailSubmittedPage(userAnswers: UserAnswers): Either[ErrorModel, String] =
-    if (!userAnswers.subscriptionSummary.paperlessReference) {
+  def checkDetailsForSameEmailSubmittedPage(userAnswers: UserAnswers): Either[ErrorModel, String] = {
+    val isOnEmailOrPreReturn =
+      userAnswers.subscriptionSummary.paperlessReference || userAnswers.get(ReturnPeriodKeyPage).isDefined
+
+    if (!isOnEmailOrPreReturn) {
       Left(ErrorModel(BAD_REQUEST, "User is not currently on email"))
     } else if (!userAnswers.get(ContactPreferencePage).contains(true)) {
       Left(ErrorModel(BAD_REQUEST, "User has not selected email as contact preference"))
@@ -185,4 +188,5 @@ class PageCheckHelper @Inject() {
           Left(ErrorModel(BAD_REQUEST, "Entered email and existing email do not match"))
       }
     }
+  }
 }

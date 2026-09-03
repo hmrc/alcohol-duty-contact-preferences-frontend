@@ -20,11 +20,12 @@
 @this(
         layout: templates.Layout,
         govukPanel: GovukPanel,
+        govukButton: GovukButton,
         paragraph: Paragraph,
         link: Link
 )
 
-@(updatedEmail: Option[String], businessTaxAccountUrl: String)(implicit request: Request[_], messages: Messages)
+@(updatedEmail: Option[String], businessTaxAccountUrl: String, continueReturnUrl: Option[String] = None)(implicit request: Request[_], messages: Messages)
 
 @layout(pageTitle = titleNoForm(messages("preferenceUpdated.title")), showBackLink = false) {
 
@@ -37,6 +38,12 @@
         @paragraph(messages("preferenceUpdated.email.guidance2"))
     } else {
         @paragraph(messages("preferenceUpdated.post.guidance"))
+    }
+
+    @continueReturnUrl.map { url =>
+        @govukButton(
+            ButtonViewModel("continueReturnButton", messages("site.continueToCompleteReturn")).asLink(url)
+        )
     }
 
     @paragraph(content = HtmlContent(

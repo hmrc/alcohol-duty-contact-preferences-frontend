@@ -36,7 +36,7 @@
         fullWidthPageLayout: FullWidthMainContent
 )
 
-@(pageTitle: String, showBackLink: Boolean = true, timeout: Boolean = true, showSignOut: Boolean = true, fullWidth: Boolean = false, withPrintCss: Boolean = false)(contentBlock: Html)(implicit rh: RequestHeader, messages: Messages)
+@(pageTitle: String, showBackLink: Boolean = true, backLinkHref: Option[String] = None, timeout: Boolean = true, showSignOut: Boolean = true, fullWidth: Boolean = false, withPrintCss: Boolean = false)(contentBlock: Html)(implicit rh: RequestHeader, messages: Messages)
 
 @head = {
     @hmrcHead(
@@ -71,7 +71,14 @@
 @beforeContent = {
 
     @if(showBackLink) {
-        @govukBackLink(BackLinkViewModel(href = "#").withCssClass("js-visible").withAttribute(("id" -> "back-link")))
+        @backLinkHref match {
+            case Some(href) => {
+                @govukBackLink(BackLinkViewModel(href = href).withAttribute(("id" -> "back-link")))
+            }
+            case None        => {
+                @govukBackLink(BackLinkViewModel(href = "#").withCssClass("js-visible").withAttribute(("id" -> "back-link")))
+            }
+        }
     }
 }
 

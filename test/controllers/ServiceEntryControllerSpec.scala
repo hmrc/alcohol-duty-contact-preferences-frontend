@@ -19,9 +19,9 @@ package controllers
 import base.SpecBase
 import connectors.UserAnswersConnector
 import models.audit.{ContactPreference, JourneyStart}
-import models.{BouncedEmail, ChangePreference, NormalMode, UpdateEmail}
+import models.{BouncedEmail, ChangePreference, NormalMode, PreReturn, UpdateEmail}
 import org.mockito.ArgumentMatchers.any
-import pages.changePreferences.ContactPreferencePage
+import pages.changePreferences.{ContactPreferencePage, ReturnPeriodKeyPage}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -36,11 +36,15 @@ import scala.concurrent.Future
 class ServiceEntryControllerSpec extends SpecBase {
 
   lazy val serviceEntryChangePreferenceRoute: String =
-    controllers.routes.ServiceEntryController.createUserAnswersAndRedirect(ChangePreference).url
+    controllers.routes.ServiceEntryController.createUserAnswersAndRedirect(ChangePreference, None).url
   lazy val serviceEntryUpdateEmailRoute: String      =
-    controllers.routes.ServiceEntryController.createUserAnswersAndRedirect(UpdateEmail).url
+    controllers.routes.ServiceEntryController.createUserAnswersAndRedirect(UpdateEmail, None).url
   lazy val serviceEntryBouncedEmailRoute: String     =
-    controllers.routes.ServiceEntryController.createUserAnswersAndRedirect(BouncedEmail).url
+    controllers.routes.ServiceEntryController.createUserAnswersAndRedirect(BouncedEmail, None).url
+  lazy val serviceEntryPreReturnRoute: String        =
+    controllers.routes.ServiceEntryController.createUserAnswersAndRedirect(PreReturn, Some(periodKey)).url
+
+  val periodKey = "24AA"
 
   val mockAuditService: AuditService = mock[AuditService]
 
@@ -196,6 +200,68 @@ class ServiceEntryControllerSpec extends SpecBase {
 
         running(application) {
           val request = FakeRequest(GET, serviceEntryBouncedEmailRoute)
+
+          val result = route(application, request).value
+
+          status(result)                 mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual routes.JourneyRecoveryController.onPageLoad().url
+
+          verify(mockUserAnswersConnector, times(1)).createUserAnswers(any())(any())
+          verify(mockUserAnswersConnector, times(0)).set(any())(any())
+        }
+      }
+
+      "must create user answers, store the period key and redirect to the Before You Start page if EntryMode is PreReturn" in new SetUp {
+        val journeyStart: JourneyStart = JourneyStart(
+          appaId,
+          ContactPreference.Email.toString,
+          PreReturn.toString
+        )
+
+        when(mockUserAnswersConnector.createUserAnswers(any())(any())) thenReturn Future.successful(
+          Right(emptyUserAnswers)
+        )
+
+        val userAnswersWithPeriodKey = emptyUserAnswers.set(ReturnPeriodKeyPage, periodKey).success.value
+
+        val application = applicationBuilder()
+          .overrides(
+            bind[UserAnswersConnector].toInstance(mockUserAnswersConnector),
+            bind[AuditService].toInstance(mockAuditService)
+          )
+          .build()
+
+        running(application) {
+          val request = FakeRequest(GET, serviceEntryPreReturnRoute)
+
+          val result = route(application, request).value
+
+          status(result)                 mustEqual SEE_OTHER
+          redirectLocation(result).value mustEqual
+            controllers.changePreferences.routes.BeforeYouStartController.onPageLoad().url
+
+          verify(mockUserAnswersConnector, times(1)).createUserAnswers(any())(any())
+          verify(mockUserAnswersConnector, times(1)).set(eqTo(userAnswersWithPeriodKey))(any())
+          verify(mockAuditService).audit(eqTo(journeyStart))(any(), any())
+        }
+      }
+
+      "must redirect to journey recovery if EntryMode is PreReturn but no period key is supplied" in new SetUp {
+        when(mockUserAnswersConnector.createUserAnswers(any())(any())) thenReturn Future.successful(
+          Right(emptyUserAnswers)
+        )
+
+        val application = applicationBuilder()
+          .overrides(
+            bind[UserAnswersConnector].toInstance(mockUserAnswersConnector)
+          )
+          .build()
+
+        running(application) {
+          val request = FakeRequest(
+            GET,
+            controllers.routes.ServiceEntryController.createUserAnswersAndRedirect(PreReturn, None).url
+          )
 
           val result = route(application, request).value
 
