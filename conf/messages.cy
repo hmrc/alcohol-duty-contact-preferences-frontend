@@ -47,7 +47,7 @@ unauthorised.p2.second = a bydd angen i chi fod wedi’ch ymrestru â’r gwasan
 
 contactPreference.title = Sut yr hoffech i ni gysylltu â chi?
 contactPreference.heading = Sut yr hoffech i ni gysylltu â chi?
-contactPreference.email = E-bostiwch fi pan fo gennyf neges ddigidol
+contactPreference.email = E-bostiwch fi pan fo neges yn fy nghyfrif
 contactPreference.post = Anfonwch lythyrau ataf drwy’r post
 contactPreference.error.required = Dewiswch sut yr hoffech i ni gysylltu â chi
 
