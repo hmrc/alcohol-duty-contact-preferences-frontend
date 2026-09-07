@@ -47,7 +47,7 @@ unauthorised.p2.second = and be enrolled in the service.
 
 contactPreference.title = How would you like to be contacted?
 contactPreference.heading = How would you like to be contacted?
-contactPreference.email = Email me when I have a message in my account
+contactPreference.email = Email me when I have a digital message
 contactPreference.post = Send me letters by post
 contactPreference.error.required = Select how you would like to be contacted
 
@@ -104,6 +104,7 @@ checkYourAnswers.title = Check your contact preference
 checkYourAnswers.heading = Check your contact preference
 checkYourAnswers.contactPreference.key = How would you like to be contacted?
 checkYourAnswers.contactPreference.email = Email me when I have a digital message
+checkYourAnswers.contactPreference.email.preReturn = Email me when I have a message in my account
 checkYourAnswers.contactPreference.post = Send me letters by post
 checkYourAnswers.contactPreference.change.hidden = how you would like to be contacted
 checkYourAnswers.emailAddress.key = Email address

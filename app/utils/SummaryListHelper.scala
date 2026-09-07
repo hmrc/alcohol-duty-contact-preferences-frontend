@@ -18,7 +18,7 @@ package utils
 
 import com.google.inject.Inject
 import models.{CheckMode, SubscriptionSummary, UserAnswers}
-import pages.changePreferences.ContactPreferencePage
+import pages.changePreferences.{ContactPreferencePage, ReturnPeriodKeyPage}
 import play.api.i18n.Messages
 import services.CountryService
 import uk.gov.hmrc.govukfrontend.views.Aliases.Text
@@ -31,19 +31,20 @@ class SummaryListHelper @Inject() (countryService: CountryService) {
   def checkYourAnswersSummaryList(userAnswers: UserAnswers)(implicit messages: Messages): SummaryList = {
     val contactPreferenceOption = userAnswers.get(ContactPreferencePage)
     val enteredEmailAddress     = userAnswers.emailAddress
+    val isPreReturn             = userAnswers.get(ReturnPeriodKeyPage).isDefined
 
     (contactPreferenceOption, enteredEmailAddress) match {
       case (Some(false), _)          =>
         SummaryListViewModel(rows =
           Seq(
-            contactPreferenceRow(emailSelected = false),
+            contactPreferenceRow(emailSelected = false, isPreReturn = isPreReturn),
             correspondenceAddressRow(getFullCorrespondenceAddress(userAnswers.subscriptionSummary))
           )
         )
       case (Some(true), Some(email)) =>
         SummaryListViewModel(rows =
           Seq(
-            contactPreferenceRow(emailSelected = true),
+            contactPreferenceRow(emailSelected = true, isPreReturn = isPreReturn),
             emailAddressRow(email)
           )
         )
@@ -65,11 +66,17 @@ class SummaryListHelper @Inject() (countryService: CountryService) {
       case None          => subscriptionSummary.correspondenceAddress
     }
 
-  private def contactPreferenceRow(emailSelected: Boolean)(implicit messages: Messages): SummaryListRow =
+  private def contactPreferenceRow(emailSelected: Boolean, isPreReturn: Boolean)(implicit
+    messages: Messages
+  ): SummaryListRow =
     SummaryListRowViewModel(
       key = KeyViewModel(Text(messages("checkYourAnswers.contactPreference.key"))),
-      value = if (emailSelected) { ValueViewModel(Text(messages("checkYourAnswers.contactPreference.email"))) }
-      else { ValueViewModel(Text(messages("checkYourAnswers.contactPreference.post"))) },
+      value = if (emailSelected) {
+        val emailKey =
+          if (isPreReturn) "checkYourAnswers.contactPreference.email.preReturn"
+          else "checkYourAnswers.contactPreference.email"
+        ValueViewModel(Text(messages(emailKey)))
+      } else { ValueViewModel(Text(messages("checkYourAnswers.contactPreference.post"))) },
       actions = Seq(
         ActionItemViewModel(
           Text(messages("site.change")),
