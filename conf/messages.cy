@@ -60,6 +60,7 @@ beforeYouStart.benefits.bullet2 = rydych yn cael gwybod pryd mae gennych neges n
 beforeYouStart.radios.legend = Sut yr hoffech i ni gysylltu â chi?
 beforeYouStart.radios.email = E-bostiwch fi pan fo gennyf neges yn fy nghyfrif
 beforeYouStart.radios.post = Parhau i gael llythyrau drwy’r post
+beforeYouStart.radios.post.hint = Byddwn yn anfon llythyrau i’ch cyfeiriad gohebiaeth
 beforeYouStart.emailAddress.label = Cyfeiriad e-bost
 
 enrolledEmails.title = Byddwn ni’n anfon e-bost atoch pan fo gennych neges ddigidol

@@ -15,7 +15,7 @@
  *@
 
 @import components.{PageHeading, Paragraph}
-@import viewmodels.{LabelSize, LegendSize}
+@import viewmodels.LegendSize
 
 @this(
         layout: templates.Layout,
@@ -34,7 +34,7 @@
     @govukInput(
         InputViewModel(
             field = form("emailAddress"),
-            label = LabelViewModel(messages("beforeYouStart.emailAddress.label")).withCssClass(LabelSize.Small.toString)
+            label = LabelViewModel(messages("beforeYouStart.emailAddress.label"))
         ).asEmail()
     )
 }
@@ -72,7 +72,8 @@
                     RadioItem(
                         id = Some("contactPreferencePost"),
                         value = Some("false"),
-                        content = Text(messages("beforeYouStart.radios.post"))
+                        content = Text(messages("beforeYouStart.radios.post")),
+                        hint = Some(Hint(content = Text(messages("beforeYouStart.radios.post.hint"))))
                     )
                 )
             )
