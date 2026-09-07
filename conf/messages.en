@@ -51,8 +51,8 @@ contactPreference.email = Email me when I have a message in my account
 contactPreference.post = Send me letters by post
 contactPreference.error.required = Select how you would like to be contacted
 
-beforeYouStart.title = Before you Start
-beforeYouStart.heading = Before you Start
+beforeYouStart.title = Before you start
+beforeYouStart.heading = Before you start
 beforeYouStart.currentlyPost = We currently contact you by post.
 beforeYouStart.benefits.intro = You can change your contact preference to email so that you:
 beforeYouStart.benefits.bullet1 = receive an email when you have messages about Alcohol Duty in your business tax account
