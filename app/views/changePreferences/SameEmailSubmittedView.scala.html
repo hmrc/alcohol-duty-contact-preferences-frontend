@@ -20,13 +20,20 @@
         layout: templates.Layout,
         paragraph: Paragraph,
         link: Link,
-        pageHeading: PageHeading
+        pageHeading: PageHeading,
+        govukButton: GovukButton
 )
-@(businessTaxAccountUrl: String, email: String)(implicit request: Request[_], messages: Messages)
+@(businessTaxAccountUrl: String, email: String, continueReturnUrl: Option[String] = None)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("emailFound.title"))) {
+@layout(pageTitle = titleNoForm(messages("emailFound.title")), showBackLink = false) {
 
     @pageHeading(messages("emailFound.heading", email))
+
+    @continueReturnUrl.map { url =>
+        @govukButton(
+            ButtonViewModel("continueReturnButton", messages("site.continueToCompleteReturn")).asLink(url)
+        )
+    }
 
     @paragraph(content =
         HtmlContent(

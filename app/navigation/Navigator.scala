@@ -150,7 +150,7 @@ class Navigator @Inject() (
     request.userAnswers.emailAddress match {
       case Some(emailAddress: String) =>
         emailVerificationConnector
-          .startEmailVerification(startJourneyHelper.createRequest(request.credId, emailAddress))
+          .startEmailVerification(startJourneyHelper.createRequest(request.credId, emailAddress, request.userAnswers))
           .value
           .map {
             case Right(redirectUri: RedirectUri) =>

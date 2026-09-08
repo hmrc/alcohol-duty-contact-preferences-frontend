@@ -20,6 +20,7 @@ import base.SpecBase
 import config.Constants.submissionDetailsKey
 import models.ErrorModel
 import org.mockito.ArgumentMatchers.any
+import pages.changePreferences.ReturnPeriodKeyPage
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
@@ -90,6 +91,35 @@ class PreferenceUpdatedControllerSpec extends SpecBase {
         ).toString
 
         verify(mockHelper, times(1)).checkDetailsForPreferenceUpdatedPage(eqTo(userAnswers))
+      }
+    }
+
+    "must return OK and the correct view with a continue-to-return button when the journey was started to set a contact preference before starting a return" in {
+      val mockHelper = mock[PageCheckHelper]
+
+      when(mockHelper.checkDetailsForPreferenceUpdatedPage(any())) thenReturn Right(Some(emailAddress))
+
+      val userAnswersForReturn = userAnswersPostNoEmail.set(ReturnPeriodKeyPage, "24AA").success.value
+
+      val application = applicationBuilder(userAnswers = Some(userAnswersForReturn))
+        .overrides(bind[PageCheckHelper].toInstance(mockHelper))
+        .build()
+
+      running(application) {
+        val request = FakeRequest(GET, preferenceUpdatedRoute).withSession(
+          submissionDetailsKey -> Json.toJson(testSubmissionResponse).toString()
+        )
+
+        val result = route(application, request).value
+
+        val view = application.injector.instanceOf[PreferenceUpdatedView]
+
+        status(result)          mustEqual OK
+        contentAsString(result) mustEqual view(
+          Some(emailAddress),
+          appConfig.businessTaxAccountUrl,
+          Some(appConfig.returnsFrontendContactPreferenceCompleteUrl("24AA"))
+        )(request, getMessages(application)).toString
       }
     }
 

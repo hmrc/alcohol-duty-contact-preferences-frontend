@@ -20,6 +20,7 @@ import config.Constants.submissionDetailsKey
 import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
 import models.PaperlessPreferenceSubmittedResponse
+import pages.changePreferences.ReturnPeriodKeyPage
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.libs.json.Json
@@ -50,8 +51,13 @@ class PreferenceUpdatedController @Inject() (
       case Some(submissionResponse) =>
         Json.fromJson[PaperlessPreferenceSubmittedResponse](Json.parse(submissionResponse)).asOpt match {
           case Some(_) =>
+            val continueReturnUrl = request.userAnswers
+              .get(ReturnPeriodKeyPage)
+              .map(appConfig.returnsFrontendContactPreferenceCompleteUrl)
+
             helper.checkDetailsForPreferenceUpdatedPage(request.userAnswers) match {
-              case Right(updatedEmailOption) => Ok(view(updatedEmailOption, appConfig.businessTaxAccountUrl))
+              case Right(updatedEmailOption) =>
+                Ok(view(updatedEmailOption, appConfig.businessTaxAccountUrl, continueReturnUrl))
               case Left(error)               =>
                 logger.warn(s"[PreferenceUpdatedController] [onPageLoad] ${error.message}")
                 Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())

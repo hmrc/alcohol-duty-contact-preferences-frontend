@@ -17,7 +17,8 @@
 package utils
 
 import config.FrontendAppConfig
-import models.{EmailModel, EmailVerificationRequest, Labels, LanguageInfo}
+import models.{EmailModel, EmailVerificationRequest, Labels, LanguageInfo, UserAnswers}
+import pages.changePreferences.ReturnPeriodKeyPage
 import play.api.i18n.Messages
 
 import java.net.URLEncoder
@@ -27,11 +28,16 @@ class StartEmailVerificationJourneyHelper @Inject() (
   config: FrontendAppConfig
 ) {
 
-  def createRequest(credId: String, enteredEmail: String)(implicit
+  def createRequest(credId: String, enteredEmail: String, userAnswers: UserAnswers)(implicit
     messages: Messages
   ): EmailVerificationRequest = {
     val language: String                 = messages.lang.code
-    val enterEmailAddressPageUrl: String = config.startEmailVerificationBackUrl
+    val enterEmailAddressPageUrl: String =
+      if (userAnswers.get(ReturnPeriodKeyPage).isDefined) {
+        config.startEmailVerificationBeforeYouStartBackUrl
+      } else {
+        config.startEmailVerificationBackUrl
+      }
 
     val email: EmailModel = EmailModel(
       address = enteredEmail,

@@ -10,9 +10,13 @@ GET         /refresh-session                             controllers.KeepAliveCo
 
 GET         /there-is-a-problem                          controllers.JourneyRecoveryController.onPageLoad()
 
-GET         /start/change-preference                     controllers.ServiceEntryController.createUserAnswersAndRedirect(mode: EntryMode = ChangePreference)
-GET         /start/update-email                          controllers.ServiceEntryController.createUserAnswersAndRedirect(mode: EntryMode = UpdateEmail)
-GET         /start/bounced-email                         controllers.ServiceEntryController.createUserAnswersAndRedirect(mode: EntryMode = BouncedEmail)
+GET         /start/change-preference                     controllers.ServiceEntryController.createUserAnswersAndRedirect(mode: EntryMode = ChangePreference, periodKey: Option[String] = None)
+GET         /start/update-email                          controllers.ServiceEntryController.createUserAnswersAndRedirect(mode: EntryMode = UpdateEmail, periodKey: Option[String] = None)
+GET         /start/bounced-email                         controllers.ServiceEntryController.createUserAnswersAndRedirect(mode: EntryMode = BouncedEmail, periodKey: Option[String] = None)
+GET         /start/pre-return                            controllers.ServiceEntryController.createUserAnswersAndRedirect(mode: EntryMode = PreReturn, periodKey: Option[String])
+
+GET         /before-you-start                            controllers.changePreferences.BeforeYouStartController.onPageLoad()
+POST        /before-you-start                            controllers.changePreferences.BeforeYouStartController.onSubmit()
 
 GET         /method                                      controllers.changePreferences.ContactPreferenceController.onPageLoad(mode: Mode = NormalMode)
 POST        /method                                      controllers.changePreferences.ContactPreferenceController.onSubmit(mode: Mode = NormalMode)

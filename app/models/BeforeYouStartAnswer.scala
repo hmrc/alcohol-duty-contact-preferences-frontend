@@ -16,23 +16,4 @@
 
 package models
 
-import play.api.mvc.JavascriptLiteral
-
-sealed trait EntryMode
-
-case object ChangePreference extends EntryMode
-case object UpdateEmail extends EntryMode
-case object BouncedEmail extends EntryMode
-case object PreReturn extends EntryMode
-
-object EntryMode {
-
-  implicit val jsLiteral: JavascriptLiteral[EntryMode] = new JavascriptLiteral[EntryMode] {
-    override def to(value: EntryMode): String = value match {
-      case ChangePreference => "ChangePreference"
-      case UpdateEmail      => "UpdateEmail"
-      case BouncedEmail     => "BouncedEmail"
-      case PreReturn        => "PreReturn"
-    }
-  }
-}
+case class BeforeYouStartAnswer(contactPreferenceEmail: Boolean, emailAddress: Option[String])

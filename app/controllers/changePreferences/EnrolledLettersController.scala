@@ -18,6 +18,7 @@ package controllers.changePreferences
 
 import config.FrontendAppConfig
 import controllers.actions.{DataRequiredAction, DataRetrievalAction, IdentifierAction}
+import pages.changePreferences.ReturnPeriodKeyPage
 import play.api.Logging
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
@@ -41,7 +42,11 @@ class EnrolledLettersController @Inject() (
 
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     helper.checkDetailsForEnrolledLettersPage(request.userAnswers) match {
-      case Right(_)    => Ok(view(appConfig.businessTaxAccountUrl))
+      case Right(_)    =>
+        request.userAnswers.get(ReturnPeriodKeyPage) match {
+          case Some(periodKey) => Redirect(appConfig.returnsFrontendContactPreferenceCompleteUrl(periodKey))
+          case None            => Ok(view(appConfig.businessTaxAccountUrl))
+        }
       case Left(error) =>
         logger.warn(s"[EnrolledLettersController] [onPageLoad] ${error.message}")
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
