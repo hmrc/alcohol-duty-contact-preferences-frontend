@@ -27,7 +27,7 @@
 
 @(updatedEmail: Option[String], businessTaxAccountUrl: String, continueReturnUrl: Option[String] = None)(implicit request: Request[_], messages: Messages)
 
-@layout(pageTitle = titleNoForm(messages("preferenceUpdated.title")), showBackLink = false) {
+@layout(pageTitle = titleNoForm(messages("preferenceUpdated.title")), showBackLink = continueReturnUrl.isDefined) {
 
     @govukPanel(Panel(
         title = Text(messages("preferenceUpdated.heading"))
