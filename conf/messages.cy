@@ -58,6 +58,7 @@ beforeYouStart.benefits.intro = Gallwch newid eich dewis o ran cysylltu i e-bost
 beforeYouStart.benefits.bullet1 = rydych yn cael e-bost pan fydd gennych negeseuon am Doll Alcohol yn eich cyfrif treth busnes
 beforeYouStart.benefits.bullet2 = rydych yn cael gwybod pryd mae gennych neges newydd yn gyflymach
 beforeYouStart.radios.legend = Sut yr hoffech i ni gysylltu â chi?
+beforeYouStart.radios.hint = Gallwch newid y dewis hwn unrhyw bryd
 beforeYouStart.radios.email = E-bostiwch fi pan fo gennyf neges yn fy nghyfrif
 beforeYouStart.radios.post = Parhau i gael llythyrau drwy’r post
 beforeYouStart.radios.post.hint = Byddwn yn anfon llythyrau i’ch cyfeiriad gohebiaeth
