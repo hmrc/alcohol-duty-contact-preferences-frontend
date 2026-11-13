@@ -76,12 +76,12 @@ class CheckYourAnswersController @Inject() (
                 } else if (isLocked) {
                   Redirect(controllers.changePreferences.routes.EmailLockedController.onPageLoad())
                 } else {
-                  logger.warn("[CheckYourAnswersController] [onPageLoad] Entered email is neither verified nor locked")
+                  logger.warn("Entered email is neither verified nor locked")
                   Redirect(routes.JourneyRecoveryController.onPageLoad())
                 }
               case Left(error)                                              =>
                 logger.warn(
-                  s"[CheckYourAnswersController] [onPageLoad] Error checking email verification status. Status: ${error.status}"
+                  s"Error checking email verification status. Status: ${error.status}"
                 )
                 Redirect(routes.JourneyRecoveryController.onPageLoad())
             }
@@ -90,7 +90,7 @@ class CheckYourAnswersController @Inject() (
           Future.successful(Ok(view(summaryList, backLinkHref)))
         }
       case Left(error)                        =>
-        logger.warn(s"[CheckYourAnswersController] [onPageLoad] ${error.message}")
+        logger.warn(s"Error checking details for the check your answers page: ${error.message}")
         Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
   }
@@ -102,7 +102,7 @@ class CheckYourAnswersController @Inject() (
           .submitContactPreferences(contactPreferenceSubmission, request.appaId)
           .foldF(
             _ => {
-              logger.info("[CheckYourAnswersController] [onSubmit] Failed to submit contact preferences")
+              logger.info("Failed to submit contact preferences")
               auditUtil.auditJourneyOutcomeEvent(
                 request.appaId,
                 request.userAnswers,
@@ -112,7 +112,7 @@ class CheckYourAnswersController @Inject() (
               Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
             },
             submissionResponse => {
-              logger.info("[CheckYourAnswersController] [onSubmit] Successfully submitted contact preferences")
+              logger.info("Successfully submitted contact preferences")
               auditUtil.auditJourneyOutcomeEvent(
                 request.appaId,
                 request.userAnswers,
@@ -142,7 +142,7 @@ class CheckYourAnswersController @Inject() (
         Future.successful(Redirect(controllers.changePreferences.routes.SameEmailSubmittedController.onPageLoad()))
 
       case Left(error) =>
-        logger.warn(s"[CheckYourAnswersController] [onSubmit] ${error.message}")
+        logger.warn(s"Error creating the contact preference submission: ${error.message}")
         Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
     }
   }

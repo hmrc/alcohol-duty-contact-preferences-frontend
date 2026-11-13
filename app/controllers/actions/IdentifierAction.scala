@@ -69,10 +69,10 @@ class AuthenticatedIdentifierAction @Inject() (
         block(IdentifierRequest(request, appaId, groupId, internalId, credId))
     } recover {
       case e: AuthorisationException =>
-        logger.debug(s"[IdentifierAction] [invokeBlock] Got AuthorisationException:", e)
+        logger.debug(s"Got AuthorisationException:", e)
         handleAuthException(e)
       case e: UnauthorizedException  =>
-        logger.debug(s"[IdentifierAction] [invokeBlock] Got UnauthorizedException:", e)
+        logger.debug(s"Got UnauthorizedException:", e)
         Redirect(routes.UnauthorisedController.onPageLoad())
     }
   }
@@ -108,7 +108,7 @@ class AuthenticatedIdentifierAction @Inject() (
   def getOrElseFailWithUnauthorised[T](o: Option[T], failureMessage: String): T =
     o.getOrElse {
       logger.warn(
-        s"[IdentifierAction] [getOrElseFailWithUnauthorised] Identifier Action failed with error: $failureMessage"
+        s"Identifier Action failed with error while identifying the user: $failureMessage"
       )
       throw new IllegalStateException(failureMessage)
     }

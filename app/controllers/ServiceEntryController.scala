@@ -60,7 +60,7 @@ class ServiceEntryController @Inject() (
                   } yield Redirect(controllers.changePreferences.routes.BeforeYouStartController.onPageLoad())
                 case None     =>
                   logger.warn(
-                    "[ServiceEntryController] [createUserAnswersAndRedirect] Error on service entry: PreReturn entry missing periodKey"
+                    "Error on service entry: PreReturn entry missing periodKey"
                   )
                   Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
               }
@@ -73,7 +73,7 @@ class ServiceEntryController @Inject() (
                 } yield Redirect(controllers.changePreferences.routes.ExistingEmailController.onPageLoad())
               } else {
                 logger.warn(
-                  "[ServiceEntryController] [createUserAnswersAndRedirect] Error on service entry: User is trying to update email but not on email"
+                  "Error on service entry: User is trying to update email but not on email"
                 )
                 Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
               }
@@ -86,14 +86,14 @@ class ServiceEntryController @Inject() (
                 } yield Redirect(controllers.changePreferences.routes.EmailErrorController.onPageLoad())
               } else {
                 logger.warn(
-                  "[ServiceEntryController] [createUserAnswersAndRedirect] Error on service entry: User does not have a bounced email"
+                  "Error on service entry: User does not have a bounced email"
                 )
                 Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
               }
           }
         case Left(error) =>
           logger.warn(
-            s"[ServiceEntryController] [createUserAnswersAndRedirect] Error creating user answers: ${error.message}"
+            s"Error creating user answers: ${error.message}"
           )
           Future.successful(Redirect(controllers.routes.JourneyRecoveryController.onPageLoad()))
       }

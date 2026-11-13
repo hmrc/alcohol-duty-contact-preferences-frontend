@@ -43,7 +43,7 @@ class EnrolledEmailsController @Inject() (
     helper.checkDetailsForEnrolledEmailsPage(request.userAnswers) match {
       case Right(email) => Ok(view(email, appConfig.businessTaxAccountUrl))
       case Left(error)  =>
-        logger.warn(s"[EnrolledEmailsController] [onPageLoad] ${error.message}")
+        logger.warn(s"Error checking details for the enrolled emails page: ${error.message}")
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
