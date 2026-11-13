@@ -48,7 +48,7 @@ class EnrolledLettersController @Inject() (
           case None            => Ok(view(appConfig.businessTaxAccountUrl))
         }
       case Left(error) =>
-        logger.warn(s"[EnrolledLettersController] [onPageLoad] ${error.message}")
+        logger.warn(s"Error checking details for the enrolled letters page: ${error.message}")
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
