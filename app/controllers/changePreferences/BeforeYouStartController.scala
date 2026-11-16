@@ -56,7 +56,7 @@ class BeforeYouStartController @Inject() (
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     request.userAnswers.get(ReturnPeriodKeyPage) match {
       case None    =>
-        logger.warn("[BeforeYouStartController] [onPageLoad] No return period key found in user answers")
+        logger.warn("No return period key found in user answers when loading the before you start page")
         Redirect(routes.JourneyRecoveryController.onPageLoad())
       case Some(_) =>
         val preparedForm = request.userAnswers.get(ContactPreferencePage) match {
@@ -74,7 +74,7 @@ class BeforeYouStartController @Inject() (
   def onSubmit(): Action[AnyContent] = (identify andThen getData andThen requireData).async { implicit request =>
     request.userAnswers.get(ReturnPeriodKeyPage) match {
       case None    =>
-        logger.warn("[BeforeYouStartController] [onSubmit] No return period key found in user answers")
+        logger.warn("No return period key found in user answers when submitting the before you start page")
         Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
       case Some(_) =>
         form
@@ -85,7 +85,7 @@ class BeforeYouStartController @Inject() (
               case BeforeYouStartAnswer(false, _)                 => continueByPost()
               case BeforeYouStartAnswer(true, Some(emailAddress)) => continueByEmail(emailAddress)
               case BeforeYouStartAnswer(true, None)               =>
-                logger.warn("[BeforeYouStartController] [onSubmit] Email selected but no email address bound")
+                logger.warn("Email selected but no email address bound")
                 Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
             }
           )
@@ -118,7 +118,7 @@ class BeforeYouStartController @Inject() (
         updateUserAnswersAndGetVerificationStatus(emailAddress, updatedAnswers, request.credId).value.flatMap {
           case Left(error)                  =>
             logger.warn(
-              s"[BeforeYouStartController] [onSubmit] Failed to submit user's entered email address. status: ${error.status}"
+              s"Failed to submit user's entered email address from the before you start page. status: ${error.status}"
             )
             Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
           case Right(addressEnteredDetails) =>

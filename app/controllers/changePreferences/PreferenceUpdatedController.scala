@@ -46,7 +46,7 @@ class PreferenceUpdatedController @Inject() (
   def onPageLoad(): Action[AnyContent] = (identify andThen getData andThen requireData) { implicit request =>
     request.session.get(submissionDetailsKey) match {
       case None                     =>
-        logger.warn("[PreferenceUpdatedController] [onPageLoad] Submission response not present in session")
+        logger.warn("Submission response not present in session")
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
       case Some(submissionResponse) =>
         Json.fromJson[PaperlessPreferenceSubmittedResponse](Json.parse(submissionResponse)).asOpt match {
@@ -59,11 +59,11 @@ class PreferenceUpdatedController @Inject() (
               case Right(updatedEmailOption) =>
                 Ok(view(updatedEmailOption, appConfig.businessTaxAccountUrl, continueReturnUrl))
               case Left(error)               =>
-                logger.warn(s"[PreferenceUpdatedController] [onPageLoad] ${error.message}")
+                logger.warn(s"Error checking details for the preference updated page: ${error.message}")
                 Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
             }
           case None    =>
-            logger.warn("[PreferenceUpdatedController] [onPageLoad] Submission response format not valid")
+            logger.warn("Submission response format not valid")
             Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
         }
     }

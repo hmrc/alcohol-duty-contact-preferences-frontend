@@ -52,7 +52,7 @@ class Navigator @Inject() (
         }
     case _                     =>
       logger.warn(
-        "[Navigator] [normalRoutes] Navigation attempted from a page that doesn't exist in the route map in normal mode. Redirecting to journey recovery."
+        "Navigation attempted from a page that doesn't exist in the route map in normal mode. Redirecting to journey recovery."
       )
       _ => routes.JourneyRecoveryController.onPageLoad()
   }
@@ -71,7 +71,7 @@ class Navigator @Inject() (
       _ =>
         _ =>
           logger.warn(
-            "[Navigator] [checkRouteMap] Navigation attempted from a page that doesn't exist in the route map in check mode. Redirecting to Check Your Answers."
+            "Navigation attempted from a page that doesn't exist in the route map in check mode. Redirecting to Check Your Answers."
           )
           controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad()
   }
@@ -93,27 +93,27 @@ class Navigator @Inject() (
     (selectedEmail, paperlessReference, hasVerifiedEmail) match {
       case (Some(true), false, false) =>
         logger.info(
-          "[Navigator] [contactPreferenceRoute] User selected email and is currently on post with no verified email in ETMP. Redirecting to /what-email-address"
+          "User selected email and is currently on post with no verified email in ETMP. Redirecting to /what-email-address"
         )
         controllers.changePreferences.routes.EnterEmailAddressController.onPageLoad(NormalMode)
       case (Some(true), false, true)  =>
         logger.info(
-          "[Navigator] [contactPreferenceRoute] User selected email and is currently on post but has a verified email in ETMP. Redirecting to /existing-email"
+          "User selected email and is currently on post but has a verified email in ETMP. Redirecting to /existing-email"
         )
         controllers.changePreferences.routes.ExistingEmailController.onPageLoad()
       case (Some(true), true, _)      =>
         logger.info(
-          "[Navigator] [contactPreferenceRoute] User selected email and is currently on email. Redirecting to /enrolled-emails"
+          "User selected email and is currently on email. Redirecting to /enrolled-emails"
         )
         controllers.changePreferences.routes.EnrolledEmailsController.onPageLoad()
       case (Some(false), true, _)     =>
         logger.info(
-          "[Navigator] [contactPreferenceRoute] User selected post and is currently on email. Redirecting to /correspondence-address"
+          "User selected post and is currently on email. Redirecting to /correspondence-address"
         )
         controllers.changePreferences.routes.CorrespondenceAddressController.onPageLoad()
       case (Some(false), false, _)    =>
         logger.info(
-          "[Navigator] [contactPreferenceRoute] User selected post and is currently on post. Redirecting to /enrolled-letters"
+          "User selected post and is currently on post. Redirecting to /enrolled-letters"
         )
         controllers.changePreferences.routes.EnrolledLettersController.onPageLoad()
       case _                          =>
@@ -133,11 +133,11 @@ class Navigator @Inject() (
     (isVerified, isLocked) match {
       case (true, _)      =>
         logger.info(
-          "[Navigator] [enterEmailAddressNavigation] User has a verified email address. Redirecting to Check Your Answers"
+          "User has a verified email address. Redirecting to Check Your Answers"
         )
         Future.successful(Redirect(controllers.changePreferences.routes.CheckYourAnswersController.onPageLoad()))
       case (false, true)  =>
-        logger.info("[Navigator] [enterEmailAddressNavigation] User has been locked out for the entered email address.")
+        logger.info("User has been locked out for the entered email address.")
         Future.successful(Redirect(controllers.changePreferences.routes.EmailLockedController.onPageLoad()))
       case (false, false) =>
         handleEmailVerificationHandoff(request)
@@ -155,19 +155,19 @@ class Navigator @Inject() (
           .map {
             case Right(redirectUri: RedirectUri) =>
               logger.info(
-                s"[Navigator] [handleEmailVerificationHandoff] Redirecting to Email Verification Service, uri: ${redirectUri.redirectUri}"
+                s"Redirecting to Email Verification Service, uri: ${redirectUri.redirectUri}"
               )
               val redirectTo = s"${config.emailVerificationRedirectBaseUrl}${redirectUri.redirectUri}"
               Redirect(redirectTo)
             case Left(errorModel: ErrorModel)    =>
               logger.info(
-                s"[Navigator] [handleEmailVerificationHandoff] Could not start email verification journey. message ${errorModel.message}, status: ${errorModel.status}"
+                s"Could not start email verification journey. message ${errorModel.message}, status: ${errorModel.status}"
               )
               Redirect(routes.JourneyRecoveryController.onPageLoad())
           }
       case None                       =>
         logger.info(
-          "[Navigator] [handleEmailVerificationHandoff] Unexpected error. No email address found in user answers"
+          "Unexpected error. No email address found in user answers"
         )
         Future.successful(Redirect(routes.JourneyRecoveryController.onPageLoad()))
     }

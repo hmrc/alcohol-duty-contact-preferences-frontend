@@ -50,7 +50,7 @@ class SubmitPreferencesConnector @Inject() (
             case Success(successResponse) => Right(successResponse)
             case Failure(_)               =>
               logger.warn(
-                s"[SubmitPreferencesConnector] [submitContactPreferences] Invalid JSON format, failed to parse as PaperlessPreferenceSubmittedResponse"
+                s"Invalid JSON format, failed to parse as PaperlessPreferenceSubmittedResponse"
               )
               Left(
                 ErrorModel(
@@ -61,12 +61,12 @@ class SubmitPreferencesConnector @Inject() (
           }
         case Left(errorResponse)                      =>
           logger.warn(
-            s"[SubmitPreferencesConnector] [submitContactPreferences] Unexpected response when submitting contact preferences. Status: ${errorResponse.statusCode}"
+            s"Unexpected response when submitting contact preferences. Status: ${errorResponse.statusCode}"
           )
           Left(ErrorModel(errorResponse.statusCode, s"Unexpected response. Status: ${errorResponse.statusCode}"))
         case Right(response)                          =>
           logger.warn(
-            s"[SubmitPreferencesConnector] [submitContactPreferences] Unexpected status code when submitting contact preferences: ${response.status}"
+            s"Unexpected status code when submitting contact preferences: ${response.status}"
           )
           Left(
             ErrorModel(

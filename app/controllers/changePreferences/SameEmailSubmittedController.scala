@@ -48,7 +48,7 @@ class SameEmailSubmittedController @Inject() (
           .map(appConfig.returnsFrontendContactPreferenceCompleteUrl)
         Ok(view(appConfig.businessTaxAccountUrl, email, continueReturnUrl))
       case Left(error)  =>
-        logger.warn(s"[SameEmailSubmittedController] [onPageLoad] ${error.message}")
+        logger.warn(s"Error checking details for the same email submitted page: ${error.message}")
         Redirect(controllers.routes.JourneyRecoveryController.onPageLoad())
     }
   }
